@@ -169,7 +169,7 @@ GET /v1/aap/control/uil
 {
   "gateId": "borduria",
   "datasetId": "12345678-ab12-4ab6-8999-123456789abc",
-  "platformId": "acme",
+  "platformId": "croatia eFTI platform",
   "subsetId": "full"
 }
 ```
@@ -225,7 +225,7 @@ INSERT INTO request (
    {
      "control": {...},
      "gateIdDest": "borduria",
-     "platformId": "acme"
+     "platformId": "croatia eFTI platform"
    }
    ```
 
@@ -314,7 +314,7 @@ UIL = gateId + platformId + datasetId
 Example:
 ```
 Gate: borduria
-Platform: acme
+Platform: croatia eFTI platform
 Dataset: 12345678-ab12-4ab6-8999-123456789abc
 ```
 
@@ -681,7 +681,7 @@ If using eDelivery between gates:
 
 **Setup**:
 - Gate: Borduria (BO)
-- Platform: ACME
+- Platform: croatia eFTI platform
 - Dataset: Pre-loaded XML file
 
 **Steps**:
@@ -691,7 +691,7 @@ If using eDelivery between gates:
    {
      "gateId": "borduria",
      "datasetId": "12345678-ab12-4ab6-8999-123456789abc",
-     "platformId": "acme",
+     "platformId": "croatia eFTI platform",
      "subsetId": "full"
    }
    ```
@@ -708,7 +708,7 @@ If using eDelivery between gates:
 **Setup**:
 - Requesting Gate: Borduria (BO)
 - Target Gate: Syldavia (SY)
-- Platform: Massive Dynamic
+- Platform: slovenia eFTI platform
 - Dataset: Pre-loaded on Syldavia platform
 
 **Steps**:
@@ -718,7 +718,7 @@ If using eDelivery between gates:
    {
      "gateId": "syldavia",
      "datasetId": "87654321-ba21-6ba4-9888-987654321cba",
-     "platformId": "massivedynamic",
+     "platformId": "slovenia eFTI platform",
      "subsetId": "full"
    }
    ```

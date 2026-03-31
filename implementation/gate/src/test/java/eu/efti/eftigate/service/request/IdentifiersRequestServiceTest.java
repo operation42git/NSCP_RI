@@ -16,6 +16,7 @@ import eu.efti.eftigate.entity.IdentifiersResults;
 import eu.efti.eftigate.exception.RequestNotFoundException;
 import eu.efti.eftigate.repository.IdentifiersRequestRepository;
 import eu.efti.eftigate.service.BaseServiceTest;
+import eu.efti.eftigate.service.gate.EftiGateIdResolver;
 import eu.efti.identifiersregistry.service.IdentifiersService;
 import eu.efti.v1.codes.TransportEquipmentCategoryCode;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +68,8 @@ class IdentifiersRequestServiceTest extends BaseServiceTest {
     private IdentifiersRequestRepository identifiersRequestRepository;
     @Mock
     private IdentifiersControlUpdateDelegateService identifiersControlUpdateDelegateService;
+    @Mock
+    private EftiGateIdResolver eftiGateIdResolver;
     private IdentifiersRequestService identifiersRequestService;
     @Captor
     private ArgumentCaptor<IdentifiersRequestDto> requestDtoArgumentCaptor;
@@ -102,7 +105,7 @@ class IdentifiersRequestServiceTest extends BaseServiceTest {
                 .build();
 
         identifiersRequestService = new IdentifiersRequestService(identifiersRequestRepository, mapperUtils, rabbitSenderService, controlService, gateProperties,
-                identifiersService, requestUpdaterService, serializeUtils, logManager, identifiersControlUpdateDelegateService, validationService);
+                identifiersService, requestUpdaterService, serializeUtils, logManager, identifiersControlUpdateDelegateService, validationService, eftiGateIdResolver);
     }
 
     @Test

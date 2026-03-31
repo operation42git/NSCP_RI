@@ -7,13 +7,13 @@
 	},
 	"item": [
 		{
-			"name": "BO",
+			"name": "HR",
 			"item": [
 				{
 					"name": "Gate",
 					"item": [
 						{
-							"name": "Authentication BO",
+							"name": "Authentication HR",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -44,7 +44,7 @@
 									"urlencoded": [
 										{
 											"key": "username",
-											"value": "user_bo",
+											"value": "user_hr",
 											"type": "text"
 										},
 										{
@@ -64,19 +64,19 @@
 										},
 										{
 											"key": "client_secret",
-											"value": "{{kc_gate_bo_secret}}",
+											"value": "{{kc_gate_hr_secret}}",
 											"type": "text"
 										}
 									]
 								},
 								"url": {
-									"raw": "{{kc_bo_url}}/realms/eFTI_BO/protocol/openid-connect/token",
+									"raw": "{{kc_hr_url}}/realms/eFTI_HR/protocol/openid-connect/token",
 									"host": [
-										"{{kc_bo_url}}"
+										"{{kc_hr_url}}"
 									],
 									"path": [
 										"realms",
-										"eFTI_BO",
+										"eFTI_HR",
 										"protocol",
 										"openid-connect",
 										"token"
@@ -115,7 +115,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"borduria\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"acme\",\r\n    \"subsetId\": \"full\"\r\n}",
+									"raw": "{\r\n    \"gateId\": \"croatia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"croatia eFTI platform\",\r\n    \"subsetId\": \"full\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -123,9 +123,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{gate_bo_url}}/v1/control/uil",
+									"raw": "{{gate_hr_url}}/v1/control/uil",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -173,7 +173,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/control/uil?requestId={{requestId}}",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -237,7 +237,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"modeCode\": \"1\",\r\n  \"identifier\": \"54321\",\r\n  \"identifierType\": [\r\n    \"EQUIPMENT\"\r\n  ],\r\n  \"registrationCountryCode\": \"FR\",\r\n  \"dangerousGoodsIndicator\": false,\r\n  \"eftiGateIndicator\": [\"BO\", \"SY\"]\r\n}",
+									"raw": "{\r\n  \"modeCode\": \"1\",\r\n  \"identifier\": \"54321\",\r\n  \"identifierType\": [\r\n    \"EQUIPMENT\"\r\n  ],\r\n  \"registrationCountryCode\": \"FR\",\r\n  \"dangerousGoodsIndicator\": false,\r\n  \"eftiGateIndicator\": [\"HR\", \"SLO\"]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -247,7 +247,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/getIdentifiers",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -275,7 +275,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/getIdentifiers?requestId={{requestId}}",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -321,7 +321,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"syldavia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"massivedynamic\",\r\n    \"subsetId\": \"full\"\r\n}",
+									"raw": "{\r\n    \"gateId\": \"slovenia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"slovenia eFTI platform\",\r\n    \"subsetId\": \"full\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -329,9 +329,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{gate_bo_url}}/v1/control/uil",
+									"raw": "{{gate_hr_url}}/v1/control/uil",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -367,9 +367,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{gate_bo_url}}/v1/control/uil/follow-up",
+									"raw": "{{gate_hr_url}}/v1/control/uil/follow-up",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -419,7 +419,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"borduria\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"acme\",\r\n    \"subsetId\": \"full\",\r\n       \"authority\": {\r\n      \"country\":\"DE\",\r\n      \"isEmergencyService\":\"yes\",\r\n      \"legalContact\":{\r\n      \"buildingNumber\":\"111\",\r\n      \"city\":\"test\",\r\n      \"email\":\"test@test.test\",\r\n      \"postalCode\":\"54321\",\r\n      \"streetName\":\"street\"\r\n      },\r\n      \"name\":\"BALM\",\r\n      \"nationalUniqueIdentifier\":\"BALM\",\r\n      \"workingContact\":{ \"buildingNumber\":\"111\",\r\n      \"city\":\"test\",\r\n      \"email\":\"test@test.test\",\r\n      \"postalCode\":\"54321\",\r\n      \"streetName\":\"street\"}\r\n    }\r\n}",
+									"raw": "{\r\n    \"gateId\": \"croatia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"croatia eFTI platform\",\r\n    \"subsetId\": \"full\",\r\n       \"authority\": {\r\n      \"country\":\"DE\",\r\n      \"isEmergencyService\":\"yes\",\r\n      \"legalContact\":{\r\n      \"buildingNumber\":\"111\",\r\n      \"city\":\"test\",\r\n      \"email\":\"test@test.test\",\r\n      \"postalCode\":\"54321\",\r\n      \"streetName\":\"street\"\r\n      },\r\n      \"name\":\"BALM\",\r\n      \"nationalUniqueIdentifier\":\"BALM\",\r\n      \"workingContact\":{ \"buildingNumber\":\"111\",\r\n      \"city\":\"test\",\r\n      \"email\":\"test@test.test\",\r\n      \"postalCode\":\"54321\",\r\n      \"streetName\":\"street\"}\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -429,7 +429,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/aap/control/uil",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -478,7 +478,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/aap/control/uil?requestId={{requestId}}",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -546,7 +546,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/aap/control/identifiers",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -569,7 +569,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/aap/control/identifiers?requestId={{requestId}}",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -627,7 +627,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"syldavia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"massivedynamic\",\r\n    \"subsetId\": \"full\",\r\n       \"authority\": {\r\n      \"country\":\"DE\",\r\n      \"isEmergencyService\":\"yes\",\r\n      \"legalContact\":{\r\n      \"buildingNumber\":\"111\",\r\n      \"city\":\"test\",\r\n      \"email\":\"test@test.test\",\r\n      \"postalCode\":\"54321\",\r\n      \"streetName\":\"street\"\r\n      },\r\n      \"name\":\"BALM\",\r\n      \"nationalUniqueIdentifier\":\"BALM\",\r\n      \"workingContact\":{ \"buildingNumber\":\"111\",\r\n      \"city\":\"test\",\r\n      \"email\":\"test@test.test\",\r\n      \"postalCode\":\"54321\",\r\n      \"streetName\":\"street\"}\r\n    }\r\n\r\n}",
+									"raw": "{\r\n    \"gateId\": \"slovenia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"slovenia eFTI platform\",\r\n    \"subsetId\": \"full\",\r\n       \"authority\": {\r\n      \"country\":\"DE\",\r\n      \"isEmergencyService\":\"yes\",\r\n      \"legalContact\":{\r\n      \"buildingNumber\":\"111\",\r\n      \"city\":\"test\",\r\n      \"email\":\"test@test.test\",\r\n      \"postalCode\":\"54321\",\r\n      \"streetName\":\"street\"\r\n      },\r\n      \"name\":\"BALM\",\r\n      \"nationalUniqueIdentifier\":\"BALM\",\r\n      \"workingContact\":{ \"buildingNumber\":\"111\",\r\n      \"city\":\"test\",\r\n      \"email\":\"test@test.test\",\r\n      \"postalCode\":\"54321\",\r\n      \"streetName\":\"street\"}\r\n    }\r\n\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -637,7 +637,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/aap/control/uil",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -676,7 +676,7 @@
 								"url": {
 									"raw": "{{gate_bo_url}}/v1/aap/control/uil/follow-up",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -748,19 +748,19 @@
 										},
 										{
 											"key": "client_secret",
-											"value": "{{kc_simulator_bo_secret}}",
+											"value": "{{kc_simulator_hr_secret}}",
 											"type": "text"
 										}
 									]
 								},
 								"url": {
-									"raw": "{{kc_bo_url}}/realms/eFTI_BO/protocol/openid-connect/token",
+									"raw": "{{kc_hr_url}}/realms/eFTI_HR/protocol/openid-connect/token",
 									"host": [
-										"{{kc_bo_url}}"
+										"{{kc_hr_url}}"
 									],
 									"path": [
 										"realms",
-										"eFTI_BO",
+										"eFTI_HR",
 										"protocol",
 										"openid-connect",
 										"token"
@@ -814,9 +814,9 @@
 									]
 								},
 								"url": {
-									"raw": "{{simulator_bo_url}}/identifiers/upload/file",
+									"raw": "{{simulator_hr_url}}/identifiers/upload/file",
 									"host": [
-										"{{simulator_bo_url}}"
+										"{{simulator_hr_url}}"
 									],
 									"path": [
 										"identifiers",
@@ -864,9 +864,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{simulator_bo_url}}/identifiers/upload",
+									"raw": "{{simulator_hr_url}}/identifiers/upload",
 									"host": [
-										"{{simulator_bo_url}}"
+										"{{simulator_hr_url}}"
 									],
 									"path": [
 										"identifiers",
@@ -881,13 +881,13 @@
 			]
 		},
 		{
-			"name": "LI",
+			"name": "AT",
 			"item": [
 				{
 					"name": "Gate",
 					"item": [
 						{
-							"name": "Authentication LI",
+							"name": "Authentication AT",
 							"event": [
 								{
 									"listen": "test",
@@ -909,7 +909,7 @@
 									"urlencoded": [
 										{
 											"key": "username",
-											"value": "user_li",
+											"value": "user_at",
 											"type": "text"
 										},
 										{
@@ -929,19 +929,19 @@
 										},
 										{
 											"key": "client_secret",
-											"value": "{{kc_gate_li_secret}}",
+											"value": "{{kc_gate_at_secret}}",
 											"type": "text"
 										}
 									]
 								},
 								"url": {
-									"raw": "{{kc_li_url}}/realms/eFTI_LI/protocol/openid-connect/token",
+									"raw": "{{kc_at_url}}/realms/eFTI_AT/protocol/openid-connect/token",
 									"host": [
-										"{{kc_li_url}}"
+										"{{kc_at_url}}"
 									],
 									"path": [
 										"realms",
-										"eFTI_LI",
+										"eFTI_AT",
 										"protocol",
 										"openid-connect",
 										"token"
@@ -980,7 +980,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"listenbourg\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"umbrellainc\",\r\n    \"subsetId\": \"full\"\r\n\r\n}",
+									"raw": "{\r\n    \"gateId\": \"austria\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"austria eFTI platform\",\r\n    \"subsetId\": \"full\"\r\n\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -988,9 +988,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{gate_li_url}}/v1/control/uil",
+									"raw": "{{gate_at_url}}/v1/control/uil",
 									"host": [
-										"{{gate_li_url}}"
+										"{{gate_at_url}}"
 									],
 									"path": [
 										"v1",
@@ -1038,7 +1038,7 @@
 								"url": {
 									"raw": "{{gate_li_url}}/v1/control/uil?requestId={{requestId}}",
 									"host": [
-										"{{gate_li_url}}"
+										"{{gate_at_url}}"
 									],
 									"path": [
 										"v1",
@@ -1102,7 +1102,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"modeCode\": \"1\",\r\n  \"identifier\": \"54321\",\r\n  \"identifierType\": [\r\n    \"EQUIPMENT\"\r\n  ],\r\n  \"registrationCountryCode\": \"FR\",\r\n  \"dangerousGoodsIndicator\": false,\r\n  \"eftiGateIndicator\": [\"BO\", \"SY\", \"LI\"]\r\n}",
+									"raw": "{\r\n  \"modeCode\": \"1\",\r\n  \"identifier\": \"54321\",\r\n  \"identifierType\": [\r\n    \"EQUIPMENT\"\r\n  ],\r\n  \"registrationCountryCode\": \"FR\",\r\n  \"dangerousGoodsIndicator\": false,\r\n  \"eftiGateIndicator\": [\"HR\", \"SLO\", \"AT\"]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1112,7 +1112,7 @@
 								"url": {
 									"raw": "{{gate_li_url}}/v1/control/identifiers",
 									"host": [
-										"{{gate_li_url}}"
+										"{{gate_at_url}}"
 									],
 									"path": [
 										"v1",
@@ -1141,7 +1141,7 @@
 								"url": {
 									"raw": "{{gate_li_url}}/v1/getIdentifiers?requestId={{requestId}}",
 									"host": [
-										"{{gate_li_url}}"
+										"{{gate_at_url}}"
 									],
 									"path": [
 										"v1",
@@ -1218,19 +1218,19 @@
 										},
 										{
 											"key": "client_secret",
-											"value": "{{kc_simulator_li_secret}}",
+											"value": "{{kc_simulator_at_secret}}",
 											"type": "text"
 										}
 									]
 								},
 								"url": {
-									"raw": "{{kc_li_url}}/realms/eFTI_LI/protocol/openid-connect/token",
+									"raw": "{{kc_at_url}}/realms/eFTI_AT/protocol/openid-connect/token",
 									"host": [
-										"{{kc_li_url}}"
+										"{{kc_at_url}}"
 									],
 									"path": [
 										"realms",
-										"eFTI_LI",
+										"eFTI_AT",
 										"protocol",
 										"openid-connect",
 										"token"
@@ -1277,9 +1277,9 @@
 									]
 								},
 								"url": {
-									"raw": "{{simulator_li_url}}/identifiers/upload/file",
+									"raw": "{{simulator_at_url}}/identifiers/upload/file",
 									"host": [
-										"{{simulator_li_url}}"
+										"{{simulator_at_url}}"
 									],
 									"path": [
 										"identifiers",
@@ -1327,9 +1327,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{simulator_li_url}}/identifiers/upload",
+									"raw": "{{simulator_at_url}}/identifiers/upload",
 									"host": [
-										"{{simulator_li_url}}"
+										"{{simulator_at_url}}"
 									],
 									"path": [
 										"identifiers",
@@ -1344,13 +1344,13 @@
 			]
 		},
 		{
-			"name": "SY",
+			"name": "SLO",
 			"item": [
 				{
 					"name": "Gate",
 					"item": [
 						{
-							"name": "Authentication SY",
+							"name": "Authentication SLO",
 							"event": [
 								{
 									"listen": "test",
@@ -1372,7 +1372,7 @@
 									"urlencoded": [
 										{
 											"key": "username",
-											"value": "user_sy",
+											"value": "user_slo",
 											"type": "text"
 										},
 										{
@@ -1392,19 +1392,19 @@
 										},
 										{
 											"key": "client_secret",
-											"value": "{{kc_gate_sy_secret}}",
+											"value": "{{kc_gate_slo_secret}}",
 											"type": "text"
 										}
 									]
 								},
 								"url": {
-									"raw": "{{kc_sy_url}}/realms/eFTI_SY/protocol/openid-connect/token",
+									"raw": "{{kc_slo_url}}/realms/eFTI_SLO/protocol/openid-connect/token",
 									"host": [
-										"{{kc_sy_url}}"
+										"{{kc_slo_url}}"
 									],
 									"path": [
 										"realms",
-										"eFTI_SY",
+										"eFTI_SLO",
 										"protocol",
 										"openid-connect",
 										"token"
@@ -1443,7 +1443,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"syldavia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"massivedynamic\",\r\n    \"subsetId\": \"full\"\r\n}",
+									"raw": "{\r\n    \"gateId\": \"slovenia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"slovenia eFTI platform\",\r\n    \"subsetId\": \"full\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1451,9 +1451,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{gate_sy_url}}/v1/control/uil",
+									"raw": "{{gate_slo_url}}/v1/control/uil",
 									"host": [
-										"{{gate_sy_url}}"
+										"{{gate_slo_url}}"
 									],
 									"path": [
 										"v1",
@@ -1501,7 +1501,7 @@
 								"url": {
 									"raw": "{{gate_sy_url}}/v1/control/uil?requestId={{requestId}}",
 									"host": [
-										"{{gate_sy_url}}"
+										"{{gate_slo_url}}"
 									],
 									"path": [
 										"v1",
@@ -1565,7 +1565,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"modeCode\": \"1\",\r\n  \"identifier\": \"54321\",\r\n  \"identifierType\": [\r\n    \"EQUIPMENT\"\r\n  ],\r\n  \"registrationCountryCode\": \"FR\",\r\n  \"dangerousGoodsIndicator\": false,\r\n  \"eftiGateIndicator\": [\"BO\", \"SY\"]\r\n}",
+									"raw": "{\r\n  \"modeCode\": \"1\",\r\n  \"identifier\": \"54321\",\r\n  \"identifierType\": [\r\n    \"EQUIPMENT\"\r\n  ],\r\n  \"registrationCountryCode\": \"FR\",\r\n  \"dangerousGoodsIndicator\": false,\r\n  \"eftiGateIndicator\": [\"HR\", \"SLO\"]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1575,7 +1575,7 @@
 								"url": {
 									"raw": "{{gate_sy_url}}/v1/control/identifiers",
 									"host": [
-										"{{gate_sy_url}}"
+										"{{gate_slo_url}}"
 									],
 									"path": [
 										"v1",
@@ -1604,7 +1604,7 @@
 								"url": {
 									"raw": "{{gate_sy_url}}/v1/control/identifiers?requestId={{requestId}}",
 									"host": [
-										"{{gate_sy_url}}"
+										"{{gate_slo_url}}"
 									],
 									"path": [
 										"v1",
@@ -1651,7 +1651,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"france\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"ttf\",\r\n    \"subsetId\": \"full\"\r\n}",
+									"raw": "{\r\n    \"gateId\": \"croatia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"ttf\",\r\n    \"subsetId\": \"full\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1659,9 +1659,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{gate_sy_url}}/v1/control/uil",
+									"raw": "{{gate_slo_url}}/v1/control/uil",
 									"host": [
-										"{{gate_sy_url}}"
+										"{{gate_slo_url}}"
 									],
 									"path": [
 										"v1",
@@ -1697,9 +1697,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{gate_bo_url}}/v1/control/uil/follow-up",
+									"raw": "{{gate_hr_url}}/v1/control/uil/follow-up",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",
@@ -1772,19 +1772,19 @@
 										},
 										{
 											"key": "client_secret",
-											"value": "{{kc_simulator_sy_secret}}",
+											"value": "{{kc_simulator_slo_secret}}",
 											"type": "text"
 										}
 									]
 								},
 								"url": {
-									"raw": "{{kc_sy_url}}/realms/eFTI_SY/protocol/openid-connect/token",
+									"raw": "{{kc_slo_url}}/realms/eFTI_SLO/protocol/openid-connect/token",
 									"host": [
-										"{{kc_sy_url}}"
+										"{{kc_slo_url}}"
 									],
 									"path": [
 										"realms",
-										"eFTI_SY",
+										"eFTI_SLO",
 										"protocol",
 										"openid-connect",
 										"token"
@@ -1831,9 +1831,9 @@
 									]
 								},
 								"url": {
-									"raw": "{{simulator_sy_url}}/identifiers/upload/file",
+									"raw": "{{simulator_slo_url}}/identifiers/upload/file",
 									"host": [
-										"{{simulator_sy_url}}"
+										"{{simulator_slo_url}}"
 									],
 									"path": [
 										"identifiers",
@@ -1881,9 +1881,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{simulator_sy_url}}/identifiers/upload",
+									"raw": "{{simulator_slo_url}}/identifiers/upload",
 									"host": [
-										"{{simulator_sy_url}}"
+										"{{simulator_slo_url}}"
 									],
 									"path": [
 										"identifiers",
@@ -1997,7 +1997,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"france\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"ttf\",\r\n    \"subsetId\": \"full\"\r\n}",
+									"raw": "{\r\n    \"gateId\": \"croatia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"ttf\",\r\n    \"subsetId\": \"full\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2205,7 +2205,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"gateId\": \"borduria\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"acme\",\r\n    \"subsetId\": \"full\"\r\n}",
+									"raw": "{\r\n    \"gateId\": \"croatia\",\r\n    \"datasetId\": \"12345678-ab12-4ab6-8999-123456789abc\",\r\n    \"platformId\": \"croatia eFTI platform\",\r\n    \"subsetId\": \"full\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2250,9 +2250,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{gate_bo_url}}/v1/control/uil/follow-up",
+									"raw": "{{gate_hr_url}}/v1/control/uil/follow-up",
 									"host": [
-										"{{gate_bo_url}}"
+										"{{gate_hr_url}}"
 									],
 									"path": [
 										"v1",

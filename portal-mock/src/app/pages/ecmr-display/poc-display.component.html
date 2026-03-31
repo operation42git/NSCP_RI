@@ -1,0 +1,224 @@
+<div class="poc-container">
+  <!-- Header -->
+  <header class="poc-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Pregled podataka o pošiljci</h1>
+        <div class="header-badges">
+          <span class="badge">POC</span>
+          <button class="btn btn-sm btn-link" (click)="onSwitchToPilot()" style="color: white; padding: 4px 8px; text-decoration: none;">
+            Povratak na Pilot
+          </button>
+        </div>
+      </div>
+      <div class="basic-info-grid">
+        <div class="info-item">
+          <div class="info-label">eCMR identifikator</div>
+          <div class="info-value">{{ ecmrData.ecmrId || '—' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Datum izdavanja</div>
+          <div class="info-value">{{ ecmrData.issueDate || '—' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Mjesto izdavanja</div>
+          <div class="info-value">{{ ecmrData.issueLocation || '—' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Datum prihvaćanja</div>
+          <div class="info-value">{{ ecmrData.carrierAcceptanceDateTime || '—' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Pošiljatelj</div>
+          <div class="info-value">{{ ecmrData.consignor?.name || '—' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Primatelj</div>
+          <div class="info-value">{{ ecmrData.consignee?.name || '—' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Prijevoznik</div>
+          <div class="info-value">{{ ecmrData.carrier?.name || '—' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Broj vozila</div>
+          <div class="info-value">{{ ecmrData.vehicleNumber || '—' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Ukupna masa</div>
+          <div class="info-value">{{ ecmrData.totalGrossWeight ? ecmrData.totalGrossWeight + (ecmrData.totalGrossWeightUnit ? ' ' + ecmrData.totalGrossWeightUnit : '') : '—' }}</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Sidebar - Fixed -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Kartice</div>
+      <div class="sidebar-content">
+        <div *ngIf="dataGroups.length === 0" class="empty-sidebar">
+          <p>Nema dostupnih kartica</p>
+        </div>
+        <div *ngFor="let group of dataGroups">
+          <div 
+            *ngFor="let card of group.cards"
+            class="group-item"
+            [class.active]="activeCardId === card.id"
+            (click)="scrollToCard(card.id)">
+            {{ card.name }}
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div *ngIf="loading" class="loading-state">
+        <p>Učitavanje podataka...</p>
+      </div>
+      <div *ngIf="!loading && dataGroups.length === 0" class="empty-state">
+        <p>Nema dostupnih podataka</p>
+      </div>
+      <div *ngIf="!loading && dataGroups.length > 0" class="cards-container">
+        <div *ngFor="let group of dataGroups">
+          <div 
+            *ngFor="let card of group.cards"
+            class="card"
+            [id]="'card-' + card.id">
+            <div class="card-header">
+              <div>
+                <h2>{{ card.name }}</h2>
+                <p>{{ card.definition }}</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Cards with subsections (Ruta i događaji, Stranke i kontakti) -->
+              <ng-container *ngIf="card.subsections && card.subsections.length > 0">
+                <div *ngFor="let subsection of card.subsections" class="subsection">
+                  <button 
+                    class="subsection-header"
+                    [class.expanded]="expandedSubsection.has(subsection.id)"
+                    (click)="toggleSubsection(subsection.id)"
+                    type="button">
+                    <span class="subsection-icon">{{ expandedSubsection.has(subsection.id) ? '▼' : '▶' }}</span>
+                    <span class="subsection-title">{{ subsection.name }}</span>
+                  </button>
+                  <div *ngIf="expandedSubsection.has(subsection.id)" class="subsection-content">
+                    <!-- Critical Fields -->
+                    <div class="fields-section">
+                      <div class="fields">
+                        <div *ngFor="let field of subsection.criticalFields" class="field">
+                          <div class="field-name">{{ field.name }}</div>
+                          <div class="field-value" [class.empty]="!field.value">
+                            {{ field.value || '—' }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Advanced Fields -->
+                    <div *ngIf="subsection.advancedFields.length > 0" class="expandable-section">
+                      <button 
+                        class="expand-button advanced-button"
+                        [class.expanded]="expandedAdvanced.has(subsection.id + '-advanced')"
+                        (click)="expandedAdvanced.has(subsection.id + '-advanced') ? expandedAdvanced.delete(subsection.id + '-advanced') : expandedAdvanced.add(subsection.id + '-advanced')"
+                        type="button">
+                        <span class="button-icon">{{ expandedAdvanced.has(subsection.id + '-advanced') ? '▼' : '▶' }}</span>
+                        <span class="button-text">Napredni podaci</span>
+                      </button>
+                      <div *ngIf="expandedAdvanced.has(subsection.id + '-advanced')" class="fields expanded-content">
+                        <div *ngFor="let field of subsection.advancedFields" class="field">
+                          <div class="field-name">{{ field.name }}</div>
+                          <div class="field-value" [class.empty]="!field.value">
+                            {{ field.value || '—' }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Audit Fields -->
+                    <div *ngIf="subsection.auditFields.length > 0" class="expandable-section">
+                      <button 
+                        class="expand-button audit-button"
+                        [class.expanded]="expandedAudit.has(subsection.id + '-audit')"
+                        (click)="expandedAudit.has(subsection.id + '-audit') ? expandedAudit.delete(subsection.id + '-audit') : expandedAudit.add(subsection.id + '-audit')"
+                        type="button">
+                        <span class="button-icon">{{ expandedAudit.has(subsection.id + '-audit') ? '▼' : '▶' }}</span>
+                        <span class="button-text">Audit podaci</span>
+                      </button>
+                      <div *ngIf="expandedAudit.has(subsection.id + '-audit')" class="fields expanded-content">
+                        <div *ngFor="let field of subsection.auditFields" class="field">
+                          <div class="field-name">{{ field.name }}</div>
+                          <div class="field-value" [class.empty]="!field.value">
+                            {{ field.value || '—' }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- Cards without subsections -->
+              <ng-container *ngIf="!card.subsections || card.subsections.length === 0">
+                <!-- Critical Fields - Always shown -->
+                <div class="fields-section">
+                  <div class="fields">
+                    <div *ngFor="let field of card.criticalFields" class="field">
+                      <div class="field-name">{{ field.name }}</div>
+                      <div class="field-value" [class.empty]="!field.value">
+                        {{ field.value || '—' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Advanced Fields - Expandable -->
+                <div *ngIf="card.advancedFields.length > 0" class="expandable-section">
+                  <button 
+                    class="expand-button advanced-button"
+                    [class.expanded]="expandedAdvanced.has(card.id)"
+                    (click)="toggleAdvanced(card.id)"
+                    type="button">
+                    <span class="button-icon">{{ expandedAdvanced.has(card.id) ? '▼' : '▶' }}</span>
+                    <span class="button-text">Napredni podaci</span>
+                  </button>
+                  <div *ngIf="expandedAdvanced.has(card.id)" class="fields expanded-content">
+                    <div *ngFor="let field of card.advancedFields" class="field">
+                      <div class="field-name">{{ field.name }}</div>
+                      <div class="field-value" [class.empty]="!field.value">
+                        {{ field.value || '—' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Audit Fields - Expandable -->
+                <div *ngIf="card.auditFields.length > 0" class="expandable-section">
+                  <button 
+                    class="expand-button audit-button"
+                    [class.expanded]="expandedAudit.has(card.id)"
+                    (click)="toggleAudit(card.id)"
+                    type="button">
+                    <span class="button-icon">{{ expandedAudit.has(card.id) ? '▼' : '▶' }}</span>
+                    <span class="button-text">Audit podaci</span>
+                  </button>
+                  <div *ngIf="expandedAudit.has(card.id)" class="fields expanded-content">
+                    <div *ngFor="let field of card.auditFields" class="field">
+                      <div class="field-name">{{ field.name }}</div>
+                      <div class="field-value" [class.empty]="!field.value">
+                        {{ field.value || '—' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

@@ -25,9 +25,10 @@ gate:
   owner: syldavia
   country: SY
   ap:
-    url: http://efti.gate.syldavia.eu:81/domibus/services/wsplugin
+    # Domibus is multi-domain: explicitly target the syldavia domain to ensure PartyId matching uses the correct PMode
+    url: http://efti.gate.syldavia.eu:81/domibus/services/wsPlugin?domain=syldavia
     username: syldavia_service_account
     password: Azerty59*1234567
   platforms:
-    - platformId: "massivedynamic"
+    - platformId: "slovenia eFTI platform"
       useRestApi: false

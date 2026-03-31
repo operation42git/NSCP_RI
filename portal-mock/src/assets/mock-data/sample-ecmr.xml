@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<consignment xmlns="http://efti.eu/v1/consignment/common"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://efti.eu/v1/consignment/common consignment-common.xsd">
+    <applicableServiceCharge>
+        <appliedAmount currencyId="EUR">1250.00</appliedAmount>
+        <calculationBasisCode>WEIGHT</calculationBasisCode>
+        <payingPartyRoleCode>CONSIGNOR</payingPartyRoleCode>
+        <paymentArrangementCode>PREPAID</paymentArrangementCode>
+    </applicableServiceCharge>
+    <associatedDocument>
+        <formattedIssueDateTime formatId="205">20260315</formattedIssueDateTime>
+        <id schemeAgencyId="HR-REG">eCMR-2026-00142</id>
+        <issueLocation>
+            <name>Zagreb Distribution Center</name>
+            <postalAddress>
+                <buildingNumber>22</buildingNumber>
+                <streetName>Radnicka cesta</streetName>
+                <postcode>10000</postcode>
+                <cityName>Zagreb</cityName>
+                <countryCode>HR</countryCode>
+            </postalAddress>
+        </issueLocation>
+        <issuer>
+            <authoritativeSignatoryPerson>
+                <name>Ivan Horvat</name>
+            </authoritativeSignatoryPerson>
+        </issuer>
+        <typeCode>eCMR</typeCode>
+    </associatedDocument>
+    <carrierAcceptanceDateTime>2026-03-15T08:00:00+01:00</carrierAcceptanceDateTime>
+    <carrierAcceptanceLocation>
+        <name>Zagreb Cargo Terminal</name>
+        <postalAddress>
+            <buildingNumber>1</buildingNumber>
+            <streetName>Jankomir</streetName>
+            <postcode>10090</postcode>
+            <cityName>Zagreb</cityName>
+            <countryCode>HR</countryCode>
+        </postalAddress>
+    </carrierAcceptanceLocation>
+    <carrier>
+        <name>Trans-Europa Logistics d.o.o.</name>
+        <postalAddress>
+            <buildingNumber>45</buildingNumber>
+            <streetName>Slavonska avenija</streetName>
+            <postcode>10000</postcode>
+            <cityName>Zagreb</cityName>
+            <countryCode>HR</countryCode>
+        </postalAddress>
+        <authoritativeSignatoryPerson>
+            <name>Marko Petrovic</name>
+        </authoritativeSignatoryPerson>
+    </carrier>
+    <connectingCarrier>
+        <name>Alpine Freight GmbH</name>
+        <postalAddress>
+            <buildingNumber>12</buildingNumber>
+            <streetName>Industriestrasse</streetName>
+            <postcode>1100</postcode>
+            <cityName>Wien</cityName>
+            <countryCode>AT</countryCode>
+        </postalAddress>
+    </connectingCarrier>
+    <consignee>
+        <name>Bavarian Auto Parts GmbH</name>
+        <postalAddress>
+            <buildingNumber>88</buildingNumber>
+            <streetName>Ingolstadter Strasse</streetName>
+            <postcode>80939</postcode>
+            <cityName>Munich</cityName>
+            <countryCode>DE</countryCode>
+        </postalAddress>
+        <authoritativeSignatoryPerson>
+            <name>Klaus Weber</name>
+        </authoritativeSignatoryPerson>
+    </consignee>
+    <consigneeReceiptLocation>
+        <name>Munich Warehouse B7</name>
+        <postalAddress>
+            <buildingNumber>88</buildingNumber>
+            <streetName>Ingolstadter Strasse</streetName>
+            <postcode>80939</postcode>
+            <cityName>Munich</cityName>
+            <countryCode>DE</countryCode>
+        </postalAddress>
+    </consigneeReceiptLocation>
+    <consignor>
+        <name>Adriatic Manufacturing d.o.o.</name>
+        <postalAddress>
+            <buildingNumber>7</buildingNumber>
+            <streetName>Industrijska zona</streetName>
+            <postcode>51000</postcode>
+            <cityName>Rijeka</cityName>
+            <countryCode>HR</countryCode>
+        </postalAddress>
+        <authoritativeSignatoryPerson>
+            <name>Ana Kovacevic</name>
+        </authoritativeSignatoryPerson>
+    </consignor>
+    <consignorProvidedBorderClearanceInstructions>
+        <description>EU internal transport - no customs clearance required</description>
+    </consignorProvidedBorderClearanceInstructions>
+    <contractTermsText>Standard CMR terms apply. Delivery within 48h of acceptance.</contractTermsText>
+    <grossWeight unitId="KGM">4500</grossWeight>
+    <grossVolume unitId="MTQ">18.5</grossVolume>
+    <includedConsignmentItem>
+        <goodsUnitQuantity>12</goodsUnitQuantity>
+        <grossWeight unitId="KGM">2800</grossWeight>
+        <grossVolume unitId="MTQ">11.2</grossVolume>
+        <shippingMarks>
+            <markingText>ADR-HR-2026-A1</markingText>
+        </shippingMarks>
+        <dimensions>
+            <description>Industrial pallets 120x80cm</description>
+        </dimensions>
+        <transportDangerousGoods>
+            <properShippingName>PAINT RELATED MATERIAL</properShippingName>
+            <uNDGID>1263</uNDGID>
+            <hazardClassificationID>3</hazardClassificationID>
+            <hazardCategoryCode>II</hazardCategoryCode>
+            <packagingDangerLevelCode>II</packagingDangerLevelCode>
+            <tunnelRestrictionCode>D/E</tunnelRestrictionCode>
+            <information>Flammable liquid, industrial paint components</information>
+            <netWeight unitId="KGM">2400</netWeight>
+            <dangerousGoodsLogisticsPackage>
+                <itemQuantity>12</itemQuantity>
+                <shippingMarks>
+                    <markingText>ADR-HR-2026-A1</markingText>
+                </shippingMarks>
+            </dangerousGoodsLogisticsPackage>
+        </transportDangerousGoods>
+    </includedConsignmentItem>
+    <includedConsignmentItem>
+        <goodsUnitQuantity>8</goodsUnitQuantity>
+        <grossWeight unitId="KGM">1700</grossWeight>
+        <grossVolume unitId="MTQ">7.3</grossVolume>
+        <shippingMarks>
+            <markingText>GEN-HR-2026-B2</markingText>
+        </shippingMarks>
+        <dimensions>
+            <description>Cardboard boxes on euro pallets</description>
+        </dimensions>
+    </includedConsignmentItem>
+    <mainCarriageTransportMovement>
+        <modeCode>3</modeCode>
+        <usedTransportMeans>
+            <id>ZG-1234-AB</id>
+        </usedTransportMeans>
+    </mainCarriageTransportMovement>
+    <usedTransportEquipment>
+        <categoryCode>TRAILER</categoryCode>
+        <id>ZG-T-5678</id>
+    </usedTransportEquipment>
+</consignment>

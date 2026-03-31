@@ -1,0 +1,48 @@
+spring:
+  rabbitmq:
+    password: at
+    username: at
+    virtual-host: at
+  datasource:
+    control:
+      liquibase:
+        default-schema: eftiat
+    identifiers:
+      liquibase:
+        default-schema: eftiat
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://auth.gate.austria.eu:8080/realms/eFTI_AT
+  jpa:
+    properties:
+      hibernate:
+        control_schema: "eftiat"
+        identifiers_schema: "eftiat"
+
+gate:
+  owner: listenbourg
+  country: AT
+  ap:
+    # Domibus is multi-domain: explicitly target the listenbourg domain to ensure PartyId matching uses the correct PMode
+    url: http://efti.gate.listenbourg.eu:81/domibus/services/wsPlugin?domain=listenbourg
+    username: listenbourg_service_account
+    password: Azerty59*1234567
+  platforms:
+    - platformId: "austria eFTI platform"
+      useRestApi: false
+  # Remote gates that can be accessed via direct REST API (bypassing Domibus)
+  remoteGates:
+    # Croatia gate (owner: "croatia", runs on efti-gate-HR:8880)
+    - gateId: "croatia"
+      useRestApi: true
+      restApiBaseUrl: "http://efti-gate-HR:8880"
+    # Slovenia gate (owner: "slovenia", runs on efti-gate-SLO:8882)
+    - gateId: "slovenia"
+      useRestApi: true
+      restApiBaseUrl: "http://efti-gate-SLO:8882"
+
+
+
+

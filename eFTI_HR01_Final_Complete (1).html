@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFTI HR01 - Kompletan Pregled sa Svim Podacima</title>
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --paper: #ffffff;
+            --bg: #f9fafb;
+            --accent: #2563eb;
+            --accent-light: rgba(37, 99, 235, 0.1);
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --border-radius: 8px;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* HEADER - OSNOVNI PODACI */
+        .header-basic {
+            background: white;
+            border-bottom: 1px solid var(--line);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-basic h1 {
+            margin: 0 0 12px 0;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .basic-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        /* MAIN CONTENT */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--paper);
+            border-right: 1px solid var(--line);
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .sidebar-title {
+            padding: 0 16px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 12px;
+        }
+
+        .group-section {
+            margin-bottom: 16px;
+        }
+
+        .group-section h3 {
+            margin: 0 0 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            padding-top: 8px;
+        }
+
+        .group-section:first-child h3 {
+            padding-top: 0;
+        }
+
+        .group-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--muted);
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 12px;
+        }
+
+        .group-item:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .group-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: var(--bg);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .card-header p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            opacity: 0.85;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        .card-body h3 {
+            margin: 0 0 12px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 12px;
+        }
+
+        .field {
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+        }
+
+        .field-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+
+        .field-id {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .field-desc {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.4;
+            padding: 8px;
+            background: white;
+            border-radius: 3px;
+            border-left: 2px solid var(--warning);
+        }
+
+        .stats {
+            display: flex;
+            gap: 16px;
+            padding: 12px 0;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 150px;
+                border-right: none;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .fields {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-basic {
+                padding: 12px 16px;
+            }
+
+            .header-basic h1 {
+                font-size: 18px;
+            }
+
+            .basic-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 12px;
+            }
+
+            .card-header {
+                padding: 12px;
+            }
+
+            .card-body {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER SA OSNOVNIM PODACIMA -->
+    <header class="header-basic">
+        <h1>📦 eFTI HR01 - Cestovni Prijevoz Hrvatska</h1>
+        <div class="basic-info-grid">
+            <div class="info-item">
+                <div class="info-label">Scenarij</div>
+                <div class="info-value">HR01</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Vrste Transporta</div>
+                <div class="info-value">Cestovni (Common)</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Grupa Datos</div>
+                <div class="info-value" id="statsGroups">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Kartice</div>
+                <div class="info-value" id="statsCards">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Ukupno Polja</div>
+                <div class="info-value" id="statsFields">-</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="main-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-title">Grupe Podataka</div>
+            <div id="cards-map"></div>
+        </aside>
+
+        <!-- CONTENT SA SVIM KARTICAMA -->
+        <main class="content" id="content"></main>
+    </div>
+</div>
+
+<script>
+// ========== DATA ==========
+const cardsData = [{"id": "ASBIE1049", "name": "Geografske koordinate", "originalName": "Geographical coordinates", "definition": "The geographical coordinates of the carrier acceptance location.", "group": "Lokacije", "keyFieldIds": ["eFTI49", "eFTI46"], "fields": [{"id": "eFTI49", "name": "ID", "definition": "The identification number for the consignor."}, {"id": "eFTI46", "name": "Measurement unit code", "definition": "A code specifying a unit of measure."}]}, {"id": "ASBIE1052", "name": "Geografske koordinate", "originalName": "Geographical coordinates", "definition": "The geographical coordinates of the consignee receipt location.", "group": "Lokacije", "keyFieldIds": ["eFTI136"], "fields": [{"id": "eFTI136", "name": "ID", "definition": "The identifier of the carrier acceptance location, such as a United Nations Location Code (UN/LOCODE)."}]}, {"id": "ASBIE1100", "name": "Lokacija utovara", "originalName": "Loading location", "definition": "The location where the loading event occurs for the main leg of the transport movement.", "group": "Lokacije", "keyFieldIds": ["eFTI448", "eFTI702", "eFTI52"], "fields": [{"id": "eFTI448", "name": "ID", "definition": "The identifier of the carried transport equipment."}, {"id": "eFTI702", "name": "Code list agency code", "definition": "The code of an agency that maintains one or more code lists."}, {"id": "eFTI52", "name": "Complete telephone number", "definition": "The complete telephone number for this consignor contact."}, {"id": "eFTI53", "name": "Email address", "definition": "The email address for this consignor contact."}, {"id": "eFTI606", "name": "Role code", "definition": "The code specifying the role of the certifying party responsible for confirming the unloading event for the main leg ..."}, {"id": "eFTI589", "name": "Name", "definition": "The name of the location of the loading event for the main leg of the transport movement."}, {"id": "eFTI587", "name": "ID", "definition": "The identifier of the location of the loading event for the main leg of the transport movement, such as a United Nati..."}, {"id": "eFTI590", "name": "ID", "definition": "The identification number of the certifying party responsible for confirming the loading event for the main leg of th..."}]}, {"id": "ASBIE1053", "name": "Poštanska adresa", "originalName": "Postal address", "definition": "The postal address for the consignee receipt location.", "group": "Lokacije", "keyFieldIds": ["eFTI385", "eFTI169", "eFTI168"], "fields": [{"id": "eFTI385", "name": "Stowage position ID", "definition": "The stowage position identifier for the used transport equipment."}, {"id": "eFTI169", "name": "Type", "definition": "The code specifying the type of the transport document."}, {"id": "eFTI168", "name": "URI", "definition": "The Uniform Resource Identifier (URI) of the transport document."}, {"id": "eFTI378", "name": "Category code", "definition": "The code specifying the category for the used transport equipment, such as container or trailer."}, {"id": "eFTI374", "name": "ID", "definition": "The identifier of the transport equipment used for transporting this consignment."}]}, {"id": "ASBIE1032", "name": "Poštanska adresa", "originalName": "Postal address", "definition": "The postal address of the consignor.", "group": "Lokacije", "keyFieldIds": ["eFTI154"], "fields": [{"id": "eFTI154", "name": "Name", "definition": "The name of the consignee receipt location."}]}, {"id": "ASBIE1050", "name": "Poštanska adresa", "originalName": "Postal address", "definition": "The postal address of the carrier acceptance location.", "group": "Lokacije", "keyFieldIds": ["eFTI40", "eFTI51", "eFTI42"], "fields": [{"id": "eFTI40", "name": "Date time format code", "definition": "The code of the format of the date/time content."}, {"id": "eFTI51", "name": "Name", "definition": "The name of the consignor."}, {"id": "eFTI42", "name": "Measurement unit code", "definition": "A code specifying a unit of measure."}, {"id": "eFTI581", "name": "Mode code", "definition": "The code specifying the mode of transport, such as by air, sea, rail, road or inland waterway, for the main leg of tr..."}]}, {"id": "ASBIE1027", "name": "Skup podataka o pošiljci", "originalName": "eFTI data set consignment", "definition": "The consignment is a separately identifiable collection of consignment Items (available to be) transported from only one consignor to only one consignee via one or more modes of transport. A consignme", "group": "Osnovne informacije", "keyFieldIds": ["eFTI39", "eFTI41", "eFTI45"], "fields": [{"id": "eFTI39", "name": "Carrier acceptance date", "definition": "The consignment carrier acceptance date/time."}, {"id": "eFTI41", "name": "Gross mass", "definition": "A measure of the gross weight (mass) of this consignment which includes the weight of packaging but which excludes th..."}, {"id": "eFTI45", "name": "Gross volume", "definition": "The measure of the gross volume, normally calculated by multiplying the maximum length, width and height of this cons..."}]}, {"id": "ASBIE1031", "name": "Informacije o e-mailu", "originalName": "Email information", "definition": "The email address information of this consignor contact.", "group": "Ostalo", "keyFieldIds": ["eFTI618"], "fields": [{"id": "eFTI618", "name": "ID", "definition": "The identifier of the means of transport used in the main leg of transportation of the consignment of goods from one ..."}]}, {"id": "ASBIE1097", "name": "Земља регистрације", "originalName": "Registration country", "definition": "The country of registration of the used transport equipment.", "group": "Ostalo", "keyFieldIds": ["eFTI1022", "eFTI62", "eFTI156"], "fields": [{"id": "eFTI1022", "name": "Sequence number", "definition": "The sequence number differentiating this main transport movement from others in a chain of transport movements."}, {"id": "eFTI62", "name": "House number", "definition": "The house number of the street or the place for this consignor address."}, {"id": "eFTI156", "name": "Longitude", "definition": "The longitude of the consignee receipt location."}, {"id": "eFTI155", "name": "Latitude", "definition": "The latitude of the consignee receipt location."}, {"id": "eFTI141", "name": "Postcode", "definition": "The postal code of the address of this carrier acceptance location."}, {"id": "eFTI144", "name": "Street name", "definition": "The street name of the address of this carrier acceptance location."}, {"id": "eFTI167", "name": "House number", "definition": "The house number of the street or the place of the address of the consignee receipt location."}, {"id": "eFTI164", "name": "Building number", "definition": "The building number of the address of the consignee receipt location."}, {"id": "eFTI151", "name": "House number", "definition": "The house number of the street or the place of the address of this carrier acceptance location."}, {"id": "eFTI139", "name": "Latitude", "definition": "The latitude of the carrier acceptance location."}, {"id": "eFTI58", "name": "Country code", "definition": "The country code of this consignor address."}, {"id": "eFTI57", "name": "City name", "definition": "The name of the city, town or village for this consignor address."}, {"id": "eFTI59", "name": "Country sub- division name", "definition": "The country sub-division name of this consignor address."}, {"id": "eFTI137", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI56", "name": "Street name", "definition": "The street name of this consignor address."}, {"id": "eFTI55", "name": "Post office box", "definition": "The identifier of the postal office box or other postal service location, assigned to a person or organization, where..."}, {"id": "eFTI54", "name": "Postcode", "definition": "The postal code of the address for this consignor party."}, {"id": "eFTI60", "name": "Building number", "definition": "The building number for this consignor address."}, {"id": "eFTI50", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI140", "name": "Longitude", "definition": "The longitude of the carrier acceptance location."}]}, {"id": "ASBIE1108", "name": "Земља регистрације", "originalName": "Registration country", "definition": "The country of registration of the means of transport used in the main leg of transportation of the consignment of goods from one place to another.", "group": "Ostalo", "keyFieldIds": ["eFTI375", "eFTI157", "eFTI162"], "fields": [{"id": "eFTI375", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI157", "name": "Postcode", "definition": "The postal code of the address for the consignee receipt location."}, {"id": "eFTI162", "name": "Country code", "definition": "The country code of the address of the consignee receipt location."}, {"id": "eFTI163", "name": "Country sub- division name", "definition": "The country sub-division name of the address of the consignee receipt location."}, {"id": "eFTI160", "name": "Street name", "definition": "The street name of the address of the consignee receipt location."}, {"id": "eFTI161", "name": "City name", "definition": "The name of the city, town or village of the address of the consignee receipt location."}, {"id": "eFTI148", "name": "Building number", "definition": "The building number of the address of this carrier acceptance location."}, {"id": "eFTI147", "name": "Country sub- division name", "definition": "The name of the country sub-division of the address of this carrier acceptance location."}, {"id": "eFTI146", "name": "Country code", "definition": "The country code of the address of this carrier acceptance location."}, {"id": "eFTI145", "name": "City name", "definition": "The name of the city, town or village of the address of this carrier acceptance location."}, {"id": "eFTI153", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI578", "name": "Registration country code", "definition": "The code for the registration country of the used transport equipment."}]}, {"id": "ASBIE1029", "name": "Kontakt informacije", "originalName": "Contact information", "definition": "The contact information for the consignor such as telephone number and email address.", "group": "Stranke i kontakti", "keyFieldIds": ["eFTI138", "eFTI152"], "fields": [{"id": "eFTI138", "name": "Name", "definition": "The name of the carrier acceptance location."}, {"id": "eFTI152", "name": "ID", "definition": "The identifier of this consignee receipt location, such as a United Nations Location Code (UN/LOCODE)."}]}, {"id": "ASBIE1101", "name": "Potvrđujuća strana", "originalName": "Certifying party", "definition": "The details of the certifying party responsible for confirming the loading event details for the main leg of the transport movement.", "group": "Stranke i kontakti", "keyFieldIds": ["eFTI998"], "fields": [{"id": "eFTI998", "name": "Stowage position ID", "definition": "The stowage position identifier for this piece of carried logistics transport equipment."}]}, {"id": "ASBIE1105", "name": "Potvrđujuća strana", "originalName": "Certifying party", "definition": "The details of the certifying party responsible for confirming the unloading event details for the main leg of the transport movement.", "group": "Stranke i kontakti", "keyFieldIds": ["eFTI450"], "fields": [{"id": "eFTI450", "name": "Category code", "definition": "The code specifying the category of the carried transport equipment."}]}, {"id": "ASBIE1102", "name": "Autentifikacija dokumenta", "originalName": "Document authentication", "definition": "The details of the document authentication provided by the certifying party responsible for confirming the loading event for the main leg of the transport movement.", "group": "Transport i dokumenti", "keyFieldIds": ["eFTI593", "eFTI600", "eFTI449"], "fields": [{"id": "eFTI593", "name": "Role code", "definition": "The code specifying the role of the certifying party responsible for confirming the loading event for the main leg of..."}, {"id": "eFTI600", "name": "ID", "definition": "The identifier of the location of the unloading event for this main leg of the transport movement, such as a United N..."}, {"id": "eFTI449", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI592", "name": "Name", "definition": "The name of the certifying party responsible for confirming the loading event for the main leg of the transport movem..."}, {"id": "eFTI620", "name": "Registration country code", "definition": "The country code of the registration country of the transport means used in the main leg of transportation of the con..."}]}, {"id": "ASBIE1106", "name": "Autentifikacija dokumenta", "originalName": "Document authentication", "definition": "The details of the document authentication provided by the certifying party responsible for confirming the unloading event for the main leg of the transport movement.", "group": "Transport i dokumenti", "keyFieldIds": ["eFTI619", "eFTI605", "eFTI603"], "fields": [{"id": "eFTI619", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI605", "name": "Name", "definition": "The name of the certifying party responsible for confirming the unloading event for the main leg of the transport mov..."}, {"id": "eFTI603", "name": "ID", "definition": "The identification number of the certifying party responsible for confirming the unloading event for the main leg of ..."}, {"id": "eFTI602", "name": "Name", "definition": "The name of the location of the unloading event for the main leg of the transport movement."}, {"id": "eFTI588", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI604", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI601", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI591", "name": "Identification scheme agency code", "definition": "The code of the agency that maintains the identification scheme."}, {"id": "eFTI594", "name": "Statement code", "definition": "The code specifying the authentication statement by the certifying party responsible for confirming the loading event..."}, {"id": "eFTI608", "name": "Statement code", "definition": "The code specifying the statement of the document authentication by the certifying party responsible for confirming t..."}]}, {"id": "ASBIE1107", "name": "Korištena transportna sredstva", "originalName": "Used transport means", "definition": "The means of transport used in this main leg of transportation of the consignment of goods from one place to another.", "group": "Transport i dokumenti", "keyFieldIds": ["eFTI701", "eFTI700", "eFTI699"], "fields": [{"id": "eFTI701", "name": "Statistical classification code", "definition": "The classification code that specifies the nature of the consignment cargo for statistical purposes."}, {"id": "eFTI700", "name": "Operational category code", "definition": "The category code, such as obnoxious or hazardous, that specifies the operational nature of the consignment cargo."}, {"id": "eFTI699", "name": "Goods description", "definition": "The description of the nature of the consignment cargo."}, {"id": "eFTI698", "name": "Nature of goods code", "definition": "The code that specifies the nature of the consignment cargo."}]}];
+
+let currentCardIdx = 0;
+
+// ========== RENDER ==========
+function renderAll() {
+    renderSidebar();
+    renderContent();
+    updateStats();
+}
+
+function updateStats() {
+    const groups = [...new Set(cardsData.map(c => c.group))];
+    const totalFields = cardsData.reduce((sum, c) => sum + (c.fields?.length || 0), 0);
+    
+    document.getElementById("statsGroups").textContent = groups.length;
+    document.getElementById("statsCards").textContent = cardsData.length;
+    document.getElementById("statsFields").textContent = totalFields;
+}
+
+function renderSidebar() {
+    const grouped = {};
+    cardsData.forEach(card => {
+        if (!grouped[card.group]) grouped[card.group] = [];
+        grouped[card.group].push(card);
+    });
+
+    let html = '';
+    for (const [groupName, groupCards] of Object.entries(grouped)) {
+        html += `<div class="group-section">`;
+        html += `<h3>${groupName}</h3>`;
+        groupCards.forEach(card => {
+            const isActive = cardsData[currentCardIdx].id === card.id ? 'active' : '';
+            const cardIdx = cardsData.indexOf(card);
+            html += `<div class="group-item ${isActive}" onclick="scrollToCard(${cardIdx})">${card.name}</div>`;
+        });
+        html += `</div>`;
+    }
+    document.getElementById("cards-map").innerHTML = html;
+}
+
+function scrollToCard(idx) {
+    currentCardIdx = idx;
+    const cardEl = document.getElementById('card-' + cardsData[idx].id);
+    if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    renderSidebar();
+}
+
+function renderContent() {
+    let html = '';
+    
+    const grouped = {};
+    cardsData.forEach(card => {
+        if (!grouped[card.group]) grouped[card.group] = [];
+        grouped[card.group].push(card);
+    });
+
+    for (const [groupName, groupCards] of Object.entries(grouped)) {
+        groupCards.forEach(card => {
+            const keyIds = new Set(card.keyFieldIds || []);
+            const keyFields = card.fields.filter(f => keyIds.has(f.id));
+            const advFields = card.fields.filter(f => !keyIds.has(f.id));
+
+            html += `
+                <div class="card" id="card-${card.id}">
+                    <div class="card-header">
+                        <h2>${card.name}</h2>
+                        <p>${card.definition}</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span>Ključna polja:</span>
+                                <span class="stat-value">${keyFields.length}</span>
+                            </div>
+                            <div class="stat">
+                                <span>Ukupno polja:</span>
+                                <span class="stat-value">${card.fields.length}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3>Ključni Podaci (${keyFields.length})</h3>
+                        <div class="fields">
+                            ${keyFields.map(field => `
+                                <div class="field">
+                                    <div class="field-name">${field.name}</div>
+                                    <div class="field-id">${field.id}</div>
+                                    <div class="field-desc">${field.definition}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        ${advFields.length ? `
+                            <h3 style="margin-top: 16px;">Napredni Podaci (${advFields.length})</h3>
+                            <div class="fields">
+                                ${advFields.map(field => `
+                                    <div class="field">
+                                        <div class="field-name">${field.name}</div>
+                                        <div class="field-id">${field.id}</div>
+                                        <div class="field-desc">${field.definition}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    document.getElementById("content").innerHTML = html;
+}
+
+// ========== INIT ==========
+renderAll();
+</script>
+</body>
+</html>

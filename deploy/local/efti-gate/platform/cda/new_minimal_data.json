@@ -1,0 +1,115 @@
+{
+  "ecmr_identifier": "SI-ECMR-260111-01",
+  "issue_date": "2026-01-11T06:45:00+01:00",
+  "issue_location": {
+    "city": "Ljubljana",
+    "country": "SI"
+  },
+  "consignor": {
+    "name": "Sava Distribution d.o.o.",
+    "address": {
+      "street": "Dunajska cesta",
+      "building_number": "150",
+      "postcode": "1000",
+      "city": "Ljubljana",
+      "country": "SI"
+    },
+    "tax_id": "SI12345678"
+  },
+  "consignee": {
+    "name": "Adria Food d.o.o.",
+    "address": {
+      "street": "Radnička cesta",
+      "building_number": "80",
+      "postcode": "10000",
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "tax_id": "12345678901"
+  },
+  "delivery_location": {
+    "name": "",
+    "address": {
+      "city": "Zagreb",
+      "country": "HR"
+    }
+  },
+  "pickup": {
+    "location": {
+      "city": "Ljubljana",
+      "country": "SI"
+    },
+    "datetime": "2026-01-11T07:15:00+01:00"
+  },
+  "attached_documents": [
+    {
+      "id": "INV-2601-0456",
+      "type": "Invoice"
+    }
+  ],
+  "carrier": {
+    "name": "TransLogistika d.o.o.",
+    "address": {
+      "street": "Slavonska avenija",
+      "building_number": "52",
+      "postcode": "10000",
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "tax_id": "11223344556"
+  },
+  "carrier_reservations": "",
+  "goods": {
+    "marks": "AF-PLT-2026-01",
+    "package_count": 10,
+    "packaging_description": "10 paleta (EUR)",
+    "nature": "Pakirani prehrambeni proizvodi (neopasno)",
+    "hs_code": "21069098",
+    "gross_weight": {
+      "value": 6500.00,
+      "unit": "KGM"
+    },
+    "volume": {
+      "value": 24.00,
+      "unit": "MTQ"
+    }
+  },
+  "sender_instructions": "Transport chain CABOT-260111 (leg 1/3).",
+  "cod_amount": {
+    "value": 0.00,
+    "currency": "EUR"
+  },
+  "freight_payment": "PREPAID",
+  "payment_party": "CONSIGNOR",
+  "special_agreements": "CMR / Road transport",
+  "signatures": {
+    "consignor": {
+      "company": "Sava Distribution d.o.o.",
+      "person": "Marko Kovač"
+    },
+    "carrier": {
+      "company": "TransLogistika d.o.o.",
+      "person": "Marko Kovač"
+    },
+    "consignee": {
+      "company": "Adria Food d.o.o.",
+      "person": "Marko Kovač"
+    }
+  },
+  "vehicle": {
+    "id": "HRZG1234AB",
+    "trailer_id": "HRZG5678CD",
+    "model": ""
+  },
+  "tariff": {
+    "basis": "per_km",
+    "amount": {
+      "value": 0.00,
+      "currency": "EUR"
+    }
+  }
+}
+
+
+
+

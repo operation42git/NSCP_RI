@@ -179,7 +179,7 @@ class NotesRequestServiceTest extends BaseServiceTest {
     @Test
     void shouldBuildResponseBody_whenRequestReceived() {
         controlDto.setRequestType(RequestTypeEnum.NOTE_SEND);
-        controlDto.setPlatformId("acme");
+        controlDto.setPlatformId("croatia eFTI platform");
         final RabbitRequestDto rabbitRequestDto = new RabbitRequestDto();
         rabbitRequestDto.setControl(controlDto);
         rabbitRequestDto.setPlatformId("example");

@@ -1,60 +1,214 @@
-#neubar {
-  background: #003088;
-  box-shadow: 4px 6px 12px rgba(0,0,0,0.4)
+.nscp-header {
+  background-color: #ffffff;
+  position: relative;
+  z-index: 100;
 }
 
-.nav-item .active {
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.nscp-logo {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo-img {
+  height: 36px;
+  width: auto;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.user-btn {
+  background: none;
+  border: 1px solid #c0c8d4;
+  color: #1a2640;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 14px;
   border-radius: 6px;
-  background-color: #c6aa76;
-  color: #221b48;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
-#neubar .dropdown-menu a:hover {
-  color: #454545
+.user-btn:hover {
+  background-color: #f0f4f8;
+  border-color: #a0aab4;
+  color: #1a2640;
 }
 
-#neubar .nav-item {
-  margin : auto 4px;
+.user-btn .fa-user {
+  font-size: 13px;
+  color: #5a6a7a;
 }
 
-#neubar a {
-
-  padding-left:12px;
-  padding-right:12px;
+.user-btn::after {
+  margin-left: 4px;
+  font-size: 10px;
 }
 
-#neubar .dropdown-menu {
-  background : #545454
+.header-sep {
+  display: inline-block;
+  width: 1px;
+  height: 24px;
+  background-color: #d0d8e4;
+  margin: 0 12px;
 }
 
-a.navbar-brand {
-  color: #454545
+.logout-link {
+  color: #5a6a7a;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
 }
 
-.nav-link {
-  color: white;
+.logout-link:hover {
+  color: #1a2640;
 }
 
-.login-btn {
-  background-color: #C6AA76;
-  color: white;
-  border-radius: 5px;
-  border: none;
-  padding: 7px 12px;
-  font-weight: bold;
-  box-shadow: 2px 3px 6px rgba(0,0,0,0.4)
+.user-section .dropdown-menu {
+  border: 1px solid #d0d8e4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  margin-top: 4px;
+  border-radius: 8px;
 }
 
-.login-btn:hover {
-  background-color: #ad9972;
+.user-section .dropdown-item {
+  color: #2c3e50;
+  font-size: 13px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.header-title {
-  color: #003088;
-  font-size: x-large;
-  text-shadow: 1px 1px;
+.user-section .dropdown-item:hover {
+  background-color: #f0f4f8;
 }
 
-.navend-button {
-  margin-right: 90px;
+.user-section .dropdown-item.active {
+  background-color: #e8eef5;
+  color: #1a2640;
+  font-weight: 600;
+}
+
+.country-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e8eef5;
+  color: #1a3a6e;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  min-width: 28px;
+}
+
+/* Navigation bar */
+.nscp-nav {
+  background-color: #1a2640;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nscp-nav-link {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.nscp-nav-link:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nscp-nav-link.active {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.polling-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.polling-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  white-space: nowrap;
+  margin-bottom: 0;
+}
+
+.polling-toggle .form-check-input {
+  cursor: pointer;
+}
+
+.polling-toggle .form-check-input:checked {
+  background-color: #4a90d9;
+  border-color: #4a90d9;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 12px;
+  }
+
+  .nscp-logo {
+    font-size: 24px;
+  }
+
+  .nav-links {
+    gap: 0;
+  }
+
+  .nscp-nav-link {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .polling-toggle {
+    display: none;
+  }
 }

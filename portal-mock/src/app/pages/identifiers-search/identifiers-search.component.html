@@ -6,7 +6,7 @@
       <div class="form row">
         <div class="form-group col-md-6">
           <label for="identifier" class="mb-2">{{'identifiers-search.identifier' | translate }}</label>
-          <input type="text" class="form-control" [ngClass]="{'is-invalid': hasFieldError('identifier')}" id="identifier" placeholder="vehicleID" formControlName="identifier" required>
+          <input type="text" class="form-control" [ngClass]="{'is-invalid': hasFieldError('identifier')}" id="identifier" placeholder="" formControlName="identifier">
           <div class="invalid-feedback" *ngIf="hasFieldError('identifier')">
             {{getFieldError('identifier')}}
           </div>
@@ -19,6 +19,7 @@
                                      [settings]="dropdownSettings"
                                      [data]="identifierTypes"
                                      [(ngModel)]="selectedIdentifierType"
+                                     [ngModelOptions]="{standalone: true}"
                                      (onSelect)="onItemSelectIdentifierType($event)"
                                      (onDeSelect)="onItemDeselectIdentifierType($event)"
                                      (onSelectAll)="onSelectAllIdentifierType()"
@@ -81,6 +82,7 @@
               [settings]="dropdownSettings"
               [data]="countries"
               [(ngModel)]="selectedGateIndicators"
+              [ngModelOptions]="{standalone: true}"
               (onSelect)="onItemSelectCountry($event)"
               (onDeSelect)="onItemDeselectCountry($event)"
               (onSelectAll)="onSelectAllCountry()"
@@ -125,31 +127,134 @@
           </div>
         </div>
 
-        <div class="mt-4 table-responsive" *ngIf="result?.identifiers?.length! > 0">
-          <table class="table table-hover" aria-label="identifiers search table">
-            <thead>
-            <tr>
-              <th scope="col" class="key" (click)="sort('gateId')">{{'identifiers-search.gate-id' | translate }}<span class="fa fa-fw fa-sort"></span></th>
-              <th scope="col" class="key" (click)="sort('datasetId')">{{'identifiers-search.dataset-id' | translate }}<span class="fa fa-fw fa-sort"></span></th>
-              <th scope="col" class="key" (click)="sort('platformId')">{{'identifiers-search.platform-id' | translate }}<span class="fa fa-fw fa-sort"></span></th>
-              <th scope="col" class="key" (click)="sort('countryStart')">{{'identifiers-search.acceptance-date' | translate }}<span class="fa fa-fw fa-sort"></span></th>
-              <th scope="col" class="key" (click)="sort('journeyStart')">{{'identifiers-search.delivery-date' | translate }}<span class="fa fa-fw fa-sort"></span> </th>
-              <th scope="col" class="key">{{'identifiers-search.action' | translate }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let identifier of identifiers">
-              <td class="value">{{identifier.gateId}}</td>
-              <td class="value">{{identifier.datasetId}}</td>
-              <td class="value">{{identifier.platformId}}</td>
-              <td class="value">{{identifier.carrierAcceptanceDatetime | date:'dd/MM/yyyy hh:mm:ss' }}</td>
-              <td class="value">{{identifier.deliveryEventActualOccurrenceDatetime | date:'dd/MM/yyyy hh:mm:ss' }}</td>
-              <td class="value"><button id="open-btn" class="btn btn-primary-in" (click)="displayIdentifiers(identifier)" title="{{'identifiers-search.open' | translate }}">
-                <span class="fa-solid fa-arrow-up-right-from-square"></span>
-              </button></td>
-            </tr>
-            </tbody>
-          </table>
+        <div class="mt-4" *ngIf="currentSearch.requestId">
+          <div *ngIf="identifiers && identifiers.length > 0" class="result-cards">
+            <div *ngFor="let identifier of identifiers; let i = index" class="result-card" [class.expanded]="isCardExpanded(i)" [class.has-adr]="getDangerousGoodsIndicator(identifier) === 'YES'">
+              <!-- Summary Row - Simplified Single Line -->
+              <div class="result-summary" (click)="toggleCard(i)">
+                <div class="expand-icon">
+                  <i class="fas fa-chevron-right" [class.rotated]="isCardExpanded(i)"></i>
+                </div>
+                
+                <div class="simplified-card-content">
+                  <div class="card-row-1">
+                    <span class="gate-name">Gate{{identifier.gateId}}</span>
+                    <span class="separator">|</span>
+                    <span class="dataset-info">
+                      <span class="dataset-label">{{'identifiers-search.dataset-id' | translate }}:</span>
+                      <span class="dataset-value">{{identifier.datasetId | slice:0:12}}…</span>
+                    </span>
+                    <span class="separator">|</span>
+                    <span class="date-info-simple">
+                      <span class="date-label-simple">ACCEPTED</span>
+                      <span class="date-value-simple">{{identifier.carrierAcceptanceDatetime | date:'dd.MM.yyyy' }}</span>
+                    </span>
+                    <span class="separator">|</span>
+                    <span class="date-info-simple">
+                      <span class="date-label-simple">DELIVERED</span>
+                      <span class="date-value-simple">{{identifier.deliveryEventActualOccurrenceDatetime | date:'dd.MM.yyyy' }}</span>
+                    </span>
+                  </div>
+                  <div class="card-row-2 badges-row">
+                    <span class="transport-badge-simple" *ngIf="getMainTransportMode(identifier)">
+                      {{getTransportModeName(getMainTransportMode(identifier)!)}}<span *ngIf="getMainTransportCountry(identifier)"> · {{getMainTransportCountry(identifier)}}</span><span *ngIf="getDangerousGoodsIndicator(identifier) === 'YES'" class="adr-badge-simple"> · ADR</span>
+                    </span>
+                    <span class="equipment-badge-simple">
+                      <i class="fas fa-trailer equipment-icon"></i>{{getUsedEquipmentCount(identifier)}}
+                    </span>
+                    <span class="equipment-badge-simple carried" *ngIf="getCarriedEquipmentCount(identifier) > 0">
+                      <i class="fas fa-box equipment-icon"></i>{{getCarriedEquipmentCount(identifier)}}
+                    </span>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary-in action-button" (click)="displayIdentifiers(identifier); $event.stopPropagation()" [title]="'identifiers-search.open' | translate">
+                  <i class="fas fa-arrow-up-right-from-square"></i>
+                </button>
+              </div>
+
+              <!-- Expanded Details -->
+              <div class="result-details" *ngIf="isCardExpanded(i)">
+                <div class="details-container">
+                  <!-- Main Transport Movement -->
+                  <div class="details-section" *ngIf="identifier.mainCarriageTransportMovement && identifier.mainCarriageTransportMovement.length > 0">
+                    <div class="details-section-title">{{'identifiers-search.transport-movement' | translate }}</div>
+                    <div class="transport-movement-list">
+                      <div class="transport-movement-item" *ngFor="let transport of identifier.mainCarriageTransportMovement">
+                        <span class="transport-detail-inline">
+                          <i class="fas" [ngClass]="{
+                            'fa-ship': transport.modeCode === 1,
+                            'fa-train': transport.modeCode === 2,
+                            'fa-truck': transport.modeCode === 3,
+                            'fa-plane': transport.modeCode === 4
+                          }"></i>
+                          {{getTransportModeName(transport.modeCode)}}
+                        </span>
+                        <span class="transport-sep">|</span>
+                        <span class="transport-detail-inline">
+                          <span class="dangerous-goods-badge-detail" [ngClass]="transport.dangerousGoodsIndicator === 'true' ? 'yes' : (transport.dangerousGoodsIndicator === 'false' ? 'no' : 'na')">
+                            {{transport.dangerousGoodsIndicator === 'true' ? 'ADR' : (transport.dangerousGoodsIndicator === 'false' ? 'No' : 'N/A')}}
+                          </span>
+                        </span>
+                        <span class="transport-sep">|</span>
+                        <span class="transport-detail-inline">{{'identifiers-search.registration-country' | translate }}: {{transport.registrationCountryCode || '—'}}</span>
+                        <span class="transport-sep">|</span>
+                        <span class="transport-detail-inline">{{'identifiers-search.scheme-agency-id' | translate }}: {{transport.schemeAgencyId || '—'}}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Used Transport Equipment -->
+                  <div class="details-section equipment-section" *ngIf="identifier.usedTransportEquipment && identifier.usedTransportEquipment.length > 0">
+                    <div class="details-section-title">{{'identifiers-search.used-transport-equipment' | translate }} ({{identifier.usedTransportEquipment.length}})</div>
+                    <div class="equipment-list">
+                      <div class="equipment-item" *ngFor="let equipment of identifier.usedTransportEquipment; let eqIndex = index">
+                        <div class="equipment-item-header">
+                          #{{eqIndex + 1}} <span class="equipment-id-badge">{{equipment.id || '—'}}</span>
+                        </div>
+                        <div class="equipment-details-inline">
+                          <span class="eq-detail">{{'identifiers-search.sequence-number' | translate }}: {{equipment.sequenceNumber}}</span>
+                          <span class="eq-sep">|</span>
+                          <span class="eq-detail">{{'identifiers-search.category-code' | translate }}: {{equipment.categoryCode || '—'}}</span>
+                          <span class="eq-sep">|</span>
+                          <span class="eq-detail">{{'identifiers-search.registration-country' | translate }}: {{equipment.registrationCountryCode || '—'}}</span>
+                          <span class="eq-sep">|</span>
+                          <span class="eq-detail">{{'identifiers-search.scheme-agency-id' | translate }}: {{equipment.schemeAgencyId || '—'}}</span>
+                        </div>
+                        <!-- Carried Equipment -->
+                        <div class="carried-equipment-section" *ngIf="equipment.carriedTransportEquipment && equipment.carriedTransportEquipment.length > 0">
+                          <div class="carried-header">{{'identifiers-search.carried-equipment' | translate }} ({{equipment.carriedTransportEquipment.length}})</div>
+                          <div class="carried-equipment-grid">
+                            <div class="carried-equipment-item" *ngFor="let carried of equipment.carriedTransportEquipment">
+                              <span class="carried-value">{{carried.id || '—'}}</span>
+                              <span class="carried-meta">Seq: {{carried.sequenceNumber}}</span>
+                              <span class="carried-meta" *ngIf="carried.schemeAgencyId">{{carried.schemeAgencyId}}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="carried-equipment-section" *ngIf="!equipment.carriedTransportEquipment || equipment.carriedTransportEquipment.length === 0">
+                          <div class="empty-carried">{{'identifiers-search.no-carried-equipment' | translate }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!identifiers || identifiers.length === 0" class="text-center p-4">
+            <p class="value">No results found</p>
+            <div *ngIf="result" class="mt-3" style="font-size: 12px; color: #666;">
+              <p>Debug info:</p>
+              <p>result.identifiers exists: {{result.identifiers ? 'Yes' : 'No'}}</p>
+              <p *ngIf="result.identifiers">result.identifiers.length: {{result.identifiers.length}}</p>
+              <p>identifiers array length: {{identifiers ? identifiers.length : 0}}</p>
+              <p *ngIf="result.identifiers && result.identifiers.length > 0">
+                First identifier has consignments: {{result.identifiers[0].consignments ? 'Yes' : 'No'}}
+                <span *ngIf="result.identifiers[0].consignments">({{result.identifiers[0].consignments.length}} items)</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "id": "lokacije",
+      "name": "Lokacije",
+      "cards": []
+    },
+    {
+      "id": "osnovne-informacije",
+      "name": "Osnovne informacije",
+      "cards": []
+    },
+    {
+      "id": "stranke-i-kontakti",
+      "name": "Stranke i kontakti",
+      "cards": []
+    },
+    {
+      "id": "transport-i-dokumenti",
+      "name": "Transport i dokumenti",
+      "cards": []
+    },
+    {
+      "id": "ostalo",
+      "name": "Ostalo",
+      "cards": []
+    }
+  ]
+}
+
+
+

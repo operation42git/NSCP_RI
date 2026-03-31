@@ -11,9 +11,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EntityScan("eu.platform")
+@EntityScan(basePackages = {"eu.platform", "eu.efti.platformgatesimulator.entity"})
+@EnableJpaRepositories(basePackages = "eu.efti.platformgatesimulator.repository")
 @ComponentScan(basePackages = {"eu.platform", "eu.efti"})
 public class PlatformConfig {
 

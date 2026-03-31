@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADR Display - Portal Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        /* Card Component - Matching Angular */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+        
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(to bottom, #fafbfc, #ffffff);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            letter-spacing: -0.01em;
+        }
+        
+        .field-range {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        .fields-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 24px;
+        }
+        
+        .field-group {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+            background: #fff;
+        }
+        
+        .field-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .field-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .field-label span {
+            display: block;
+        }
+        
+        .field-value {
+            font-size: 13px;
+            color: #1f2937;
+            min-height: 20px;
+        }
+        
+        .field-value.empty {
+            color: #9ca3af;
+            font-style: italic;
+        }
+        
+        .radioactive-section {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f9fafb;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .section-header h2 {
+            color: #1f2937;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .section-header p {
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        .section-content {
+            padding: 20px;
+        }
+        
+        /* XML Mapping Annotations */
+        .xml-mapping {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 15px;
+            margin-top: 10px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+        
+        .xml-mapping strong {
+            color: #78350f;
+        }
+        
+        .xml-mapping code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #92400e;
+        }
+        
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        .mapping-table th {
+            background: #f3f4f6;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .mapping-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #1f2937;
+            vertical-align: top;
+        }
+        
+        .mapping-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .mapping-table code {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #92400e;
+        }
+        
+        .legend {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .legend-color.mapping {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .legend-color.display {
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .legend-color.radioactive {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ADR / Opasna roba Display</h1>
+        <p class="subtitle">Visual representation of the ADR (Dangerous Goods) section displayed in the portal, with XML field mappings from consignment-common.xml</p>
+        
+        <!-- ADR Card - Matching Angular Component -->
+        <div class="card">
+            <div class="card-header">
+                <h2>ADR / Opasna roba</h2>
+                <span class="field-range">Bilješka o opasnoj robi</span>
+            </div>
+            <div class="card-body">
+                <div class="fields-grid">
+                            <!-- Shipping Marks -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Oznake za otpremu</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Proper Shipping Name -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Pravilno naziv za otpremu</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- UN No -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>UN broj</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Hazard Classification ID -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>ID klasifikacije opasnosti</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Hazard Category Code -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Kod kategorije opasnosti</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Hazard Type Code -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Kod vrste opasnosti</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Packaging Danger Level Code -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Kod razine opasnosti pakiranja</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Tunnel Restriction Code -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Kod ograničenja tunela</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Limited Quantity Code -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Kod ograničene količine</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Special Provision ID -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>ID posebnih odredbi</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Reportable Quantity -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Prijavljiva količina</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Technical Name -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Tehnički naziv</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Regulatory Authority -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Regulatorno tijelo</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Number of Packages -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Broj paketa</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Packing Description -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Opis pakiranja</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Net wt (kg) -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Neto masa (kg)</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Gross weight (kg) -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Bruto masa (kg)</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Cube (m³) -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Volumen (m³)</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Density -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Gustoća</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Melting Point -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Talište</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                            
+                            <!-- Explosive Cargo Net Weight -->
+                            <div class="field-group">
+                                <div class="field-label">
+                                    <span>Neto masa eksplozivnog tereta</span>
+                                </div>
+                                <div class="field-value empty">—</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Radioactive Material Section -->
+                        <div class="field-group full-width radioactive-section">
+                            <div class="field-label">
+                                <span>Radioaktivni materijal</span>
+                            </div>
+                            <div class="fields-grid" style="margin-top: 8px;">
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Izotop</span>
+                                    </div>
+                                    <div class="field-value empty">—</div>
+                                </div>
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Razina aktivnosti</span>
+                                    </div>
+                                    <div class="field-value empty">—</div>
+                                </div>
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Indeks sigurnosti fisijskog kritičnosti</span>
+                                    </div>
+                                    <div class="field-value empty">—</div>
+                                </div>
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Kod transportnog indeksa</span>
+                                    </div>
+                                    <div class="field-value empty">—</div>
+                                </div>
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Poseban oblik</span>
+                                    </div>
+                                    <div class="field-value empty">—</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Supplementary Info -->
+                        <div class="field-group full-width">
+                            <div class="field-label">
+                                <span>Dopunske informacije</span>
+                            </div>
+                            <div class="field-value empty">—</div>
+                        </div>
+                        
+                        <!-- Information -->
+                        <div class="field-group full-width">
+                            <div class="field-label">
+                                <span>Informacije</span>
+                            </div>
+                            <div class="field-value empty">—</div>
+                        </div>
+                        
+                        <!-- Temperature Requirements -->
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Kontrolna temperatura</span>
+                            </div>
+                            <div class="field-value empty">—</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Temperatura za hitne slučajeve</span>
+                            </div>
+                            <div class="field-value empty">—</div>
+                        </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section: Field Mapping Table -->
+        <div class="section">
+            <div class="section-header">
+                <h2>XML Field Mappings</h2>
+                <p>Mapping from consignment-common.xml to ADR display fields</p>
+            </div>
+            <div class="section-content">
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Display Field</th>
+                            <th style="width: 50%;">XML Path (consignment-common.xml)</th>
+                            <th style="width: 20%;">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Shipping marks</strong></td>
+                            <td><code>consignment/dangerousGoods/dangerousGoodsLogisticsPackage/shippingMarks/markingText</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/dangerousGoodsLogisticsPackage/shippingMarks/markingText</code></td>
+                            <td>From logistics package</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Proper Shipping Name</strong></td>
+                            <td><code>consignment/dangerousGoods/properShippingName</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/properShippingName</code></td>
+                            <td>Required ADR field</td>
+                        </tr>
+                        <tr>
+                            <td><strong>UN No</strong></td>
+                            <td><code>consignment/dangerousGoods/uNDGID</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/uNDGID</code></td>
+                            <td>UN Number identifier</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hazard Classification ID</strong></td>
+                            <td><code>consignment/dangerousGoods/hazardClassificationID</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/hazardClassificationID</code></td>
+                            <td>Hazard class code</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hazard Category Code</strong></td>
+                            <td><code>consignment/dangerousGoods/hazardCategoryCode</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/hazardCategoryCode</code></td>
+                            <td>Category classification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hazard Type Code</strong></td>
+                            <td><code>consignment/dangerousGoods/hazardTypeCode</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/hazardTypeCode</code></td>
+                            <td>Type of hazard</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Packaging Danger Level Code</strong></td>
+                            <td><code>consignment/dangerousGoods/packagingDangerLevelCode</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/packagingDangerLevelCode</code></td>
+                            <td>Packaging level</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tunnel Restriction Code</strong></td>
+                            <td><code>consignment/dangerousGoods/tunnelRestrictionCode</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/tunnelRestrictionCode</code></td>
+                            <td>Tunnel restrictions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Limited Quantity Code</strong></td>
+                            <td><code>consignment/dangerousGoods/limitedQuantityCode</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/limitedQuantityCode</code></td>
+                            <td>Limited quantity indicator</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Special Provision ID</strong></td>
+                            <td><code>consignment/dangerousGoods/specialProvisionID</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/specialProvisionID</code></td>
+                            <td>Special provisions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reportable Quantity</strong></td>
+                            <td><code>consignment/dangerousGoods/reportableQuantity</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/reportableQuantity</code></td>
+                            <td>Reportable quantity value</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Technical Name</strong></td>
+                            <td><code>consignment/dangerousGoods/technicalName</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/technicalName</code></td>
+                            <td>Technical/scientific name</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Regulatory Authority</strong></td>
+                            <td><code>consignment/dangerousGoods/regulatoryAuthorityName</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/regulatoryAuthorityName</code></td>
+                            <td>Regulatory body name</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Number of Packages</strong></td>
+                            <td><code>consignment/includedConsignmentItem/goodsUnitQuantity</code><br>
+                                or<br>
+                                <code>consignment/dangerousGoods/dangerousGoodsLogisticsPackage/itemQuantity</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/dangerousGoodsLogisticsPackage/itemQuantity</code></td>
+                            <td>Package count</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Packing Description</strong></td>
+                            <td><code>consignment/includedConsignmentItem/dimensions/description</code></td>
+                            <td>Packing details</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Net wt (kg)</strong></td>
+                            <td><code>consignment/dangerousGoods/netWeight</code> + <code>@unitId</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/netWeight</code> + <code>@unitId</code></td>
+                            <td>Net weight with unit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gross weight (kg)</strong></td>
+                            <td><code>consignment/dangerousGoods/grossWeight</code> + <code>@unitId</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/grossWeight</code> + <code>@unitId</code></td>
+                            <td>Gross weight with unit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cube (m³)</strong></td>
+                            <td><code>consignment/dangerousGoods/grossVolume</code> + <code>@unitId</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/grossVolume</code> + <code>@unitId</code></td>
+                            <td>Volume with unit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Density</strong></td>
+                            <td><code>consignment/dangerousGoods/densityMeasure</code> + <code>@unitId</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/densityMeasure</code> + <code>@unitId</code></td>
+                            <td>Density measure</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Melting Point</strong></td>
+                            <td><code>consignment/dangerousGoods/meltingPointTemperatureMeasure</code> + <code>@unitId</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/meltingPointTemperatureMeasure</code> + <code>@unitId</code></td>
+                            <td>Melting point temperature</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Explosive Cargo Net Weight</strong></td>
+                            <td><code>consignment/dangerousGoods/explosiveCargoNetWeight</code> + <code>@unitId</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/explosiveCargoNetWeight</code> + <code>@unitId</code></td>
+                            <td>For explosive materials</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Control Temperature</strong></td>
+                            <td><code>consignment/dangerousGoods/controlTemperature/conditionMeasure</code> + <code>@unitId</code><br>
+                                <code>consignment/dangerousGoods/controlTemperature/typeCode</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/controlTemperature/conditionMeasure</code> + <code>@unitId</code><br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/controlTemperature/typeCode</code></td>
+                            <td>Temperature control requirements</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Emergency Temperature</strong></td>
+                            <td><code>consignment/dangerousGoods/emergencyTemperature/conditionMeasure</code> + <code>@unitId</code><br>
+                                <code>consignment/dangerousGoods/emergencyTemperature/typeCode</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/emergencyTemperature/conditionMeasure</code> + <code>@unitId</code><br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/emergencyTemperature/typeCode</code></td>
+                            <td>Emergency temperature</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Radioactive Material - Isotope</strong></td>
+                            <td><code>consignment/dangerousGoods/radioactiveMaterial/applicableRadioactiveIsotope/name</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/radioactiveMaterial/applicableRadioactiveIsotope/name</code></td>
+                            <td>Isotope name</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Radioactive Material - Activity Level</strong></td>
+                            <td><code>consignment/dangerousGoods/radioactiveMaterial/applicableRadioactiveIsotope/activityLevelMeasure</code> + <code>@unitId</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/radioactiveMaterial/applicableRadioactiveIsotope/activityLevelMeasure</code> + <code>@unitId</code></td>
+                            <td>Activity level with unit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Radioactive Material - Fissile Criticality Safety Index</strong></td>
+                            <td><code>consignment/dangerousGoods/radioactiveMaterial/fissileCriticalitySafetyIndexNumber</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/radioactiveMaterial/fissileCriticalitySafetyIndexNumber</code></td>
+                            <td>Fissile index</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Radioactive Material - Transport Index Code</strong></td>
+                            <td><code>consignment/dangerousGoods/radioactiveMaterial/radioactivePackageTransportIndexCode</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/radioactiveMaterial/radioactivePackageTransportIndexCode</code></td>
+                            <td>Transport index</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Radioactive Material - Special Form</strong></td>
+                            <td><code>consignment/dangerousGoods/radioactiveMaterial/specialFormInformation</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/radioactiveMaterial/specialFormInformation</code></td>
+                            <td>Special form info</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Supplementary Info</strong></td>
+                            <td><code>consignment/dangerousGoods/supplementaryInformation</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/supplementaryInformation</code></td>
+                            <td>Additional information</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Information</strong></td>
+                            <td><code>consignment/dangerousGoods/information</code><br>
+                                or<br>
+                                <code>consignment/includedConsignmentItem/transportDangerousGoods/information</code></td>
+                            <td>General information</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color mapping"></div>
+                <span>Yellow boxes show XML field mappings from consignment-common.xml</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color display"></div>
+                <span>Display fields are shown in the white sections above</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color radioactive"></div>
+                <span>Radioactive Material section has special highlighting</span>
+            </div>
+        </div>
+        
+        <!-- Summary -->
+        <div class="section" style="margin-top: 40px;">
+            <div class="section-header">
+                <h2>Summary</h2>
+            </div>
+            <div class="section-content">
+                <h3 style="margin-bottom: 15px; font-size: 16px;">ADR Display Characteristics:</h3>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>Always Visible:</strong> ADR section is always displayed, regardless of whether dangerous goods data exists in the XML</li>
+                    <li><strong>All Fields Shown:</strong> All ADR fields are always displayed, showing "—" when data is not available</li>
+                    <li><strong>No Duplicates:</strong> Fields already shown in ECMR section (consignor, consignee) are not duplicated in ADR section</li>
+                    <li><strong>ADR-Specific Only:</strong> Only dangerous goods specific fields are shown, not general transport/equipment data</li>
+                    <li><strong>Multiple Sources:</strong> Data can come from either <code>consignment/dangerousGoods</code> (consignment level) or <code>consignment/includedConsignmentItem/transportDangerousGoods</code> (item level)</li>
+                </ul>
+                
+                <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 16px;">Field Mapping Process:</h3>
+                <ol style="margin-left: 20px; line-height: 2;">
+                    <li>XML data from consignment-common.xml is parsed by ECMRParserService</li>
+                    <li>ADR data is extracted from both consignment-level and item-level dangerous goods elements</li>
+                    <li>parseADRData() method creates ADRData object with ADRItem array</li>
+                    <li>Frontend component displays all ADR fields using field-group format matching ECMR section</li>
+                    <li>All fields are always visible, displaying "—" when XML data is missing</li>
+                </ol>
+                
+                <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 16px;">Key ADR Fields:</h3>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>Proper Shipping Name:</strong> Required ADR field - proper shipping name of dangerous goods</li>
+                    <li><strong>UN Number (uNDGID):</strong> UN identification number for the dangerous substance</li>
+                    <li><strong>Hazard Classification:</strong> Classification ID, Category Code, and Type Code</li>
+                    <li><strong>Packaging & Restrictions:</strong> Packaging danger level, tunnel restrictions, limited quantity codes</li>
+                    <li><strong>Temperature Requirements:</strong> Control and emergency temperature specifications</li>
+                    <li><strong>Radioactive Material:</strong> Special section for radioactive materials with isotope and activity details</li>
+                    <li><strong>Physical Properties:</strong> Density, melting point, weights, volumes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

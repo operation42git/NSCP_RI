@@ -25,12 +25,14 @@ echo "Building..."
 mvn -B package --file $projectPomFile $SKIP_TESTS
 
 echo "Copying apps..."
-cp -rf ../../../implementation/gate/target/gate-*.jar ./gate/efti-gate.jar
-cp -rf ../../../implementation/platform-gate-simulator/target/platform-gate-simulator-*.jar ./platform/platform-simulator.jar
+# Copy executable JAR files (Spring Boot executable JARs with shell script prepended)
+# The docker-compose.yml uses 'sh -c "exec java -jar ..."' to properly handle executable JARs
+cp -f ../../../implementation/gate/target/gate-*.jar ./gate/efti-gate.jar
+cp -f ../../../implementation/platform-gate-simulator/target/platform-gate-simulator-*.jar ./platform/platform-simulator.jar
 
 echo "Starting up docker compose"
 docker compose up -d
-docker compose restart efti-gate-BO efti-gate-LI efti-gate-SY
+docker compose restart efti-gate-HR efti-gate-SLO efti-gate-AT
 
 wait_for_gate() {
     gate_port=$1
@@ -49,7 +51,21 @@ echo "Gates are up and running"
 
 echo "Configure the gates with initial data"
 # This goes through the schemas in the common database and configures all of them with the same data
-for schema in eftibo eftili eftisy; do
+for schema in eftihr eftislo eftiat; do
   echo 'Configuring gate with initial data for database: ' $schema
   sed "1iset search_path to $schema;" ./gate-db/gate-config.sql | docker exec -i reference-gate-shared-db psql -U efti -d efti
 done
+
+echo ""
+echo "=========================================="
+echo "Deployment completed successfully!"
+echo "=========================================="
+echo ""
+echo "NOTE: To access the portal web application, you need to start it separately:"
+echo "  1. cd ../../../portal-mock"
+echo "  2. npm ci  (first time only, to install dependencies)"
+echo "  3. npm start"
+echo ""
+echo "Then access the portal at: http://portal.efti.fr:83"
+echo "(Make sure portal.efti.fr is in your hosts file: 127.0.0.1 portal.efti.fr)"
+echo ""

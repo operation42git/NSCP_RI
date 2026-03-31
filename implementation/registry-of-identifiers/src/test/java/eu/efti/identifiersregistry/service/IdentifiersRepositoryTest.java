@@ -69,7 +69,7 @@ class IdentifiersRepositoryTest {
                 .schemeAgencyId("UN")
                 .build();
         firstConsignment.setGateId("france");
-        firstConsignment.setPlatformId("acme");
+        firstConsignment.setPlatformId("croatia eFTI platform");
         firstConsignment.setDatasetId("67676767-6767-6767-6767-11180123be5b");
         firstConsignment.setMainCarriageTransportMovements(List.of(firstMainCarriageTransportMovement));
         firstConsignment.setUsedTransportEquipments(List.of(firstUsedTransportEquipment));
@@ -98,7 +98,7 @@ class IdentifiersRepositoryTest {
                 .build();
 
         secondConsignment.setGateId("france");
-        secondConsignment.setPlatformId("acme");
+        secondConsignment.setPlatformId("croatia eFTI platform");
         secondConsignment.setDatasetId("67676767-6767-6767-6767-22280123be5b");
         secondConsignment.setMainCarriageTransportMovements(List.of(secondMainCarriageTransportMovement));
         secondConsignment.setUsedTransportEquipments(List.of(secondUsedTransportEquipment));
@@ -127,7 +127,7 @@ class IdentifiersRepositoryTest {
                 .build();
 
         thirdConsignment.setGateId("france");
-        thirdConsignment.setPlatformId("acme");
+        thirdConsignment.setPlatformId("croatia eFTI platform");
         thirdConsignment.setDatasetId("67676767-6767-6767-6767-33380123be5b");
         thirdConsignment.setMainCarriageTransportMovements(List.of(thirdMainCarriageTransportMovement));
         thirdConsignment.setUsedTransportEquipments(List.of(thirdUsedTransportEquipment));
@@ -155,7 +155,7 @@ class IdentifiersRepositoryTest {
                 .build();
 
         fourthConsignment.setGateId("finland");
-        fourthConsignment.setPlatformId("syldavia");
+        fourthConsignment.setPlatformId("slovenia eFTI platform");
         fourthConsignment.setDatasetId("67676767-6767-6767-6767-44480123be5b");
         fourthConsignment.setMainCarriageTransportMovements(List.of(fourthMainCarriageTransportMovement));
         fourthConsignment.setUsedTransportEquipments(List.of(fourthUsedTransportEquipment));
@@ -184,7 +184,7 @@ class IdentifiersRepositoryTest {
                 .build();
 
         fifthConsignment.setGateId("italy");
-        fifthConsignment.setPlatformId("listenbourg");
+        fifthConsignment.setPlatformId("austria eFTI platform");
         fifthConsignment.setDatasetId("67676767-6767-6767-6767-55580123be5b");
         fifthConsignment.setMainCarriageTransportMovements(List.of(fifthMainCarriageTransportMovement));
         fifthConsignment.setUsedTransportEquipments(List.of(fifthUsedTransportEquipment));
@@ -212,7 +212,7 @@ class IdentifiersRepositoryTest {
                 .build();
 
         sixthConsignment.setGateId("danemark");
-        sixthConsignment.setPlatformId("umbrellainc");
+        sixthConsignment.setPlatformId("austria eFTI platform");
         sixthConsignment.setDatasetId("67676767-6767-6767-6767-66680123be5b");
         sixthConsignment.setMainCarriageTransportMovements(List.of(sixthMainCarriageTransportMovement));
         sixthConsignment.setUsedTransportEquipments(List.of(sixthUsedTransportEquipment));

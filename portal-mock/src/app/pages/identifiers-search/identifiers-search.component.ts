@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from "@angular/router";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
-import { DatePipe, KeyValuePipe, NgClass, NgIf, NgFor } from "@angular/common";
+import { DatePipe, KeyValuePipe, NgClass, NgIf, NgFor, SlicePipe } from "@angular/common";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { IdentifiersService } from "../../core/services/identifiers.service";
 import { SessionService } from "../../core/services/session.service";
@@ -29,7 +29,7 @@ import { EnumSelectPipe } from "../../core/pipe/enum-select.pipe";
   imports: [
     RouterOutlet, ReactiveFormsModule, NgFor, NgIf, NgClass,
     IconsModule, TranslateModule, DatePipe, NgMultiSelectDropDownModule, FormsModule, NgbPopover,
-    HighchartsChartModule, KeyValuePipe, EnumSelectPipe
+    HighchartsChartModule, KeyValuePipe, EnumSelectPipe, SlicePipe
   ],
   styleUrl: './identifiers-search.component.css'
 })
@@ -46,8 +46,9 @@ export class IdentifiersSearchComponent implements OnInit {
 
   currentSearch: CurrentSearch = {} as CurrentSearch;
   public result!: IdentifiersResponse;
-  public identifiers!: Identifiers[];
+  public identifiers: Identifiers[] = [];
   currentSort!: string;
+  expandedCards: Set<number> = new Set();
 
   highcharts: typeof Highcharts = Highcharts;
 
@@ -126,7 +127,7 @@ export class IdentifiersSearchComponent implements OnInit {
 
   initForm() {
     this.searchForm = this.formBuilder.group({
-      identifier: [ { value: null, disabled: false }, [Validators.required, Validators.pattern("[A-Za-z0-9]{0,17}$")] ],
+      identifier: [ { value: null, disabled: false }, [Validators.required, Validators.pattern('^[A-Za-z0-9]{1,17}$')] ],
       identifierType: [ { value: null, disabled: false } ],
       registrationCountryCode: [ { value: null, disabled: false } ],
       modeCode: [ { value: null, disabled: false } ],
@@ -135,13 +136,21 @@ export class IdentifiersSearchComponent implements OnInit {
   }
 
   hasFieldError(key: string): boolean {
-    return this.formSubmitted && !this.searchForm.controls[key].valid;
+    const control = this.searchForm.controls[key];
+    if (!control) return false;
+    // Only show error if form was submitted AND field is invalid AND field is touched
+    return this.formSubmitted && !control.valid && control.touched;
   }
 
   getFieldError(field: string): string | null {
-    if(this.searchForm.controls[field].hasError('required')) {
+    const control = this.searchForm.controls[field];
+    if (!control) return null;
+    
+    if(control.hasError('required')) {
       return this.translate.instant('form.error.required')
-    } else if (this.searchForm.controls[field].hasError('pattern')) {
+    } else if (control.hasError('pattern')) {
+      // Debug: log the actual error and value
+      console.log('Pattern validation failed for:', control.value, 'Pattern:', '^[A-Za-z0-9]{1,17}$');
       return this.translate.instant('form.error.pattern')
     }
     return null;
@@ -150,6 +159,9 @@ export class IdentifiersSearchComponent implements OnInit {
   submit() {
     this.formSubmitted = true;
     if(!this.searchForm.valid) {
+      // Ensure validation errors become visible to the user (otherwise submit appears to "do nothing")
+      this.searchForm.markAllAsTouched();
+      this.toastr.warning(this.translate.instant('form.error.fix-errors'));
       return;
     }
     const searchData: IdentifiersSearch = {
@@ -202,9 +214,54 @@ export class IdentifiersSearchComponent implements OnInit {
   manageResult(result: IdentifiersResponse) {
     this.result = result;
     this.identifiers = [];
-    result.identifiers.forEach(i => {
-      this.identifiers = [...this.identifiers, ...i.consignments];
-    })
+    console.log('=== MANAGE_RESULT START ===');
+    console.log('Full result object:', JSON.stringify(result, null, 2));
+    
+    if (!result) {
+      console.warn('manageResult: result is null or undefined');
+      return;
+    }
+    
+    if (!result.identifiers) {
+      console.warn('manageResult: result.identifiers is null or undefined');
+      this.currentSearch.status = result.status;
+      return;
+    }
+    
+    console.log('result.identifiers:', result.identifiers);
+    console.log('result.identifiers.length:', result.identifiers.length);
+    
+    result.identifiers.forEach((i, index) => {
+      console.log(`=== Identifier Result ${index} ===`);
+      console.log(`  Full object:`, JSON.stringify(i, null, 2));
+      console.log(`  gateIndicator:`, i.gateIndicator);
+      console.log(`  status:`, i.status);
+      console.log(`  consignments:`, i.consignments);
+      console.log(`  consignments type:`, typeof i.consignments);
+      console.log(`  consignments is array:`, Array.isArray(i.consignments));
+      console.log(`  consignments length:`, i.consignments?.length);
+      
+      if (i.consignments && Array.isArray(i.consignments)) {
+        if (i.consignments.length > 0) {
+          console.log(`  ✓ Adding ${i.consignments.length} consignments`);
+          i.consignments.forEach((c, cIndex) => {
+            console.log(`    Consignment ${cIndex}:`, c);
+          });
+          this.identifiers = [...this.identifiers, ...i.consignments];
+        } else {
+          console.warn(`  ⚠ Consignments array exists but is empty for identifier ${index}`);
+        }
+      } else {
+        console.warn(`  ✗ No valid consignments array found for identifier ${index}`);
+        if (i.consignments !== null && i.consignments !== undefined) {
+          console.warn(`    Consignments value (not an array):`, i.consignments);
+        }
+      }
+    });
+    
+    console.log('Final identifiers array length:', this.identifiers.length);
+    console.log('Final identifiers array:', this.identifiers);
+    console.log('=== MANAGE_RESULT END ===');
     this.currentSearch.status = result.status;
   }
   displayIdentifiers(identifiers: Identifiers): void {
@@ -237,6 +294,67 @@ export class IdentifiersSearchComponent implements OnInit {
     return "pending";
   }
 
+  toggleCard(index: number) {
+    if (this.expandedCards.has(index)) {
+      this.expandedCards.delete(index);
+    } else {
+      this.expandedCards.add(index);
+    }
+  }
+
+  isCardExpanded(index: number): boolean {
+    return this.expandedCards.has(index);
+  }
+
+  getTransportModeName(modeCode: number): string {
+    const modeNames: { [key: number]: string } = {
+      1: 'Waterway',
+      2: 'Railway',
+      3: 'Road',
+      4: 'Air'
+    };
+    return modeNames[modeCode] || `Mode ${modeCode}`;
+  }
+
+  getDangerousGoodsIndicator(identifier: Identifiers): string {
+    if (identifier.mainCarriageTransportMovement && identifier.mainCarriageTransportMovement.length > 0) {
+      const indicator = identifier.mainCarriageTransportMovement[0].dangerousGoodsIndicator;
+      if (indicator === 'true') return 'YES';
+      if (indicator === 'false') return 'NO';
+    }
+    return 'N/A';
+  }
+
+  getMainTransportMode(identifier: Identifiers): number | null {
+    if (identifier.mainCarriageTransportMovement && identifier.mainCarriageTransportMovement.length > 0) {
+      return identifier.mainCarriageTransportMovement[0].modeCode;
+    }
+    return null;
+  }
+
+  getMainTransportCountry(identifier: Identifiers): string | null {
+    if (identifier.mainCarriageTransportMovement && identifier.mainCarriageTransportMovement.length > 0) {
+      return identifier.mainCarriageTransportMovement[0].registrationCountryCode;
+    }
+    return null;
+  }
+
+  getUsedEquipmentCount(identifier: Identifiers): number {
+    return identifier.usedTransportEquipment?.length || 0;
+  }
+
+  getCarriedEquipmentCount(identifier: Identifiers): number {
+    let count = 0;
+    identifier.usedTransportEquipment?.forEach(equipment => {
+      count += equipment.carriedTransportEquipment?.length || 0;
+    });
+    return count;
+  }
+
+  hasResults(): boolean {
+    return this.identifiers && this.identifiers.length > 0;
+  }
+
   private updateSeriesOption() {
 
     let notCalled: [string, number][] = [];
@@ -259,7 +377,10 @@ export class IdentifiersSearchComponent implements OnInit {
               inProgress.push([country.toLowerCase(), 0]);
               break;
             case 'COMPLETE':
-              success.push([country.toLowerCase(), this.result?.identifiers.filter(id => id.gateIndicator === country).length]);
+              // Count actual consignments, not result entries
+              let countryResults = this.result?.identifiers.filter(id => id.gateIndicator === country) || [];
+              let totalConsignments = countryResults.reduce((sum, r) => sum + (r.consignments?.length || 0), 0);
+              success.push([country.toLowerCase(), totalConsignments]);
               break;
             case 'TIMEOUT':
               timeout.push([country.toLowerCase(), 0]);

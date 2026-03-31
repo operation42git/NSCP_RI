@@ -1,12 +1,47 @@
-<app-menu></app-menu>
-<main class="content">
-  <div class="container container-fluid">
-    <div class="p-2 page">
-      <router-outlet></router-outlet>
+<div class="app-wrapper">
+  <app-menu></app-menu>
+
+  <div class="banner-section">
+    <img src="/assets/images/transport-banner.png" alt="" class="banner-img" />
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="content-area">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <div class="footer-logos">
+        <div class="footer-logo-item">
+          <img src="/assets/images/logo-akd.png" alt="AKD" class="footer-img footer-img-akd" />
+        </div>
+        <div class="footer-divider"></div>
+        <div class="footer-logo-item">
+          <img src="/assets/images/logo-eu.png" alt="Financira Europska unija iz NextGenerationEU" class="footer-img footer-img-eu" />
+        </div>
+        <div class="footer-divider"></div>
+        <div class="footer-logo-item">
+          <img src="/assets/images/logo-hr-ministry.png" alt="Republika Hrvatska - Ministarstvo mora, prometa i infrastrukture" class="footer-img footer-img-hr" />
+        </div>
+        <div class="footer-divider"></div>
+        <div class="footer-logo-item">
+          <img src="/assets/images/logo-nscp.png" alt="NSCP" class="footer-img footer-img-nscp" />
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="bottom-bar">
+    <div class="container d-flex justify-content-end">
+      <a href="javascript:void(0)" class="accessibility-btn">
+        <i class="fa-solid fa-gear me-2"></i>Pristupačnost <i class="fa-solid fa-chevron-right ms-2"></i>
+      </a>
     </div>
   </div>
-</main>
+</div>
 
-<footer class="bg-body-tertiary text-center text-lg-start">
-</footer>
 <app-loader></app-loader>

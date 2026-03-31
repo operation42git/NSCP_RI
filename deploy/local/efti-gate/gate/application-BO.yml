@@ -25,10 +25,11 @@ gate:
   owner: borduria
   country: BO
   ap:
-    url: http://efti.gate.borduria.eu:81/domibus/services/wsplugin
+    # Domibus is multi-domain: explicitly target the borduria domain to ensure PartyId matching uses the correct PMode
+    url: http://efti.gate.borduria.eu:81/domibus/services/wsPlugin?domain=borduria
     username: borduria_service_account
     password: Azerty59*1234567
   platforms:
-    - platformId: "acme"
+    - platformId: "croatia eFTI platform"
       useRestApi: true
       restApiBaseUrl: "http://platform-ACME:8070/api/gate-api"

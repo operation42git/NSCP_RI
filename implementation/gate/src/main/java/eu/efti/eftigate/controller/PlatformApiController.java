@@ -34,10 +34,10 @@ public class PlatformApiController implements V0Api {
     }
 
     @Override
-    public ResponseEntity<Void> putConsignmentIdentifiers(String datasetId, Object body) {
+    public ResponseEntity<Void> putConsignmentIdentifiers(String datasetId, String body) {
         var ctx = PlatformApiContextResolver.getPlatformContextOrFail();
 
-        var xml = (String) body;
+        var xml = body;
         var validationError = validationService.isXmlValid(xml);
         if (validationError.isPresent()) {
             var problemDetail = org.springframework.http.ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);

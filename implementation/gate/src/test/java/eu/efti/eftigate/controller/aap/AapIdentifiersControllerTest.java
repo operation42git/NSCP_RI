@@ -54,7 +54,7 @@ class AapIdentifiersControllerTest {
     void before() {
         identifiersResponseDto.setStatus(StatusEnum.COMPLETE);
         identifiersResponseDto.setRequestId(REQUEST_ID);
-        consignmentDto.setPlatformId("acme");
+        consignmentDto.setPlatformId("croatia eFTI platform");
         consignmentDto.setDatasetId("datasetId");
         consignmentDto.setGateId("gateId");
         identifiersResponseDto.setIdentifiers(List.of(IdentifierRequestResultDto.builder()

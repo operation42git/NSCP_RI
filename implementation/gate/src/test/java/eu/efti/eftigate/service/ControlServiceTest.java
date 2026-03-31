@@ -262,7 +262,7 @@ class ControlServiceTest extends AbstractServiceTest {
     @Test
     void createControlEntityTest() {
         uilDto.setGateId("borduria");
-        uilDto.setPlatformId("acme");
+        uilDto.setPlatformId("croatia eFTI platform");
         when(controlRepository.save(any())).thenReturn(controlEntity);
         when(requestServiceFactory.getRequestServiceByRequestType(any(RequestTypeEnum.class))).thenReturn(uilRequestService);
 

@@ -40,7 +40,9 @@ public class WebserviceClient {
 
         //enable chunking
         BindingProvider bindingProvider = (BindingProvider) backendPort;
-        bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, wsdl);
+        // Strip ?wsdl from endpoint address - endpoint should be the SOAP service URL, not WSDL URL
+        String endpointAddress = wsdl.contains("?wsdl") ? wsdl.substring(0, wsdl.indexOf("?wsdl")) : wsdl;
+        bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
 
         if (StringUtils.isNotBlank(username)) {
             log.debug("Adding username [ {} ] to the requestContext", username);

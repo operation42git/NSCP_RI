@@ -203,6 +203,8 @@
         </pluginManagement>
 
         <plugins>
+            <!-- Temporarily disabled dependency-check due to NVD API 403 errors -->
+            <!--
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
@@ -221,6 +223,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>

@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consignment Common - Complete Data View</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --paper: #ffffff;
+            --bg: #f9fafb;
+            --accent: #2563eb;
+            --accent-light: rgba(37, 99, 235, 0.1);
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --border-radius: 12px;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            background: var(--bg);
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header */
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 32px 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 8px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px 24px;
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .section-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            font-size: 13px;
+            min-width: 250px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        /* Group Header */
+        .group-header {
+            margin: 32px 0 16px 0;
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            border-bottom: 3px solid var(--line);
+        }
+
+        .group-header:first-of-type {
+            margin-top: 0;
+        }
+
+        /* Collapsible Card */
+        .collapsible-card {
+            margin-bottom: 16px;
+            border: 1px solid var(--line);
+            border-radius: var(--border-radius);
+            background: var(--paper);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .collapsible-card.collapsed {
+            background: var(--bg);
+        }
+
+        .collapsible-card.critical {
+            border-left: 4px solid var(--danger);
+        }
+
+        .collapsible-card.important {
+            border-left: 4px solid var(--accent);
+        }
+
+        .collapsible-card-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .collapsible-card-header:hover {
+            background: var(--bg);
+        }
+
+        .card-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .card-icon {
+            font-size: 20px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: var(--bg);
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .card-summary {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-count {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .badge-critical {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge-empty {
+            background: var(--line);
+            color: var(--muted);
+        }
+
+        .expand-icon {
+            font-size: 18px;
+            color: var(--muted);
+            transition: transform 0.3s;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .collapsible-card.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-card.expanded .collapsible-card-body {
+            max-height: 10000px;
+        }
+
+        .card-content {
+            padding: 20px;
+            border-top: 1px solid var(--line);
+        }
+
+        /* Fields Grid */
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .field-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+
+        .field-value {
+            font-size: 14px;
+            color: var(--ink);
+            line-height: 1.6;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            min-height: 44px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .field-value.empty {
+            color: var(--muted);
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .section-controls {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .fields-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Consignment Data</h1>
+                <p>Complete view of all data from consignment-common.xml</p>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="section-header">
+                <h2>Podaci o pošiljci</h2>
+                <div class="section-controls">
+                    <input type="search" class="search-input" placeholder="Pretraži sve podatke..." id="searchInput">
+                    <button class="btn btn-primary" onclick="toggleAll()">Proširi sve</button>
+                </div>
+            </div>
+
+            <!-- Group 1: Consignment Identification & Metadata -->
+            <div class="group-header">Identifikacija i metapodaci</div>
+
+            <div class="collapsible-card collapsed" data-card="consignmentId">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">🆔</div>
+                        <div>
+                            <div class="card-title">Consignment Identification</div>
+                            <div class="card-summary">Consignment ID, Gross Weight, Gross Volume, Information</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Consignment ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Gross Weight</div>
+                                <div class="field-value">[Placeholder: grossWeight]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Gross Volume</div>
+                                <div class="field-value">[Placeholder: grossVolume]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Information</div>
+                                <div class="field-value">[Placeholder: information]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 2: Parties -->
+            <div class="group-header">Stranke</div>
+
+            <div class="collapsible-card collapsed" data-card="consignor">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">📤</div>
+                        <div>
+                            <div class="card-title">Consignor</div>
+                            <div class="card-summary">consignor - Name, Address, Contact, Licenses, Contracts</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Party ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Name</div>
+                                <div class="field-value">[Placeholder: name]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Role Code</div>
+                                <div class="field-value">[Placeholder: roleCode]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Postal Address</div>
+                                <div class="field-value">[Placeholder: postalAddress]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Defined Contact Details</div>
+                                <div class="field-value">[Placeholder: definedContactDetails]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Agreed Contract</div>
+                                <div class="field-value">[Placeholder: agreedContract]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Applicable Licence</div>
+                                <div class="field-value">[Placeholder: applicableLicence]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Authoritative Signatory Person</div>
+                                <div class="field-value">[Placeholder: authoritativeSignatoryPerson]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Tax Registration</div>
+                                <div class="field-value">[Placeholder: taxRegistration]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed" data-card="consignee">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">📥</div>
+                        <div>
+                            <div class="card-title">Consignee</div>
+                            <div class="card-summary">consignee - Name, Address, Contact, Licenses, Contracts</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Party ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Name</div>
+                                <div class="field-value">[Placeholder: name]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Postal Address</div>
+                                <div class="field-value">[Placeholder: postalAddress]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Defined Contact Details</div>
+                                <div class="field-value">[Placeholder: definedContactDetails]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed" data-card="carrier">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">🚚</div>
+                        <div>
+                            <div class="card-title">Carrier</div>
+                            <div class="card-summary">carrier - Transport operator details</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Carrier ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Name</div>
+                                <div class="field-value">[Placeholder: name]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Postal Address</div>
+                                <div class="field-value">[Placeholder: postalAddress]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed" data-card="connectingCarrier">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">🔄</div>
+                        <div>
+                            <div class="card-title">Connecting Carrier</div>
+                            <div class="card-summary">connectingCarrier - Following carrier information</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Carrier ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Name</div>
+                                <div class="field-value">[Placeholder: name]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed" data-card="freightForwarder">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">📋</div>
+                        <div>
+                            <div class="card-title">Freight Forwarder</div>
+                            <div class="card-summary">freightForwarder - Forwarder details</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Forwarder ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Name</div>
+                                <div class="field-value">[Placeholder: name]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed" data-card="associatedParties">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">👥</div>
+                        <div>
+                            <div class="card-title">Associated Parties</div>
+                            <div class="card-summary">associatedParty - Additional parties with roles</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Multiple</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Party ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Name</div>
+                                <div class="field-value">[Placeholder: name]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Role Code</div>
+                                <div class="field-value">[Placeholder: roleCode]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 3: Locations -->
+            <div class="group-header">Lokacije</div>
+
+            <div class="collapsible-card collapsed" data-card="carrierAcceptanceLocation">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">📍</div>
+                        <div>
+                            <div class="card-title">Carrier Acceptance Location</div>
+                            <div class="card-summary">carrierAcceptanceLocation - Where goods are taken over</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Location ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Name</div>
+                                <div class="field-value">[Placeholder: name]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Carrier Acceptance DateTime</div>
+                                <div class="field-value">[Placeholder: carrierAcceptanceDateTime]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Postal Address</div>
+                                <div class="field-value">[Placeholder: postalAddress]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Geographical Coordinates</div>
+                                <div class="field-value">[Placeholder: geographicalCoordinates]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed" data-card="consigneeReceiptLocation">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">📍</div>
+                        <div>
+                            <div class="card-title">Consignee Receipt Location</div>
+                            <div class="card-summary">consigneeReceiptLocation - Delivery location</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Location ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Name</div>
+                                <div class="field-value">[Placeholder: name]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Postal Address</div>
+                                <div class="field-value">[Placeholder: postalAddress]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Geographical Coordinates</div>
+                                <div class="field-value">[Placeholder: geographicalCoordinates]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 4: Consignment Items -->
+            <div class="group-header">Stavke pošiljke</div>
+
+            <div class="collapsible-card collapsed" data-card="consignmentItems">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">📦</div>
+                        <div>
+                            <div class="card-title">Consignment Items</div>
+                            <div class="card-summary">includedConsignmentItem - Goods items with details</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Multiple items</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Goods Unit Quantity</div>
+                                <div class="field-value">[Placeholder: goodsUnitQuantity]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Gross Weight</div>
+                                <div class="field-value">[Placeholder: grossWeight]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Gross Volume</div>
+                                <div class="field-value">[Placeholder: grossVolume]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Dimensions</div>
+                                <div class="field-value">[Placeholder: dimensions]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Shipping Marks</div>
+                                <div class="field-value">[Placeholder: shippingMarks]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Associated Transport Equipment</div>
+                                <div class="field-value">[Placeholder: associatedTransportEquipment]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 5: Transport Movement & Equipment -->
+            <div class="group-header">Transport i oprema</div>
+
+            <div class="collapsible-card collapsed important" data-card="mainCarriageTransportMovement">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">🚛</div>
+                        <div>
+                            <div class="card-title">Main Carriage Transport Movement</div>
+                            <div class="card-summary">mainCarriageTransportMovement - Mode, Vehicle, Events</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Movement ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Mode Code</div>
+                                <div class="field-value">[Placeholder: modeCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Dangerous Goods Indicator</div>
+                                <div class="field-value">[Placeholder: dangerousGoodsIndicator]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Used Transport Means</div>
+                                <div class="field-value">[Placeholder: usedTransportMeans]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Arrival Event</div>
+                                <div class="field-value">[Placeholder: arrivalEvent]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Departure Event</div>
+                                <div class="field-value">[Placeholder: departureEvent]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Border Crossing Event</div>
+                                <div class="field-value">[Placeholder: borderCrossingEvent]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Call Event</div>
+                                <div class="field-value">[Placeholder: callEvent]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Itinerary Route</div>
+                                <div class="field-value">[Placeholder: itineraryRoute]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed important" data-card="usedTransportEquipment">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">🚚</div>
+                        <div>
+                            <div class="card-title">Used Transport Equipment</div>
+                            <div class="card-summary">usedTransportEquipment - Containers, trailers, equipment</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Multiple</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Equipment ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Category Code</div>
+                                <div class="field-value">[Placeholder: categoryCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Sequence Number</div>
+                                <div class="field-value">[Placeholder: sequenceNumber]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Registration Country</div>
+                                <div class="field-value">[Placeholder: registrationCountry]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Carried Transport Equipment</div>
+                                <div class="field-value">[Placeholder: carriedTransportEquipment]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Affixed Seals</div>
+                                <div class="field-value">[Placeholder: affixedSeal]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Loaded Dangerous Goods</div>
+                                <div class="field-value">[Placeholder: loadedDangerousGoods]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Gross Goods Weight Measure</div>
+                                <div class="field-value">[Placeholder: grossGoodsWeightMeasure]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Gross Goods Volume Measure</div>
+                                <div class="field-value">[Placeholder: grossGoodsVolumeMeasure]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 6: Dangerous Goods -->
+            <div class="group-header">Opasna roba</div>
+
+            <div class="collapsible-card collapsed critical" data-card="dangerousGoods">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">⚠️</div>
+                        <div>
+                            <div class="card-title">Dangerous Goods (Consignment Level)</div>
+                            <div class="card-summary">dangerousGoods - ADR data at consignment level</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-critical">Critical</span>
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">UN Number (uNDGID)</div>
+                                <div class="field-value">[Placeholder: uNDGID]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Proper Shipping Name</div>
+                                <div class="field-value">[Placeholder: properShippingName]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Technical Name</div>
+                                <div class="field-value">[Placeholder: technicalName]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Hazard Classification ID</div>
+                                <div class="field-value">[Placeholder: hazardClassificationID]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Hazard Category Code</div>
+                                <div class="field-value">[Placeholder: hazardCategoryCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Hazard Type Code</div>
+                                <div class="field-value">[Placeholder: hazardTypeCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Packaging Danger Level Code</div>
+                                <div class="field-value">[Placeholder: packagingDangerLevelCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Limited Quantity Code</div>
+                                <div class="field-value">[Placeholder: limitedQuantityCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Tunnel Restriction Code</div>
+                                <div class="field-value">[Placeholder: tunnelRestrictionCode]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Control Temperature</div>
+                                <div class="field-value">[Placeholder: controlTemperature]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Emergency Temperature</div>
+                                <div class="field-value">[Placeholder: emergencyTemperature]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Dangerous Goods Logistics Package</div>
+                                <div class="field-value">[Placeholder: dangerousGoodsLogisticsPackage]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Radioactive Material</div>
+                                <div class="field-value">[Placeholder: radioactiveMaterial]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Related Document</div>
+                                <div class="field-value">[Placeholder: relatedDocument]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed critical" data-card="transportDangerousGoods">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">⚠️</div>
+                        <div>
+                            <div class="card-title">Transport Dangerous Goods (Item Level)</div>
+                            <div class="card-summary">transportDangerousGoods - ADR data per item</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-critical">Critical</span>
+                        <span class="badge badge-count">Per item</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">UN Number</div>
+                                <div class="field-value">[Placeholder: uNDGID]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Proper Shipping Name</div>
+                                <div class="field-value">[Placeholder: properShippingName]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Dangerous Goods Logistics Package</div>
+                                <div class="field-value">[Placeholder: dangerousGoodsLogisticsPackage]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 7: Events -->
+            <div class="group-header">Događaji</div>
+
+            <div class="collapsible-card collapsed" data-card="deliveryEvent">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">📅</div>
+                        <div>
+                            <div class="card-title">Delivery Event</div>
+                            <div class="card-summary">deliveryEvent - Delivery dates, location, certifying party</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Actual Occurrence DateTime</div>
+                                <div class="field-value">[Placeholder: actualOccurrenceDateTime]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Estimated Occurrence DateTime</div>
+                                <div class="field-value">[Placeholder: estimatedOccurrenceDateTime]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Scheduled Occurrence DateTime</div>
+                                <div class="field-value">[Placeholder: scheduledOccurrenceDateTime]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Requested Occurrence DateTime</div>
+                                <div class="field-value">[Placeholder: requestedOccurrenceDateTime]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Event Type Code</div>
+                                <div class="field-value">[Placeholder: typeCode]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Occurrence Location</div>
+                                <div class="field-value">[Placeholder: occurrenceLocation]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Scheduled Occurrence Period</div>
+                                <div class="field-value">[Placeholder: scheduledOccurrencePeriod]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Certifying Party</div>
+                                <div class="field-value">[Placeholder: certifyingParty]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Additional Security Measures</div>
+                                <div class="field-value">[Placeholder: additionalSecurityMeasures]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Related Observation</div>
+                                <div class="field-value">[Placeholder: relatedObservation]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 8: Financial & Commercial -->
+            <div class="group-header">Financijski i komercijalni</div>
+
+            <div class="collapsible-card collapsed" data-card="serviceCharges">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">💰</div>
+                        <div>
+                            <div class="card-title">Service Charges</div>
+                            <div class="card-summary">applicableServiceCharge - Charges and payment arrangements</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Multiple</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Charge ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Applied Amount</div>
+                                <div class="field-value">[Placeholder: appliedAmount]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Calculation Basis Code</div>
+                                <div class="field-value">[Placeholder: calculationBasisCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Paying Party Role Code</div>
+                                <div class="field-value">[Placeholder: payingPartyRoleCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Payment Arrangement Code</div>
+                                <div class="field-value">[Placeholder: paymentArrangementCode]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Calculation Basis Price</div>
+                                <div class="field-value">[Placeholder: calculationBasisPrice]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed" data-card="financialInfo">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">💳</div>
+                        <div>
+                            <div class="card-title">Financial Information</div>
+                            <div class="card-summary">COD Amount, Declared Value, Insurance Instructions</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">COD Amount</div>
+                                <div class="field-value">[Placeholder: cODAmount]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Declared Value for Carriage Amount</div>
+                                <div class="field-value">[Placeholder: declaredValueForCarriageAmount]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Cargo Insurance Instructions</div>
+                                <div class="field-value">[Placeholder: cargoInsuranceInstructions]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 9: Documents & References -->
+            <div class="group-header">Dokumenti i reference</div>
+
+            <div class="collapsible-card collapsed" data-card="associatedDocuments">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">📄</div>
+                        <div>
+                            <div class="card-title">Associated Documents</div>
+                            <div class="card-summary">associatedDocument - Documents, attachments, references</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Multiple</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Document ID</div>
+                                <div class="field-value">[Placeholder: id]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Document Type Code</div>
+                                <div class="field-value">[Placeholder: typeCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Document Subtype Code</div>
+                                <div class="field-value">[Placeholder: subtypeCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Reference Type Code</div>
+                                <div class="field-value">[Placeholder: referenceTypeCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Formatted Issue DateTime</div>
+                                <div class="field-value">[Placeholder: formattedIssueDateTime]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Issue Location</div>
+                                <div class="field-value">[Placeholder: issueLocation]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Issuer</div>
+                                <div class="field-value">[Placeholder: issuer]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Attached Binary File</div>
+                                <div class="field-value">[Placeholder: attachedBinaryFile]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Attached Binary Object</div>
+                                <div class="field-value">[Placeholder: attachedBinaryObject]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Contractual Clause</div>
+                                <div class="field-value">[Placeholder: contractualClause]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Document URI</div>
+                                <div class="field-value">[Placeholder: uRI]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 10: Risk & Security -->
+            <div class="group-header">Rizik i sigurnost</div>
+
+            <div class="collapsible-card collapsed important" data-card="riskAnalysis">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">🔒</div>
+                        <div>
+                            <div class="card-title">Risk Analysis</div>
+                            <div class="card-summary">logisticsRiskAnalysisResult - Security and risk assessment</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <div class="field-label">Risk Level Code</div>
+                                <div class="field-value">[Placeholder: levelCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Consignment Risk Related Code</div>
+                                <div class="field-value">[Placeholder: consignmentRiskRelatedCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Screening Method Code</div>
+                                <div class="field-value">[Placeholder: screeningMethodCode]</div>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-label">Security Exemption Code</div>
+                                <div class="field-value">[Placeholder: securityExemptionCode]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Description</div>
+                                <div class="field-value">[Placeholder: description]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Information Text</div>
+                                <div class="field-value">[Placeholder: informationText]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group 11: Additional Information -->
+            <div class="group-header">Dodatne informacije</div>
+
+            <div class="collapsible-card collapsed" data-card="generalInfo">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">ℹ️</div>
+                        <div>
+                            <div class="card-title">General Information</div>
+                            <div class="card-summary">Information texts and instructions</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group full-width">
+                                <div class="field-label">Information</div>
+                                <div class="field-value">[Placeholder: information]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Delivery Information</div>
+                                <div class="field-value">[Placeholder: deliveryInformation]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Consignor Provided Information Text</div>
+                                <div class="field-value">[Placeholder: consignorProvidedInformationText]</div>
+                            </div>
+                            <div class="field-group full-width">
+                                <div class="field-label">Contract Terms Text</div>
+                                <div class="field-value">[Placeholder: contractTermsText]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-card collapsed" data-card="borderClearance">
+                <div class="collapsible-card-header" onclick="toggleCard(this)">
+                    <div class="card-title-group">
+                        <div class="card-icon">🛃</div>
+                        <div>
+                            <div class="card-title">Border Clearance</div>
+                            <div class="card-summary">Border clearance instructions</div>
+                        </div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="badge badge-count">Available</span>
+                        <span class="expand-icon">▶</span>
+                    </div>
+                </div>
+                <div class="collapsible-card-body">
+                    <div class="card-content">
+                        <div class="fields-grid">
+                            <div class="field-group full-width">
+                                <div class="field-label">Consignor Provided Border Clearance Instructions</div>
+                                <div class="field-value">[Placeholder: consignorProvidedBorderClearanceInstructions/description]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.closest('.collapsible-card');
+            card.classList.toggle('expanded');
+            card.classList.toggle('collapsed');
+        }
+
+        function toggleAll() {
+            const cards = document.querySelectorAll('.collapsible-card');
+            const allExpanded = Array.from(cards).every(card => card.classList.contains('expanded'));
+            
+            cards.forEach(card => {
+                if (allExpanded) {
+                    card.classList.remove('expanded');
+                    card.classList.add('collapsed');
+                } else {
+                    card.classList.remove('collapsed');
+                    card.classList.add('expanded');
+                }
+            });
+
+            const btn = event.target;
+            btn.textContent = allExpanded ? 'Proširi sve' : 'Sažmi sve';
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.collapsible-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const summary = card.querySelector('.card-summary').textContent.toLowerCase();
+                const matches = title.includes(searchTerm) || summary.includes(searchTerm);
+                
+                if (matches || searchTerm === '') {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

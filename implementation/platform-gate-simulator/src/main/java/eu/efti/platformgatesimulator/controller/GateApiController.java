@@ -35,7 +35,9 @@ public class GateApiController implements V0Api {
             final SupplyChainConsignment supplyChainConsignment = readerService.readFromFile(gateProperties.getCdaPath() + datasetId, subsetId.stream().toList());
             if (supplyChainConsignment != null) {
                 var xml = serializeUtils.mapDocToXmlString(EftiSchemaUtils.mapCommonObjectToDoc(serializeUtils, supplyChainConsignment));
-                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_XML).body(xml);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .contentType(MediaType.parseMediaType("application/xml;charset=UTF-8"))
+                        .body(xml);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }

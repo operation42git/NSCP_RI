@@ -137,14 +137,16 @@ public class UilRequestService extends RequestService<UilRequestEntity> {
     public void manageRestResponseReceived(String requestId, SupplyChainConsignment consignment) {
         final Optional<UilRequestDto> maybeUilRequestDto = this.findByRequestId(requestId);
         if (maybeUilRequestDto.isPresent()) {
-            if (List.of(RequestTypeEnum.LOCAL_UIL_SEARCH, EXTERNAL_ASK_UIL_SEARCH).contains(maybeUilRequestDto.get().getControl().getRequestType())) {
+            RequestTypeEnum requestType = maybeUilRequestDto.get().getControl().getRequestType();
+            // Handle both platform REST calls and gate-to-gate REST calls
+            if (List.of(RequestTypeEnum.LOCAL_UIL_SEARCH, EXTERNAL_ASK_UIL_SEARCH, RequestTypeEnum.EXTERNAL_UIL_SEARCH).contains(requestType)) {
                 String responseData = serializeUtils.mapDocToXmlString(EftiSchemaUtils.mapCommonObjectToDoc(serializeUtils, consignment));
                 UilRequestDto uilRequestDto = maybeUilRequestDto.get();
                 uilRequestDto.setReponseData(responseData.getBytes(Charset.defaultCharset()));
                 updateStatus(uilRequestDto, RequestStatusEnum.SUCCESS);
                 getControlService().updateControlStatus(uilRequestDto.getControl(), COMPLETE);
             } else {
-                throw new IllegalStateException("should only be called for local platform requests");
+                throw new IllegalStateException("should only be called for REST API requests (local platform or gate-to-gate), but got: " + requestType);
             }
         } else {
             log.error(UIL_REQUEST_DTO_NOT_FIND_IN_DB + ": {}", requestId);

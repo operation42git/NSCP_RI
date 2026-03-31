@@ -96,7 +96,7 @@ public class SecurityConfig {
      * SecurityFilterChain for Client Authentication by Client Certificate.
      */
     @Profile("certAuth")
-    @Order(2)
+    @Order(3)
     @Bean
     public SecurityFilterChain certAuthfilterChain(HttpSecurity http) throws Exception {
         http.securityMatcher("/v1/aap/**").csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(authorize -> authorize
@@ -143,9 +143,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(3)
+    @Order(4)
     public SecurityFilterChain defaultFilterChain(final HttpSecurity http, final JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
+        // Add header-based authentication filter for gate-to-gate calls (optional - continues if headers not present)
+        var eftiApiPreAuthenticatedUserHeaderFilter = new EftiApiPreAuthenticatedUserHeaderFilter();
+        eftiApiPreAuthenticatedUserHeaderFilter.setContinueFilterChainOnUnsuccessfulAuthentication(true);
+        eftiApiPreAuthenticatedUserHeaderFilter.setAuthenticationManager(new ProviderManager(createRestApiPreAuthenticatedAuthenticationProvider()));
+
         http.csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(eftiApiPreAuthenticatedUserHeaderFilter, org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter.class)
                 .sessionManagement(
                         management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                 .sessionFixation().changeSessionId()
@@ -154,7 +160,7 @@ public class SecurityConfig {
                         //open url
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/ws/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        //require login to everything else
+                        //require login to everything else (either header-based or JWT)
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

@@ -11,11 +11,11 @@ server:
 gate:
   minSleep: 1000
   maxSleep: 2000
-  owner: massivedynamic
+  owner: slovenia eFTI platform
   cda_path: classpath:cda/
   gate: syldavia
   ap:
-    url: http://efti.platform.massivedynamic.com:81/domibus/services/wsplugin
-    username: massivedynamic_service_account
+    url: http://efti.platform.slovenia-efti-platform.com:81/domibus/services/wsplugin
+    username: slovenia_efti_platform_service_account
     password: Azerty59*1234567
 

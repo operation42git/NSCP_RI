@@ -191,7 +191,7 @@ class IdentifiersQueryTest {
         Consignment consignment = identifiersMapper.eDeliverySupplyToEntity(sourceConsignment);
 
         consignment.setGateId("france");
-        consignment.setPlatformId("acme");
+        consignment.setPlatformId("croatia eFTI platform");
         consignment.setDatasetId(datasetId);
 
         return consignment;

@@ -66,6 +66,13 @@ public class IdentifiersJpaConfiguration {
         final Map<String, Object> props = new HashMap<>();
         props.put("spring.datasource.schema", schema);
         props.put("hibernate.default_schema", schema);
+        // Enable SQL logging to see actual queries
+        props.put("hibernate.show_sql", "true");
+        props.put("hibernate.format_sql", "true");
+        props.put("hibernate.use_sql_comments", "true");
+        System.out.println("=== JPA CONFIGURATION ===");
+        System.out.println("Identifiers Schema: " + schema);
+        System.out.println("==========================");
         return props;
     }
 

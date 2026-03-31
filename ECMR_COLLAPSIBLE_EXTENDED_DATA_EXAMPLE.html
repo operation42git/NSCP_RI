@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eCMR with Collapsible Extended Data - Example</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --paper: #ffffff;
+            --bg: #f9fafb;
+            --accent: #2563eb;
+            --accent-light: rgba(37, 99, 235, 0.1);
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --border-radius: 12px;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .ecmr-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            background: var(--bg);
+            min-height: 100vh;
+        }
+
+        .ecmr-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(to bottom, #fafbfc, #ffffff);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.01em;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Extended Data Section */
+        .extended-data-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 3px solid var(--line);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px 24px;
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .section-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            font-size: 13px;
+            min-width: 200px;
+        }
+
+        /* Collapsible Card */
+        .collapsible-card {
+            margin-bottom: 16px;
+            border: 1px solid var(--line);
+            border-radius: var(--border-radius);
+            background: var(--paper);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .collapsible-card.collapsed {
+            background: var(--bg);
+        }
+
+        .collapsible-card.critical {
+            border-left: 4px solid var(--danger);
+        }
+
+        .collapsible-card.important {
+            border-left: 4px solid var(--accent);
+        }
+
+        .collapsible-card-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .collapsible-card-header:hover {
+            background: var(--bg);
+        }
+
+        .card-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .card-icon {
+            font-size: 20px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: var(--bg);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .card-summary {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-count {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .badge-critical {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge-empty {
+            background: var(--line);
+            color: var(--muted);
+        }
+
+        .expand-icon {
+            font-size: 18px;
+            color: var(--muted);
+            transition: transform 0.3s;
+        }
+
+        .collapsible-card.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-card.expanded .collapsible-card-body {
+            max-height: 5000px;
+        }
+
+        .card-content {
+            padding: 20px;
+            border-top: 1px solid var(--line);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Group Header */
+        .group-header {
+            margin: 24px 0 12px 0;
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            border-bottom: 2px solid var(--line);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .section-controls {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+
+        /* Demo styles for content */
+        .demo-content {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .demo-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .demo-field:last-child {
+            border-bottom: none;
+        }
+
+        .demo-label {
+            font-weight: 600;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .demo-value {
+            color: var(--ink);
+        }
+    </style>
+</head>
+<body>
+    <div class="ecmr-container">
+        <div class="ecmr-wrapper">
+            <!-- Primary ECMR Cards (Always Visible) -->
+            <div class="card header-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div style="padding: 32px 24px;">
+                    <h1 style="margin: 0 0 8px 0; font-size: 28px;">eCMR tovarni list</h1>
+                    <p style="margin: 0; opacity: 0.9;">Međunarodni cestovni prijevoz robe (CMR) — elektronički prikaz</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Osnovni podaci</h2>
+                    <span style="font-size: 12px; color: var(--muted);">Polja 1–5, 16–18</span>
+                </div>
+                <div class="card-body">
+                    <p style="color: var(--muted); font-style: italic;">[Primary ECMR fields displayed here]</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Roba</h2>
+                    <span style="font-size: 12px; color: var(--muted);">Polja 6–12</span>
+                </div>
+                <div class="card-body">
+                    <p style="color: var(--muted); font-style: italic;">[Goods table displayed here]</p>
+                </div>
+            </div>
+
+            <!-- Extended Data Section -->
+            <div class="extended-data-section">
+                <div class="section-header">
+                    <h2>Dodatni podaci</h2>
+                    <div class="section-controls">
+                        <input type="search" class="search-input" placeholder="Pretraži dodatne podatke...">
+                        <button class="btn" onclick="toggleAll()">Proširi sve</button>
+                    </div>
+                </div>
+
+                <!-- Group 1: Transport & Movement -->
+                <div class="group-header">Transport i kretanje</div>
+
+                <div class="collapsible-card collapsed" data-category="transport">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">🚛</div>
+                            <div>
+                                <div class="card-title">Transport Movement</div>
+                                <div class="card-summary">Mode: 3 (Road), Vehicle: ABC-123</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-count">2 events</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">Mode Code:</span>
+                                    <span class="demo-value">3 (Road Transport)</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Dangerous Goods Indicator:</span>
+                                    <span class="demo-value">Yes</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Vehicle ID:</span>
+                                    <span class="demo-value">ABC-123</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Registration Country:</span>
+                                    <span class="demo-value">HR</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible-card collapsed" data-category="transport">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">📦</div>
+                            <div>
+                                <div class="card-title">Transport Equipment</div>
+                                <div class="card-summary">3 equipment items</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-count">3 items</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">Equipment IDs:</span>
+                                    <span class="demo-value">CONTAINER-001, CONTAINER-002, TRAILER-001</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Category Codes:</span>
+                                    <span class="demo-value">AE, AE, AB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 2: Safety & Compliance -->
+                <div class="group-header">Sigurnost i usklađenost</div>
+
+                <div class="collapsible-card collapsed critical" data-category="safety">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">⚠️</div>
+                            <div>
+                                <div class="card-title">ADR / Opasna roba</div>
+                                <div class="card-summary">UN1202 - Gasoline, 3 items</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-critical">Critical</span>
+                            <span class="badge badge-count">3 items</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">UN Number:</span>
+                                    <span class="demo-value">UN1202</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Proper Shipping Name:</span>
+                                    <span class="demo-value">Gasoline</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Hazard Classification:</span>
+                                    <span class="demo-value">3 - Flammable Liquid</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Packaging Group:</span>
+                                    <span class="demo-value">II</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible-card collapsed important" data-category="safety">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">🔒</div>
+                            <div>
+                                <div class="card-title">Risk Analysis</div>
+                                <div class="card-summary">Risk Level: Medium</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-count">Available</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">Risk Level:</span>
+                                    <span class="demo-value">Medium</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Screening Method:</span>
+                                    <span class="demo-value">Automated</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 3: Events & Timeline -->
+                <div class="group-header">Događaji i vremenska linija</div>
+
+                <div class="collapsible-card collapsed" data-category="events">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">📅</div>
+                            <div>
+                                <div class="card-title">Delivery Events</div>
+                                <div class="card-summary">Scheduled: 2024-01-15, Actual: 2024-01-15 14:30</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-count">1 event</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">Scheduled:</span>
+                                    <span class="demo-value">2024-01-15 10:00 - 18:00</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Actual:</span>
+                                    <span class="demo-value">2024-01-15 14:30</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Location:</span>
+                                    <span class="demo-value">Warehouse A, Zagreb</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 4: Parties & Contacts -->
+                <div class="group-header">Stranke i kontakti</div>
+
+                <div class="collapsible-card collapsed" data-category="parties">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">👥</div>
+                            <div>
+                                <div class="card-title">Associated Parties</div>
+                                <div class="card-summary">2 additional parties</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-count">2 parties</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">Party 1:</span>
+                                    <span class="demo-value">Customs Broker Ltd. (Role: BROKER)</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Party 2:</span>
+                                    <span class="demo-value">Insurance Company Inc. (Role: INSURER)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible-card collapsed" data-category="parties">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">📋</div>
+                            <div>
+                                <div class="card-title">Freight Forwarder</div>
+                                <div class="card-summary">Forward Logistics d.o.o.</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-count">Available</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">Name:</span>
+                                    <span class="demo-value">Forward Logistics d.o.o.</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Contact:</span>
+                                    <span class="demo-value">info@forwardlog.hr</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 5: Financial & Commercial -->
+                <div class="group-header">Financijski i komercijalni</div>
+
+                <div class="collapsible-card collapsed" data-category="financial">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">💰</div>
+                            <div>
+                                <div class="card-title">Service Charges</div>
+                                <div class="card-summary">3 charges, Total: 1,250.00 EUR</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-count">3 charges</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">Freight Charge:</span>
+                                    <span class="demo-value">1,000.00 EUR</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Insurance:</span>
+                                    <span class="demo-value">200.00 EUR</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Handling:</span>
+                                    <span class="demo-value">50.00 EUR</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 6: Documents & References -->
+                <div class="group-header">Dokumenti i reference</div>
+
+                <div class="collapsible-card collapsed" data-category="documents">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">📄</div>
+                            <div>
+                                <div class="card-title">Associated Documents</div>
+                                <div class="card-summary">5 documents attached</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-count">5 docs</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="demo-content">
+                                <div class="demo-field">
+                                    <span class="demo-label">Invoice:</span>
+                                    <span class="demo-value">INV-2024-001</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Packing List:</span>
+                                    <span class="demo-value">PL-2024-001</span>
+                                </div>
+                                <div class="demo-field">
+                                    <span class="demo-label">Customs Declaration:</span>
+                                    <span class="demo-value">CD-2024-001</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State Example -->
+                <div class="collapsible-card collapsed" data-category="other">
+                    <div class="collapsible-card-header" onclick="toggleCard(this)">
+                        <div class="card-title-group">
+                            <div class="card-icon">ℹ️</div>
+                            <div>
+                                <div class="card-title">General Information</div>
+                                <div class="card-summary">No additional information</div>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="badge badge-empty">No data</span>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-card-body">
+                        <div class="card-content">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <p>No additional information available for this consignment.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.closest('.collapsible-card');
+            card.classList.toggle('expanded');
+            card.classList.toggle('collapsed');
+        }
+
+        function toggleAll() {
+            const cards = document.querySelectorAll('.collapsible-card');
+            const allExpanded = Array.from(cards).every(card => card.classList.contains('expanded'));
+            
+            cards.forEach(card => {
+                if (allExpanded) {
+                    card.classList.remove('expanded');
+                    card.classList.add('collapsed');
+                } else {
+                    card.classList.remove('collapsed');
+                    card.classList.add('expanded');
+                }
+            });
+
+            const btn = event.target;
+            btn.textContent = allExpanded ? 'Proširi sve' : 'Sažmi sve';
+        }
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.collapsible-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const summary = card.querySelector('.card-summary').textContent.toLowerCase();
+                const matches = title.includes(searchTerm) || summary.includes(searchTerm);
+                
+                if (matches || searchTerm === '') {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

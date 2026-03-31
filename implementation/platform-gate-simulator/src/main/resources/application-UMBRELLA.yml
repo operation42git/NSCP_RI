@@ -11,11 +11,11 @@ server:
 gate:
   minSleep: 1000
   maxSleep: 2000
-  owner: umbrellainc
+  owner: austria eFTI platform
   cda_path: classpath:cda/
   gate: listenbourg
   ap:
-    url: http://efti.platform.umbrellainc.com:81/domibus/services/wsplugin
-    username: umbrellacorporation_service_account
+    url: http://efti.platform.austria-efti-platform.com:81/domibus/services/wsplugin
+    username: austria_efti_platform_service_account
     password: Azerty59*1234567
 

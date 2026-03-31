@@ -1,0 +1,125 @@
+{
+  "ecmr_identifier": "HR-ECMR-2026-000123",
+  "issue_date": "2026-01-11T09:15:00+01:00",
+  "issue_location": {
+    "city": "Zagreb",
+    "country": "HR"
+  },
+  "consignor": {
+    "name": "Adria Food d.o.o.",
+    "address": {
+      "street": "Radnička cesta",
+      "building_number": "80",
+      "postcode": "10000",
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "tax_id": "12345678901"
+  },
+  "consignee": {
+    "name": "Dalmacija Retail d.o.o.",
+    "address": {
+      "street": "Vukovarska",
+      "building_number": "220",
+      "postcode": "21000",
+      "city": "Split",
+      "country": "HR"
+    },
+    "tax_id": "98765432109"
+  },
+  "delivery_location": {
+    "name": "Skladište \"DR-SPL-01\"",
+    "address": {
+      "street": "Vukovarska",
+      "building_number": "220",
+      "postcode": "21000",
+      "city": "Split",
+      "country": "HR"
+    }
+  },
+  "pickup": {
+    "location": {
+      "city": "Zagreb",
+      "street": "Radnička cesta",
+      "building_number": "80",
+      "postcode": "10000",
+      "country": "HR"
+    },
+    "datetime": "2026-01-11T10:00:00+01:00"
+  },
+  "attached_documents": [
+    {
+      "id": "INV-2026-00456",
+      "type": "Invoice"
+    },
+    {
+      "id": "PL-2026-00198",
+      "type": "Packing list"
+    }
+  ],
+  "carrier": {
+    "name": "TransLogistika d.o.o.",
+    "address": {
+      "street": "Slavonska avenija",
+      "building_number": "52",
+      "postcode": "10000",
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "tax_id": "11223344556"
+  },
+  "carrier_reservations": "Bez rezervi. Ambalaža neoštećena.",
+  "goods": {
+    "marks": "AF-PLT-2026-01",
+    "package_count": 10,
+    "packaging_description": "10 paleta (EUR)",
+    "nature": "Pakirani prehrambeni proizvodi (neopasno)",
+    "hs_code": "21069098",
+    "gross_weight": {
+      "value": 6500.00,
+      "unit": "KGM"
+    },
+    "volume": {
+      "value": 24.00,
+      "unit": "MTQ"
+    }
+  },
+  "sender_instructions": "Isporuka radnim danom 08:00–16:00, najava 1h prije dolaska.",
+  "cod_amount": {
+    "value": 0.00,
+    "currency": "EUR"
+  },
+  "freight_payment": "PREPAID",
+  "payment_party": "CONSIGNOR",
+  "special_agreements": "Temperaturni režim: 5–25 °C (bez hlađenja)",
+  "signatures": {
+    "consignor": {
+      "company": "Adria Food d.o.o.",
+      "person": "Ivan Horvat"
+    },
+    "carrier": {
+      "company": "TransLogistika d.o.o.",
+      "person": "Marko Kovač"
+    },
+    "consignee": {
+      "company": "Dalmacija Retail d.o.o.",
+      "person": "Ana Marić"
+    }
+  },
+  "vehicle": {
+    "id": "HR ZG-1234-AB",
+    "trailer_id": "HR ZG-5678-CD",
+    "model": "MAN TGX 18.440 + Schmitz S.KO"
+  },
+  "tariff": {
+    "basis": "per_km",
+    "amount": {
+      "value": 620.00,
+      "currency": "EUR"
+    }
+  }
+}
+
+
+
+

@@ -3,19 +3,39 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://auth.gate.borduria.eu:8080/realms/eFTI_BO
+          issuer-uri: http://auth.gate.croatia.eu:8080/realms/eFTI_HR
+  servlet:
+    multipart:
+      location: /usr/src/myapp/tmp
+      max-file-size: 50MB
+      max-request-size: 50MB
+      file-size-threshold: 10MB
+  datasource:
+    url: jdbc:postgresql://reference-gate-shared-db:5432/efti
+    username: efti
+    password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
   port: 8070
+  tomcat:
+    basedir: /usr/src/myapp/tmp
 
 gate:
   minSleep: 1000
   maxSleep: 2000
-  owner: acme
+  owner: croatia eFTI platform
   cda_path: file:/usr/src/myapp/cda/
-  gate: borduria
+  gate: croatia
   ap:
-    url: http://efti.platform.acme.com:81/domibus/services/wsplugin
-    username: acme_service_account
+    url: http://efti.platform.croatia-efti-platform.com:81/domibus/services/wsplugin
+    username: croatia_efti_platform_service_account
     password: Azerty59*1234567
 

@@ -70,6 +70,24 @@ public class IdentifiersService {
 
     @Transactional("identifiersTransactionManager")
     public List<ConsignmentDto> search(final SearchWithIdentifiersRequestDto identifiersRequestDto) {
-        return mapper.entityToDto(this.identifiersRepository.searchByCriteria(identifiersRequestDto));
+        log.info("=== IDENTIFIER SEARCH START ===");
+        log.info("Gate Owner: {}, Gate Country: {}", gateOwner, gateCountry);
+        log.info("Search Request - Identifier: '{}', IdentifierType: {}, ModeCode: {}, RegistrationCountryCode: {}, DangerousGoodsIndicator: {}",
+                identifiersRequestDto.getIdentifier(),
+                identifiersRequestDto.getIdentifierType(),
+                identifiersRequestDto.getModeCode(),
+                identifiersRequestDto.getRegistrationCountryCode(),
+                identifiersRequestDto.getDangerousGoodsIndicator());
+        
+        List<Consignment> results = this.identifiersRepository.searchByCriteria(identifiersRequestDto);
+        log.info("Search Results Count: {}", results.size());
+        if (!results.isEmpty()) {
+            log.info("Found Consignments - GateIds: {}, PlatformIds: {}, DatasetIds: {}",
+                    results.stream().map(Consignment::getGateId).distinct().toList(),
+                    results.stream().map(Consignment::getPlatformId).distinct().toList(),
+                    results.stream().map(Consignment::getDatasetId).distinct().toList());
+        }
+        log.info("=== IDENTIFIER SEARCH END ===");
+        return mapper.entityToDto(results);
     }
 }

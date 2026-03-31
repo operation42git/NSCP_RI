@@ -1,0 +1,79 @@
+{
+  "ecmr_identifier": "HR-ECMR-260111-02",
+  "issue_date": "2026-01-11T11:00:00+01:00",
+  "issue_location": {
+    "city": "Zagreb",
+    "country": "HR"
+  },
+  "consignor": {
+    "name": "Adria Food d.o.o.",
+    "address": {
+      "street": "Radnička cesta",
+      "building_number": "80",
+      "postcode": "10000",
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "tax_id": "12345678901"
+  },
+  "consignee": {
+    "name": "Kvarner Wholesale d.o.o.",
+    "address": {
+      "street": "Osječka ulica",
+      "building_number": "12",
+      "postcode": "51000",
+      "city": "Rijeka",
+      "country": "HR"
+    },
+    "tax_id": "55443322110"
+  },
+  "pickup": {
+    "location": {
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "datetime": "2026-01-11T11:20:00+01:00"
+  },
+  "delivery_location": {
+    "name": "Rijeka",
+    "address": {
+      "city": "Rijeka",
+      "country": "HR"
+    }
+  },
+  "delivery_datetime": "2026-01-11T15:10:00+01:00",
+  "carrier": {
+    "name": "TransLogistika d.o.o.",
+    "address": {
+      "street": "Dunajska cesta",
+      "building_number": "150",
+      "postcode": "1000",
+      "city": "Ljubljana",
+      "country": "SI"
+    },
+    "tax_id": "SI12345678"
+  },
+  "attached_documents": [
+    {
+      "id": "PL-2601-0198"
+    }
+  ],
+  "tariff": {
+    "basis": "per_km",
+    "rate": {
+      "value": 1.25,
+      "unit": "KGM"
+    },
+    "amount": {
+      "value": 205.00,
+      "currency": "EUR"
+    }
+  },
+  "vehicle": {
+    "id": "SI-LJ-1234AB",
+    "trailer_id": "SI-LJ-5678CD"
+  }
+}
+
+
+

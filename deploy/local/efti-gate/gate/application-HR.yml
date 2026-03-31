@@ -1,0 +1,51 @@
+spring:
+  rabbitmq:
+    password: hr
+    username: hr
+    virtual-host: hr
+  datasource:
+    control:
+      liquibase:
+        default-schema: eftihr
+    identifiers:
+      liquibase:
+        default-schema: eftihr
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://auth.gate.croatia.eu:8080/realms/eFTI_HR
+  jpa:
+    properties:
+      hibernate:
+        control_schema: "eftihr"
+        identifiers_schema: "eftihr"
+
+gate:
+  owner: croatia
+  country: HR
+  ap:
+    # Domibus is multi-domain: explicitly target the borduria domain to ensure PartyId matching uses the correct PMode
+    url: http://efti.gate.borduria.eu:81/domibus/services/wsPlugin?domain=borduria&wsdl
+    username: borduria_service_account
+    password: Azerty59*1234567
+  platforms:
+    - platformId: "croatia eFTI platform"
+      useRestApi: true
+      restApiBaseUrl: "http://platform-ACME:8070/api/gate-api"
+  # Remote gates that can be accessed via direct REST API (bypassing Domibus)
+  # Add gates here that you want to query directly without going through Domibus
+  # The gateId must match the "owner" value of the remote gate's config
+  remoteGates:
+    # Slovenia gate (owner: "slovenia", runs on efti-gate-SLO:8882)
+    - gateId: "slovenia"
+      useRestApi: true
+      restApiBaseUrl: "http://efti-gate-SLO:8882"
+    # Austria/Listenbourg gate (owner: "listenbourg", runs on efti-gate-AT:8881)  
+    - gateId: "listenbourg"
+      useRestApi: true
+      restApiBaseUrl: "http://efti-gate-AT:8881"
+
+
+
+

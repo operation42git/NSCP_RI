@@ -2,8 +2,14 @@ package eu.efti.eftigate.mapper;
 
 import eu.efti.commons.dto.ControlDto;
 import eu.efti.commons.dto.RequestDto;
+import eu.efti.commons.dto.identifiers.CarriedTransportEquipmentDto;
 import eu.efti.commons.dto.identifiers.ConsignmentDto;
+import eu.efti.commons.dto.identifiers.MainCarriageTransportMovementDto;
+import eu.efti.commons.dto.identifiers.UsedTransportEquipmentDto;
+import eu.efti.commons.dto.identifiers.api.CarriedTransportEquipmentApiDto;
 import eu.efti.commons.dto.identifiers.api.ConsignmentApiDto;
+import eu.efti.commons.dto.identifiers.api.MainCarriageTransportMovementApiDto;
+import eu.efti.commons.dto.identifiers.api.UsedTransportEquipmentApiDto;
 import eu.efti.eftigate.dto.RabbitRequestDto;
 import eu.efti.eftigate.entity.ControlEntity;
 import eu.efti.eftigate.entity.ErrorEntity;
@@ -13,8 +19,10 @@ import eu.efti.eftigate.entity.UilRequestEntity;
 import eu.efti.identifiersregistry.IdentifiersMapper;
 import eu.efti.v1.edelivery.Consignment;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +32,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class MapperUtils {
 
     private final ModelMapper modelMapper;
@@ -75,7 +84,43 @@ public class MapperUtils {
     }
 
     public <T extends RequestEntity, D extends RequestDto> D requestToRequestDto(final T requestEntity, final Class<D> destinationClass) {
-        return modelMapper.map(requestEntity, destinationClass);
+        log.debug("=== REQUEST_TO_REQUEST_DTO START ===");
+        log.debug("Mapping entity type: {} to DTO type: {}", requestEntity.getClass().getSimpleName(), destinationClass.getSimpleName());
+        
+        D dto = modelMapper.map(requestEntity, destinationClass);
+        log.debug("ModelMapper mapping completed");
+        
+        // Special handling for IdentifiersRequestEntity -> IdentifiersRequestDto mapping
+        // ModelMapper doesn't automatically map IdentifiersResults (entity) to IdentifiersResultsDto (DTO)
+        if (requestEntity instanceof eu.efti.eftigate.entity.IdentifiersRequestEntity identifiersEntity 
+            && dto instanceof eu.efti.commons.dto.IdentifiersRequestDto identifiersDto) {
+            log.info("Special handling for IdentifiersRequestEntity -> IdentifiersRequestDto");
+            log.info("  Entity identifiersResults exists: {}", identifiersEntity.getIdentifiersResults() != null);
+            
+            if (identifiersEntity.getIdentifiersResults() != null) {
+                log.info("  Entity consignments count: {}", 
+                    identifiersEntity.getIdentifiersResults().getConsignments() != null 
+                        ? identifiersEntity.getIdentifiersResults().getConsignments().size() : 0);
+                
+                eu.efti.commons.dto.IdentifiersResultsDto resultsDto = eu.efti.commons.dto.IdentifiersResultsDto.builder()
+                        .consignments(identifiersEntity.getIdentifiersResults().getConsignments())
+                        .build();
+                identifiersDto.setIdentifiersResults(resultsDto);
+                
+                log.info("  Set DTO identifiersResults with {} consignments", 
+                    resultsDto.getConsignments() != null ? resultsDto.getConsignments().size() : 0);
+            } else {
+                log.warn("  Entity identifiersResults is null, DTO will have null identifiersResults");
+            }
+            
+            log.info("  Final DTO identifiersResults exists: {}, consignments count: {}", 
+                identifiersDto.getIdentifiersResults() != null,
+                identifiersDto.getIdentifiersResults() != null && identifiersDto.getIdentifiersResults().getConsignments() != null
+                    ? identifiersDto.getIdentifiersResults().getConsignments().size() : 0);
+        }
+        
+        log.debug("=== REQUEST_TO_REQUEST_DTO END ===");
+        return dto;
     }
 
     public ConsignmentDto eDeliveryToDto(final Consignment consignment) {
@@ -116,5 +161,82 @@ public class MapperUtils {
 
     private ConsignmentApiDto dtoToApiDto(ConsignmentDto consignmentDto) {
         return modelMapper.map(consignmentDto, ConsignmentApiDto.class);
+    }
+
+    public ConsignmentDto apiDtoToConsignmentDto(ConsignmentApiDto apiDto) {
+        // IMPORTANT: do NOT use ModelMapper here.
+        // ConsignmentApiDto has multiple "*Id" fields (gateId/datasetId/platformId) while ConsignmentDto also has an "id" field,
+        // which causes ambiguous mapping ("matches multiple source property hierarchies") and breaks cross-gate REST aggregation.
+        if (apiDto == null) {
+            return null;
+        }
+        return ConsignmentDto.builder()
+                .id(0L)
+                .platformId(apiDto.getPlatformId())
+                .datasetId(apiDto.getDatasetId())
+                .gateId(apiDto.getGateId())
+                .carrierAcceptanceDatetime(apiDto.getCarrierAcceptanceDatetime())
+                .deliveryEventActualOccurrenceDatetime(apiDto.getDeliveryEventActualOccurrenceDatetime())
+                .mainCarriageTransportMovements(apiDto.getMainCarriageTransportMovements() == null ? null :
+                        apiDto.getMainCarriageTransportMovements().stream().map(this::apiDtoToMainCarriageTransportMovementDto).toList())
+                .usedTransportEquipments(apiDto.getUsedTransportEquipments() == null ? null :
+                        apiDto.getUsedTransportEquipments().stream().map(this::apiDtoToUsedTransportEquipmentDto).toList())
+                .build();
+    }
+
+    public List<ConsignmentDto> apiDtoToConsignmentDto(List<ConsignmentApiDto> apiDtos) {
+        return CollectionUtils.emptyIfNull(apiDtos).stream().map(this::apiDtoToConsignmentDto).toList();
+    }
+
+    private MainCarriageTransportMovementDto apiDtoToMainCarriageTransportMovementDto(final MainCarriageTransportMovementApiDto apiDto) {
+        if (apiDto == null) {
+            return null;
+        }
+        short modeCode = 0;
+        if (StringUtils.isNotBlank(apiDto.getModeCode())) {
+            try {
+                modeCode = Short.parseShort(apiDto.getModeCode());
+            } catch (NumberFormatException ignored) {
+                // keep default 0; modeCode is optional on the API side
+            }
+        }
+
+        return MainCarriageTransportMovementDto.builder()
+                .id(0L)
+                .modeCode(modeCode)
+                .schemeAgencyId(apiDto.getSchemeAgencyId())
+                .dangerousGoodsIndicator(apiDto.isDangerousGoodsIndicator())
+                .usedTransportMeansId(apiDto.getId())
+                .usedTransportMeansRegistrationCountry(apiDto.getRegistrationCountryCode())
+                .build();
+    }
+
+    private UsedTransportEquipmentDto apiDtoToUsedTransportEquipmentDto(final UsedTransportEquipmentApiDto apiDto) {
+        if (apiDto == null) {
+            return null;
+        }
+
+        return UsedTransportEquipmentDto.builder()
+                .id(0L)
+                .sequenceNumber(apiDto.getSequenceNumber())
+                .equipmentId(apiDto.getId())
+                .schemeAgencyId(apiDto.getSchemeAgencyId())
+                .registrationCountry(apiDto.getRegistrationCountry())
+                .categoryCode(apiDto.getCategoryCode())
+                .carriedTransportEquipments(apiDto.getCarriedTransportEquipments() == null ? null :
+                        apiDto.getCarriedTransportEquipments().stream().map(this::apiDtoToCarriedTransportEquipmentDto).toList())
+                .build();
+    }
+
+    private CarriedTransportEquipmentDto apiDtoToCarriedTransportEquipmentDto(final CarriedTransportEquipmentApiDto apiDto) {
+        if (apiDto == null) {
+            return null;
+        }
+        return CarriedTransportEquipmentDto.builder()
+                .id(0L)
+                .sequenceNumber(apiDto.getSequenceNumber())
+                .equipmentId(apiDto.getId())
+                .schemeAgencyId(apiDto.getSchemeAgencyId())
+                .build();
     }
 }

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIL Search Display - XSLT Version Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f9fafb;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .section-header h2 {
+            color: #1f2937;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .section-header p {
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        .section-content {
+            padding: 20px;
+        }
+        
+        /* UIL Search Results Table */
+        .search-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .search-table th {
+            background: #f3f4f6;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .search-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #1f2937;
+        }
+        
+        .search-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .status-complete {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        /* XSLT Generated Display Mockup */
+        .xslt-display {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        .xslt-table {
+            width: 843px;
+            border-collapse: collapse;
+            border: 1px inset black;
+            margin: 0 auto;
+            font-size: 12px;
+        }
+        
+        .xslt-table td {
+            padding: 10px;
+            border: 1px inset black;
+            vertical-align: top;
+        }
+        
+        .xslt-table strong {
+            font-weight: bold;
+        }
+        
+        .xslt-header {
+            background: #fafafa;
+        }
+        
+        .xslt-header strong {
+            font-size: 18pt;
+        }
+        
+        .xml-mapping {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 15px;
+            margin-top: 10px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            color: #92400e;
+        }
+        
+        .xml-mapping strong {
+            color: #78350f;
+        }
+        
+        .note-box {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 10px 15px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #1e40af;
+        }
+        
+        .legend {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        
+        .legend h4 {
+            font-size: 14px;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .legend-color.xml {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+        
+        .legend-color.note {
+            background: #dbeafe;
+            border-color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>UIL Search Portal Display - XSLT Version</h1>
+        <p class="subtitle">Visual representation based on HTML from "NSCP_RI - Copy" directory (XSLT transformation approach)</p>
+        
+        <!-- Section 1: UIL Search Results Table -->
+        <div class="section">
+            <div class="section-header">
+                <h2>1. UIL Search Results Table</h2>
+                <p>Displayed after searching for a UIL (Unique Identifier)</p>
+            </div>
+            <div class="section-content">
+                <table class="search-table">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Gate ID</th>
+                            <th>Dataset ID</th>
+                            <th>Platform ID</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>REQ-12345</td>
+                            <td>GATE-001</td>
+                            <td>DS-2024-001</td>
+                            <td>PLAT-001</td>
+                            <td class="status-complete">COMPLETE</td>
+                            <td>
+                                <button class="btn btn-secondary">💬</button>
+                                <button class="btn btn-primary">🔗</button>
+                                <button class="btn btn-primary">⬇️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="xml-mapping">
+                    <strong>Note:</strong> This table shows search results metadata. When clicking "Open" (🔗), the XML data is transformed using XSLT and displayed in a new window.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 2: XSLT Generated Display -->
+        <div class="section">
+            <div class="section-header">
+                <h2>2. XSLT-Generated eCMR Display</h2>
+                <p>Generated by XSLT transformation when clicking "Open" - Based on eCMR.xslt template</p>
+            </div>
+            <div class="section-content">
+                <div class="xslt-display">
+                    <!-- First Table: Fields 1-5, 16-18 -->
+                    <table class="xslt-table">
+                        <thead class="xslt-header">
+                            <tr>
+                                <td width="400px">
+                                    <strong>1. SENDER</strong><br/>
+                                    <span id="sender-address">123 Main Street 10000 Zagreb</span><br/>
+                                    <span id="sender-subdivision">Croatia</span><br/>
+                                    <span id="sender-name">ABC Company d.o.o.</span><br/>
+                                </td>
+                                <td width="400px">
+                                    <strong style="font-size:18pt">EFTI</strong><br/>
+                                    CONSIGNMENT NOTE<br/><br/>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td width="400px">
+                                    <strong>2. CONSIGNEE</strong><br/>
+                                    <span id="consignee-address">456 Delivery Street 20000 Split</span><br/>
+                                    <span id="consignee-subdivision">Croatia</span><br/>
+                                    <span id="consignee-name">XYZ Logistics Ltd.</span><br/>
+                                </td>
+                                <td width="400px">
+                                    <strong>16. CARRIER</strong><br/>
+                                    <span id="carrier-name">Transport Co.</span><br/>
+                                    <span id="carrier-address">789 Transport Street 31000 Osijek</span><br/>
+                                    <span id="carrier-subdivision">Croatia</span><br/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="400px">
+                                    <strong>3. DELIVERY ADDRESS</strong><br/>
+                                    <span id="delivery-address">456 Delivery Street 20000 Split</span><br/>
+                                    <span id="delivery-subdivision">Croatia</span><br/>
+                                    <span id="delivery-name">XYZ Logistics Ltd.</span><br/>
+                                </td>
+                                <td width="400px">
+                                    <strong>17. Folowing carrier</strong><br/><br/><br/><br/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="400px">
+                                    <strong>4. Place and date of taking over of the goods</strong><br/>
+                                    <span id="acceptance-datetime">202401010000</span><br/>
+                                    <span id="acceptance-address">123 Warehouse Street 10000 Zagreb</span><br/>
+                                    <span id="acceptance-subdivision">Croatia</span><br/>
+                                    <span id="acceptance-name">Zagreb Warehouse</span><br/>
+                                </td>
+                                <td rowspan="2" width="400px">
+                                    <strong>18.Carrier's reservations and observations</strong><br/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="400px">
+                                    <strong>5. Annexed documents</strong><br/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="xml-mapping">
+                        <strong>XML Field Mappings (Fields 1-5, 16-18):</strong><br>
+                        • Field 1 (SENDER): <code>consignment/consignor/postalAddress/buildingNumber</code> + <code>streetName</code> + <code>postcode</code> + <code>cityName</code><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<code>consignment/consignor/postalAddress/countrySubDivisionName</code><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<code>consignment/consignor/name</code><br>
+                        • Field 2 (CONSIGNEE): <code>consignment/consignee/postalAddress/*</code> + <code>consignment/consignee/name</code><br>
+                        • Field 3 (DELIVERY ADDRESS): <code>consignment/consigneeReceiptLocation/postalAddress/*</code> + <code>consignment/consigneeReceiptLocation/name</code><br>
+                        • Field 4 (Place/Date): <code>consignment/carrierAcceptanceDateTime</code> + <code>consignment/carrierAcceptanceLocation/*</code><br>
+                        • Field 5 (Annexed documents): Empty in XSLT (not mapped)<br>
+                        • Field 16 (CARRIER): <code>consignment/carrier/name</code> + <code>consignment/carrier/postalAddress/*</code><br>
+                        • Field 17 (Following carrier): Empty in XSLT (not mapped)<br>
+                        • Field 18 (Reservations): Empty in XSLT (not mapped)
+                    </div>
+                    
+                    <!-- Goods Table: Fields 6-12 -->
+                    <table class="xslt-table" style="border-right: 1px inset black; border-left: 1px inset black; border-top: none;">
+                        <thead>
+                            <tr>
+                                <td>6. Marks and numbers</td>
+                                <td>7. Number of packages</td>
+                                <td>8. Description of packing</td>
+                                <td>9. Nature of goods, Shipping name</td>
+                                <td>10. Statist. number</td>
+                                <td>11. Gross weight in kg</td>
+                                <td>12. Volume in m3</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1.</td>
+                                <td>4</td>
+                                <td>truc cool</td>
+                                <td>Moteur Harley</td>
+                                <td></td>
+                                <td>200KG</td>
+                                <td>200m3</td>
+                            </tr>
+                            <tr>
+                                <td>2.</td>
+                                <td>4</td>
+                                <td>mega truc cool</td>
+                                <td>Poney Hollandais courte patte</td>
+                                <td></td>
+                                <td>1200KG</td>
+                                <td>500m3</td>
+                            </tr>
+                            <tr>
+                                <td><b>Total:</b></td>
+                                <td><b>8 Item</b></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><b><span id="total-weight">1000.000000000000 GRM</span></b></td>
+                                <td><b><span id="total-volume">1000.000000000000 LTR</span></b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="xml-mapping">
+                        <strong>XML Field Mappings (Fields 6-12):</strong><br>
+                        • Field 6 (Marks): <strong>Hardcoded sample data</strong> in XSLT (not mapped from XML)<br>
+                        • Field 7 (Packages): <strong>Hardcoded sample data</strong> in XSLT (not mapped from XML)<br>
+                        • Field 8 (Packing): <strong>Hardcoded sample data</strong> in XSLT (not mapped from XML)<br>
+                        • Field 9 (Nature of goods): <strong>Hardcoded sample data</strong> in XSLT (not mapped from XML)<br>
+                        • Field 10 (Stat. number): Empty in XSLT (not mapped)<br>
+                        • Field 11 (Gross weight): <code>consignment/grossWeight</code> + <code>@unitId</code> (only in totals row)<br>
+                        • Field 12 (Volume): <code>consignment/grossVolume</code> + <code>@unitId</code> (only in totals row)<br>
+                        <br>
+                        <strong>Note:</strong> The goods table rows contain hardcoded sample data. Individual item fields from <code>consignment/includedConsignmentItem</code> are not mapped in this XSLT version.
+                    </div>
+                    
+                    <!-- Instructions & Payment Table: Fields 13-21 -->
+                    <table class="xslt-table">
+                        <tr>
+                            <td width="400px">
+                                <strong>13. Sender's instructions (Custom and other formalities)</strong><br/><br/>
+                            </td>
+                            <td width="400px">
+                                <strong>19.To be paid by :</strong><br/><br/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>14. Cash on delivery</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" style="border-bottom: 1px inset black;"></td>
+                        </tr>
+                        <tr>
+                            <td width="400px">
+                                <strong>15. Directions as to freight payment</strong><br/><br/>
+                            </td>
+                            <td width="400px">
+                                <strong>20. Special agreements</strong><br/><br/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>21. Date and place of issue</strong>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td height="30px" style="border-bottom: 1px inset black;"></td>
+                        </tr>
+                    </table>
+                    
+                    <div class="xml-mapping">
+                        <strong>XML Field Mappings (Fields 13-21):</strong><br>
+                        • Field 13 (Sender's instructions): Empty in XSLT (not mapped)<br>
+                        • Field 14 (Cash on delivery): Empty in XSLT (not mapped)<br>
+                        • Field 15 (Freight payment): Empty in XSLT (not mapped)<br>
+                        • Field 19 (To be paid by): Empty in XSLT (not mapped)<br>
+                        • Field 20 (Special agreements): Empty in XSLT (not mapped)<br>
+                        • Field 21 (Date and place): Empty in XSLT (not mapped)
+                    </div>
+                    
+                    <!-- Signatures Table: Fields 22-24 -->
+                    <table class="xslt-table" style="border-right: 1px inset black; border-left: 1px inset black; border-top: none;">
+                        <thead>
+                            <tr>
+                                <td style="border-right: 1px inset black;">
+                                    22. Signature and stamp of sender<br/><br/>
+                                </td>
+                                <td style="border-right: 1px inset black;">
+                                    23. Signature and stamp of carrier<br/><br/>
+                                </td>
+                                <td style="border-right: 1px inset black;">
+                                    24. Goods received<br/><br/>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border-right: 1px inset black;"><br/><br/></td>
+                                <td style="border-right: 1px inset black;"><br/><br/></td>
+                                <td style="border-right: 1px inset black;"><br/><br/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="xml-mapping">
+                        <strong>XML Field Mappings (Fields 22-24):</strong><br>
+                        • Field 22 (Sender signature): Empty in XSLT (not mapped)<br>
+                        • Field 23 (Carrier signature): Empty in XSLT (not mapped)<br>
+                        • Field 24 (Goods received): Empty in XSLT (not mapped)
+                    </div>
+                    
+                    <!-- Vehicle & Tariff Table: Fields 25-27 -->
+                    <table class="xslt-table" style="border-right: 1px inset black; border-left: 1px inset black; border-top: none;">
+                        <thead>
+                            <tr>
+                                <td style="border-right: 1px inset black;">
+                                    25. Vehicle's and trailer's number<br/><br/>
+                                </td>
+                                <td style="border-right: 1px inset black;">
+                                    26. Vehicle's and trailer's model<br/><br/>
+                                </td>
+                                <td style="border-right: 1px inset black;">
+                                    27. Tarif<br/><br/>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border-right: 1px inset black;"><br/><br/></td>
+                                <td style="border-right: 1px inset black;"><br/><br/></td>
+                                <td style="border-right: 1px inset black;"><br/><br/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="xml-mapping">
+                        <strong>XML Field Mappings (Fields 25-27):</strong><br>
+                        • Field 25 (Vehicle/trailer number): Empty in XSLT (not mapped)<br>
+                        • Field 26 (Vehicle/trailer model): Empty in XSLT (not mapped)<br>
+                        • Field 27 (Tarif): Empty in XSLT (not mapped)
+                    </div>
+                    
+                    <!-- Tariffs Table: Field 28 -->
+                    <table class="xslt-table">
+                        <tr>
+                            <td>
+                                <strong>28. Tarifs</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" style="border-bottom: 1px inset black;"></td>
+                        </tr>
+                    </table>
+                    
+                    <div class="xml-mapping">
+                        <strong>XML Field Mappings (Field 28):</strong><br>
+                        • Field 28 (Tarifs): Empty in XSLT (not mapped)
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Implementation Details -->
+        <div class="section">
+            <div class="section-header">
+                <h2>3. Implementation Details</h2>
+                <p>How the XSLT transformation works</p>
+            </div>
+            <div class="section-content">
+                <h3 style="margin-bottom: 15px; font-size: 16px;">Display Flow:</h3>
+                <ol style="margin-left: 20px; line-height: 2;">
+                    <li><strong>UIL Search:</strong> User enters Dataset ID, Gate ID, and Platform ID</li>
+                    <li><strong>Results Table:</strong> Shows search results with Request ID, Gate ID, Dataset ID, Platform ID, Status, and Action buttons</li>
+                    <li><strong>Open Action:</strong> When clicking "Open" on a COMPLETE result:
+                        <ul style="margin-left: 30px; margin-top: 5px;">
+                            <li>XML data is decoded from base64</li>
+                            <li>XSLT stylesheet is loaded from <code>/assets/xslt/eCMR.xslt</code></li>
+                            <li>XSLTProcessor transforms the XML using the XSLT template</li>
+                            <li>Resulting HTML is opened in a new window</li>
+                        </ul>
+                    </li>
+                </ol>
+                
+                <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 16px;">Key Files:</h3>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>Component:</strong> <code>portal-mock/src/app/pages/uil-search/u il-search.component.ts</code></li>
+                    <li><strong>Template:</strong> <code>portal-mock/src/app/pages/uil-search/u il-search.component.html</code></li>
+                    <li><strong>XSLT:</strong> <code>portal-mock/src/assets/xslt/eCMR.xslt</code></li>
+                </ul>
+                
+                <div class="note-box" style="margin-top: 20px;">
+                    <strong>Important Note:</strong> This XSLT version has limited field mapping. Many fields are empty or contain hardcoded sample data. Only basic address fields (Fields 1-4, 16) and total weight/volume are mapped from the XML. The goods table contains hardcoded sample data rather than actual XML values.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <h4>Legend</h4>
+            <div class="legend-item">
+                <div class="legend-color xml"></div>
+                <span>Yellow boxes show XML field mappings from consignment-common.xml</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color note"></div>
+                <span>Blue boxes show important notes about the implementation</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

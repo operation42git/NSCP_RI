@@ -35,10 +35,12 @@
       <party name="listenbourg"
              endpoint="http://efti.gate.listenbourg.eu:81/domibus/services/msh?domain=listenbourg">
         <identifier partyId="listenbourg" partyIdType="partyTypeUrn"/>
+        <identifier partyId="austria" partyIdType="partyTypeUrn"/>
       </party>
       <party name="umbrellacorporation"
              endpoint="http://efti.platform.umbrellainc.com:81/domibus/services/msh?domain=umbrellacorporation">
         <identifier partyId="umbrellainc" partyIdType="partyTypeUrn"/>
+        <identifier partyId="austria eFTI platform" partyIdType="partyTypeUrn"/>
       </party>
     </parties>
     <meps>

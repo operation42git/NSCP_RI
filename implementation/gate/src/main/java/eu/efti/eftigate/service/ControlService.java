@@ -11,6 +11,7 @@ import eu.efti.commons.dto.SearchWithIdentifiersRequestDto;
 import eu.efti.commons.dto.UilDto;
 import eu.efti.commons.dto.ValidableDto;
 import eu.efti.commons.dto.identifiers.ConsignmentDto;
+import eu.efti.commons.dto.identifiers.api.ConsignmentApiDto;
 import eu.efti.commons.dto.identifiers.api.IdentifierRequestResultDto;
 import eu.efti.commons.enums.ErrorCodesEnum;
 import eu.efti.commons.enums.RequestStatusEnum;
@@ -380,10 +381,50 @@ public class ControlService {
     }
 
     public IdentifiersResponseDto getIdentifiersResponse(final String requestId) {
+        log.info("=== GET_IDENTIFIERS_RESPONSE START ===");
+        log.info("RequestId: {}", requestId);
+        
         final ControlDto controlDto = getControlByRequestId(requestId);
+        log.info("Control status: {}", controlDto.getStatus());
+        
         final List<IdentifiersRequestEntity> requestEntities = requestServiceFactory.getRequestServiceByRequestType(RequestType.IDENTIFIER.name()).findAllForControlId(controlDto.getId());
-        final List<IdentifiersRequestDto> requestDtos = requestEntities.stream().map(r -> mapperUtils.requestToRequestDto(r, IdentifiersRequestDto.class)).toList();
-        return buildIdentifiersResponse(controlDto, requestDtos);
+        log.info("Found {} request entities", requestEntities.size());
+        
+        requestEntities.forEach(entity -> {
+            log.info("Entity ID: {}, status: {}, gateIdDest: {}", 
+                entity.getId(), entity.getStatus(), entity.getGateIdDest());
+            log.info("  Entity identifiersResults exists: {}", entity.getIdentifiersResults() != null);
+            if (entity.getIdentifiersResults() != null) {
+                log.info("  Entity consignments count: {}", 
+                    entity.getIdentifiersResults().getConsignments() != null 
+                        ? entity.getIdentifiersResults().getConsignments().size() : 0);
+            }
+        });
+        
+        final List<IdentifiersRequestDto> requestDtos = requestEntities.stream()
+                .map(r -> {
+                    IdentifiersRequestDto dto = mapperUtils.requestToRequestDto(r, IdentifiersRequestDto.class);
+                    log.info("Mapped entity ID {} to DTO: identifiersResults exists: {}, consignments count: {}", 
+                        r.getId(),
+                        dto.getIdentifiersResults() != null,
+                        dto.getIdentifiersResults() != null && dto.getIdentifiersResults().getConsignments() != null
+                            ? dto.getIdentifiersResults().getConsignments().size() : 0);
+                    return dto;
+                })
+                .toList();
+        
+        IdentifiersResponseDto response = buildIdentifiersResponse(controlDto, requestDtos);
+        log.info("Built response with {} identifier results", response.getIdentifiers() != null ? response.getIdentifiers().size() : 0);
+        if (response.getIdentifiers() != null) {
+            for (int i = 0; i < response.getIdentifiers().size(); i++) {
+                var identifier = response.getIdentifiers().get(i);
+                log.info("  Response identifier[{}]: gateIndicator={}, status={}, consignments count={}", 
+                    i, identifier.getGateIndicator(), identifier.getStatus(),
+                    identifier.getConsignments() != null ? identifier.getConsignments().size() : 0);
+            }
+        }
+        log.info("=== GET_IDENTIFIERS_RESPONSE END ===");
+        return response;
     }
 
     private IdentifiersResponseDto buildIdentifiersResponse(final ControlDto controlDto, final List<IdentifiersRequestDto> requestDtos) {
@@ -406,16 +447,40 @@ public class ControlService {
     }
 
     private List<IdentifierRequestResultDto> getIdentifiersResultDtos(final List<IdentifiersRequestDto> requestDtos) {
+        log.info("=== GET_IDENTIFIERS_RESULT_DTOS START ===");
+        log.info("Processing {} request DTOs", requestDtos.size());
+        
         final List<IdentifierRequestResultDto> identifierResultDtos = new LinkedList<>();
-        requestDtos.forEach(requestDto -> identifierResultDtos.add(
-                IdentifierRequestResultDto.builder()
-                        .consignments(requestDto.getIdentifiersResults() != null ? mapperUtils.consignmentDtoToApiDto(requestDto.getIdentifiersResults().getConsignments()) : Collections.emptyList())
-                        .errorCode(requestDto.getError() != null ? requestDto.getError().getErrorCode() : null)
-                        .errorDescription(requestDto.getError() != null ? requestDto.getError().getErrorDescription() : null)
-                        .gateIndicator(eftiGateIdResolver.resolve(requestDto.getGateIdDest()))
-                        .status(mapRequestStatus(requestDto.getStatus()))
-                        .build())
-        );
+        requestDtos.forEach(requestDto -> {
+            log.info("Processing requestDto: gateIdDest={}, status={}", 
+                requestDto.getGateIdDest(), requestDto.getStatus());
+            log.info("  identifiersResults exists: {}", requestDto.getIdentifiersResults() != null);
+            
+            List<ConsignmentApiDto> consignmentsApiDto;
+            if (requestDto.getIdentifiersResults() != null && requestDto.getIdentifiersResults().getConsignments() != null) {
+                log.info("  DTO consignments count: {}", requestDto.getIdentifiersResults().getConsignments().size());
+                consignmentsApiDto = mapperUtils.consignmentDtoToApiDto(requestDto.getIdentifiersResults().getConsignments());
+                log.info("  Converted to {} ConsignmentApiDto objects", consignmentsApiDto.size());
+            } else {
+                log.warn("  identifiersResults is null or consignments is null!");
+                consignmentsApiDto = Collections.emptyList();
+            }
+            
+            IdentifierRequestResultDto resultDto = IdentifierRequestResultDto.builder()
+                    .consignments(consignmentsApiDto)
+                    .errorCode(requestDto.getError() != null ? requestDto.getError().getErrorCode() : null)
+                    .errorDescription(requestDto.getError() != null ? requestDto.getError().getErrorDescription() : null)
+                    .gateIndicator(eftiGateIdResolver.resolve(requestDto.getGateIdDest()))
+                    .status(mapRequestStatus(requestDto.getStatus()))
+                    .build();
+            
+            log.info("  Built IdentifierRequestResultDto: gateIndicator={}, status={}, consignments count={}", 
+                resultDto.getGateIndicator(), resultDto.getStatus(), resultDto.getConsignments().size());
+            
+            identifierResultDtos.add(resultDto);
+        });
+        
+        log.info("=== GET_IDENTIFIERS_RESULT_DTOS END: {} result DTOs ===", identifierResultDtos.size());
         return identifierResultDtos;
     }
 

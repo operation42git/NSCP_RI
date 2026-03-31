@@ -27,10 +27,12 @@
       <party name="syldavia"
              endpoint="http://efti.gate.syldavia.eu:81/domibus/services/msh?domain=syldavia">
         <identifier partyId="syldavia" partyIdType="partyTypeUrn"/>
+        <identifier partyId="slovenia" partyIdType="partyTypeUrn"/>
       </party>
       <party name="borduria"
              endpoint="http://efti.gate.borduria.eu:81/domibus/services/msh?domain=borduria">
         <identifier partyId="borduria" partyIdType="partyTypeUrn"/>
+        <identifier partyId="croatia" partyIdType="partyTypeUrn"/>
       </party>
       <party name="listenbourg"
              endpoint="http://efti.gate.listenbourg.eu:81/domibus/services/msh?domain=listenbourg">
@@ -39,6 +41,7 @@
       <party name="acme"
              endpoint="http://efti.platform.acme.com:81/domibus/services/msh?domain=acme">
         <identifier partyId="acme" partyIdType="partyTypeUrn"/>
+        <identifier partyId="croatia eFTI platform" partyIdType="partyTypeUrn"/>
       </party>
     </parties>
     <meps>

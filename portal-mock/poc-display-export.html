@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregled podataka o pošiljci - POC</title>
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --paper: #ffffff;
+            --ink: #1a202c;
+            --muted: #718096;
+            --accent: #667eea;
+            --accent-light: #e6edff;
+            --line: #e2e8f0;
+            --warning: #f59e0b;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.6;
+        }
+
+        .poc-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg);
+        }
+
+        /* Header */
+        .poc-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .basic-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        /* Sidebar - Fixed */
+        .sidebar {
+            width: 280px;
+            background: var(--paper);
+            border-right: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            padding: 20px 20px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-bottom: 2px solid var(--line);
+            flex-shrink: 0;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .group-section {
+            margin-bottom: 8px;
+        }
+
+        .group-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            color: var(--ink);
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .group-item:hover {
+            background: var(--bg);
+            color: var(--accent);
+        }
+
+        .group-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: var(--bg);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(to bottom, #fafbfc, #ffffff);
+        }
+
+        .card-header h2 {
+            margin: 0 0 4px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.01em;
+        }
+
+        .card-header p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .fields-section {
+            margin-bottom: 16px;
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-name {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+
+        .field-id {
+            font-size: 11px;
+            color: var(--muted);
+            font-family: monospace;
+            margin-top: 4px;
+        }
+
+        .field-desc {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.4;
+            padding: 8px;
+            background: white;
+            border-radius: 3px;
+            border-left: 2px solid var(--warning);
+            margin-top: 8px;
+        }
+
+        /* Expandable Sections */
+        .expandable-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line);
+        }
+
+        .expand-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+            width: 100%;
+            text-align: left;
+            box-shadow: var(--shadow);
+        }
+
+        .expand-button:hover {
+            background: var(--bg);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-1px);
+        }
+
+        .expand-button.expanded {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .expand-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .expand-button.advanced-button {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .expand-button.advanced-button:hover {
+            background: var(--accent-light);
+        }
+
+        .expand-button.advanced-button.expanded {
+            background: var(--accent-light);
+        }
+
+        .expand-button.audit-button {
+            border-color: #f59e0b;
+            color: #d97706;
+            background: #fef3c7;
+        }
+
+        .expand-button.audit-button:hover {
+            background: #fde68a;
+            border-color: #d97706;
+            color: #92400e;
+        }
+
+        .expand-button.audit-button.expanded {
+            background: #fde68a;
+            border-color: #d97706;
+            color: #92400e;
+        }
+
+        .expanded-content {
+            margin-top: 16px;
+            animation: slideDown 0.3s ease;
+            display: none;
+        }
+
+        .expanded-content.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--line);
+                position: relative;
+                height: auto;
+            }
+
+            .fields {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .poc-header {
+                padding: 16px;
+            }
+
+            .header-title h1 {
+                font-size: 20px;
+            }
+
+            .basic-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .card-header {
+                padding: 16px;
+            }
+
+            .card-body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="poc-container">
+        <!-- Header -->
+        <header class="poc-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>Pregled podataka o pošiljci</h1>
+                    <div class="header-badges">
+                        <span class="badge">POC</span>
+                    </div>
+                </div>
+                <div class="basic-info-grid" id="basic-info-grid">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar - Fixed -->
+            <aside class="sidebar">
+                <div class="sidebar-title">Grupe Podataka</div>
+                <div class="sidebar-content" id="sidebar-content">
+                    <!-- Groups will be populated by JavaScript -->
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="content">
+                <div class="cards-container" id="cards-container">
+                    <!-- Cards will be populated by JavaScript -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Translations
+        const translations = {
+            groups: {
+                "osnovne-informacije": "Osnovne informacije",
+                "stranke-i-kontakti": "Stranke i kontakti",
+                "lokacije": "Lokacije",
+                "transport-i-dokumenti": "Transport i dokumenti"
+            },
+            cards: {
+                "consignment-basic": "Skup podataka o pošiljci",
+                "asbie1028": "Pošiljatelj",
+                "asbie1048": "Lokacija prihvaćanja prijevoznika",
+                "asbie1051": "Lokacija primitka primatelja",
+                "asbie1055": "Transportni dokument",
+                "asbie1086": "Korištena transportna oprema",
+                "asbie1098": "Glavni prijevozni pokret",
+                "asbie1125": "Identifikacija prirode tereta"
+            },
+            definitions: {
+                "consignment-basic": "Pošiljka je zasebno prepoznatljiva zbirka stavki pošiljke.",
+                "asbie1028": "Pošiljatelj (pošiljatelj robe) je stranka definirana u ugovoru o prijevozu kao stranka koja šalje pošiljku (robu) za isporuku kopnom, morem ili zrakom.",
+                "asbie1048": "Lokacija gdje će ova pošiljka biti ili je prihvaćena od strane prijevoznika.",
+                "asbie1051": "Lokacija na kojoj će ova pošiljka biti ili je primljena od strane primatelja.",
+                "asbie1055": "Transportni dokument koji dokazuje ugovor o prijevozu za pošiljku koja se prevozi, kao što je zračna otpremnica za zračni teret, željeznički ili cestovni otpremni list ili teretnica za pomorski ili unutarnji vodeni prijevoz.",
+                "asbie1086": "Transportna oprema korištena za prijevoz ove pošiljke.",
+                "asbie1098": "Glavni prijevoz je primarni (glavni) dio prijevoza korišten za prijevoz pošiljke robe s jednog mjesta na drugo.",
+                "asbie1125": "Detalji tereta za pošiljku koji su dovoljni za identifikaciju njegove prirode za carinske, statističke ili transportne svrhe."
+            },
+            fields: {
+                "efti39": { "name": "Datum prihvaćanja prijevoznika", "definition": "Datum i vrijeme prihvaćanja pošiljke od strane prijevoznika." },
+                "efti40": { "name": "Kod formata datuma i vremena", "definition": "Kod formata sadržaja datuma/vremena." },
+                "efti41": { "name": "Bruto masa", "definition": "Mjera bruto težine (mase) ove pošiljke koja uključuje težinu pakiranja, ali isključuje težinu transportne opreme." },
+                "efti42": { "name": "Kod mjerne jedinice", "definition": "Kod koji specificira mjernu jedinicu." },
+                "efti45": { "name": "Bruto volumen", "definition": "Mjera bruto volumena, obično izračunata množenjem maksimalne duljine, širine i visine ove pošiljke." },
+                "efti46": { "name": "Kod mjerne jedinice", "definition": "Kod koji specificira mjernu jedinicu." },
+                "efti49": { "name": "ID", "definition": "Identifikacijski broj pošiljatelja." },
+                "efti50": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti51": { "name": "Naziv", "definition": "Naziv pošiljatelja." },
+                "efti52": { "name": "Potpuni broj telefona", "definition": "Potpuni broj telefona za kontakt pošiljatelja." },
+                "efti53": { "name": "Adresa e-pošte", "definition": "Adresa e-pošte za kontakt pošiljatelja." },
+                "efti54": { "name": "Poštanski broj", "definition": "Poštanski broj adrese pošiljatelja." },
+                "efti55": { "name": "Poštanski pretinac", "definition": "Identifikator poštanskog pretinca ili druge poštanske lokacije dodijeljene osobi ili organizaciji gdje se poštanske stavke mogu čuvati za ovog pošiljatelja." },
+                "efti56": { "name": "Naziv ulice", "definition": "Naziv ulice adrese pošiljatelja." },
+                "efti57": { "name": "Naziv grada", "definition": "Naziv grada, mjesta ili sela za adresu pošiljatelja." },
+                "efti58": { "name": "Kod države", "definition": "Kod države adrese pošiljatelja." },
+                "efti59": { "name": "Naziv podjele države", "definition": "Naziv podjele države adrese pošiljatelja." },
+                "efti60": { "name": "Broj zgrade", "definition": "Broj zgrade za adresu pošiljatelja." },
+                "efti62": { "name": "Kućni broj", "definition": "Kućni broj ulice ili mjesta za adresu pošiljatelja." },
+                "efti136": { "name": "ID", "definition": "Identifikator lokacije prihvaćanja prijevoznika, kao što je UN/LOCODE." },
+                "efti137": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti138": { "name": "Naziv", "definition": "Naziv lokacije prihvaćanja prijevoznika." },
+                "efti139": { "name": "Geografska širina", "definition": "Geografska širina lokacije prihvaćanja prijevoznika." },
+                "efti140": { "name": "Geografska dužina", "definition": "Geografska dužina lokacije prihvaćanja prijevoznika." },
+                "efti141": { "name": "Poštanski broj", "definition": "Poštanski broj adrese lokacije prihvaćanja prijevoznika." },
+                "efti144": { "name": "Naziv ulice", "definition": "Naziv ulice adrese lokacije prihvaćanja prijevoznika." },
+                "efti145": { "name": "Naziv grada", "definition": "Naziv grada, mjesta ili sela adrese lokacije prihvaćanja prijevoznika." },
+                "efti146": { "name": "Kod države", "definition": "Kod države adrese lokacije prihvaćanja prijevoznika." },
+                "efti147": { "name": "Naziv podjele države", "definition": "Naziv podjele države adrese lokacije prihvaćanja prijevoznika." },
+                "efti148": { "name": "Broj zgrade", "definition": "Broj zgrade adrese lokacije prihvaćanja prijevoznika." },
+                "efti151": { "name": "Kućni broj", "definition": "Kućni broj ulice ili mjesta adrese lokacije prihvaćanja prijevoznika." },
+                "efti152": { "name": "ID", "definition": "Identifikator lokacije primitka primatelja, kao što je UN/LOCODE." },
+                "efti153": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti154": { "name": "Naziv", "definition": "Naziv lokacije primitka primatelja." },
+                "efti155": { "name": "Geografska širina", "definition": "Geografska širina lokacije primitka primatelja." },
+                "efti156": { "name": "Geografska dužina", "definition": "Geografska dužina lokacije primitka primatelja." },
+                "efti157": { "name": "Poštanski broj", "definition": "Poštanski broj adrese za lokaciju primitka primatelja." },
+                "efti160": { "name": "Naziv ulice", "definition": "Naziv ulice adrese lokacije primitka primatelja." },
+                "efti161": { "name": "Naziv grada", "definition": "Naziv grada, mjesta ili sela adrese lokacije primitka primatelja." },
+                "efti162": { "name": "Kod države", "definition": "Kod države adrese lokacije primitka primatelja." },
+                "efti163": { "name": "Naziv podjele države", "definition": "Naziv podjele države adrese lokacije primitka primatelja." },
+                "efti164": { "name": "Broj zgrade", "definition": "Broj zgrade adrese lokacije primitka primatelja." },
+                "efti167": { "name": "Kućni broj", "definition": "Kućni broj ulice ili mjesta adrese lokacije primitka primatelja." },
+                "efti168": { "name": "URI", "definition": "Uniform Resource Identifier (URI) transportnog dokumenta." },
+                "efti169": { "name": "Tip", "definition": "Kod koji specificira tip transportnog dokumenta." },
+                "efti374": { "name": "ID", "definition": "Identifikator transportne opreme korištene za prijevoz ove pošiljke." },
+                "efti375": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti378": { "name": "Kod kategorije", "definition": "Kod koji specificira kategoriju korištene transportne opreme, kao što je kontejner ili prikolica." },
+                "efti385": { "name": "ID pozicije skladištenja", "definition": "Identifikator pozicije skladištenja za korištenu transportnu opremu." },
+                "efti448": { "name": "ID", "definition": "Identifikator prevezene transportne opreme." },
+                "efti449": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti450": { "name": "Kod kategorije", "definition": "Kod koji specificira kategoriju prevezene transportne opreme." },
+                "efti578": { "name": "Kod države registracije", "definition": "Kod za državu registracije korištene transportne opreme." },
+                "efti998": { "name": "ID pozicije skladištenja", "definition": "Identifikator pozicije skladištenja za ovaj komad prevezene logističke transportne opreme." },
+                "efti581": { "name": "Kod načina prijevoza", "definition": "Kod koji specificira način prijevoza, kao što je zračni, pomorski, željeznički, cestovni ili unutarnji vodeni put, za glavni dio prijevoza pokreta pošiljke robe." },
+                "efti1022": { "name": "Redni broj", "definition": "Redni broj koji razlikuje ovaj glavni prijevozni pokret od drugih u lancu prijevoznih pokreta." },
+                "efti587": { "name": "ID", "definition": "Identifikator lokacije događaja utovara za glavni dio prijevoznog pokreta, kao što je UN/LOCODE." },
+                "efti588": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti589": { "name": "Naziv", "definition": "Naziv lokacije događaja utovara za glavni dio prijevoznog pokreta." },
+                "efti590": { "name": "ID", "definition": "Identifikacijski broj stranke koja potvrđuje koja je odgovorna za potvrdu detalja događaja utovara za glavni dio prijevoznog pokreta." },
+                "efti591": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti592": { "name": "Naziv", "definition": "Naziv stranke koja potvrđuje koja je odgovorna za potvrdu događaja utovara za glavni dio prijevoznog pokreta." },
+                "efti593": { "name": "Kod uloge", "definition": "Kod koji specificira ulogu stranke koja potvrđuje odgovorne za potvrdu događaja utovara za glavni dio prijevoznog pokreta." },
+                "efti594": { "name": "Kod izjave", "definition": "Kod koji specificira izjavu autentifikacije od strane stranke koja potvrđuje odgovorne za potvrdu događaja utovara za glavni dio prijevoznog pokreta." },
+                "efti600": { "name": "ID", "definition": "Identifikator lokacije događaja istovara za ovaj glavni dio prijevoznog pokreta, kao što je UN/LOCODE." },
+                "efti601": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti602": { "name": "Naziv", "definition": "Naziv lokacije događaja istovara za glavni dio prijevoznog pokreta." },
+                "efti603": { "name": "ID", "definition": "Identifikacijski broj stranke koja potvrđuje koja je odgovorna za potvrdu događaja istovara za glavni dio prijevoznog pokreta." },
+                "efti604": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti605": { "name": "Naziv", "definition": "Naziv stranke koja potvrđuje koja je odgovorna za potvrdu događaja istovara za glavni dio prijevoznog pokreta." },
+                "efti606": { "name": "Kod uloge", "definition": "Kod koji specificira ulogu stranke koja potvrđuje odgovorne za potvrdu događaja istovara za glavni dio prijevoznog pokreta." },
+                "efti608": { "name": "Kod izjave", "definition": "Kod koji specificira izjavu autentifikacije dokumenta od strane stranke koja potvrđuje odgovorne za potvrdu događaja istovara za glavni dio prijevoznog pokreta." },
+                "efti618": { "name": "ID", "definition": "Identifikator sredstva prijevoza korištenog u glavnom dijelu prijevoza pošiljke robe s jednog mjesta na drugo." },
+                "efti619": { "name": "Kod agencije sheme identifikacije", "definition": "Kod agencije koja održava shemu identifikacije." },
+                "efti620": { "name": "Kod države registracije", "definition": "Kod države registracije sredstva prijevoza korištenog u glavnom dijelu prijevoza pošiljke robe s jednog mjesta na drugo." },
+                "efti698": { "name": "Kod prirode robe", "definition": "Kod koji specificira prirodu tereta pošiljke." },
+                "efti699": { "name": "Opis robe", "definition": "Opis prirode tereta pošiljke." },
+                "efti700": { "name": "Kod operativne kategorije", "definition": "Kod kategorije, kao što je opasan ili štetan, koji specificira operativnu prirodu tereta pošiljke." },
+                "efti701": { "name": "Kod statističke klasifikacije", "definition": "Kod klasifikacije koji specificira prirodu tereta pošiljke za statističke svrhe." },
+                "efti702": { "name": "Kod agencije popisa kodova", "definition": "Kod agencije koja održava jedan ili više popisa kodova." }
+            },
+            buttons: {
+                "napredni-podaci": "Napredni podaci",
+                "audit-podaci": "Audit podaci"
+            }
+        };
+
+        // HR01 Data Structure
+        const hr01Data = [
+            {
+                id: "osnovne-informacije",
+                name: "Osnovne informacije",
+                cards: [
+                    {
+                        id: "consignment-basic",
+                        name: "Skup podataka o pošiljci",
+                        definition: "Pošiljka je zasebno prepoznatljiva zbirka stavki pošiljke.",
+                        group: "Osnovne informacije",
+                        criticalFields: [
+                            { id: "eFTI39", name: "Datum prihvaćanja prijevoznika", definition: "Datum i vrijeme prihvaćanja pošiljke od strane prijevoznika." },
+                            { id: "eFTI41", name: "Bruto masa", definition: "Mjera bruto težine (mase) ove pošiljke koja uključuje težinu pakiranja, ali isključuje težinu transportne opreme." },
+                            { id: "eFTI45", name: "Bruto volumen", definition: "Mjera bruto volumena, obično izračunata množenjem maksimalne duljine, širine i visine ove pošiljke." }
+                        ],
+                        advancedFields: [
+                            { id: "eFTI40", name: "Kod formata datuma i vremena", definition: "Kod formata sadržaja datuma/vremena." },
+                            { id: "eFTI42", name: "Kod mjerne jedinice", definition: "Kod koji specificira mjernu jedinicu." },
+                            { id: "eFTI46", name: "Kod mjerne jedinice", definition: "Kod koji specificira mjernu jedinicu." }
+                        ],
+                        auditFields: [
+                            { id: "eFTI40", name: "Kod formata datuma i vremena", definition: "Kod formata sadržaja datuma/vremena." }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "stranke-i-kontakti",
+                name: "Stranke i kontakti",
+                cards: [
+                    {
+                        id: "asbie1028",
+                        name: "Pošiljatelj",
+                        definition: "Pošiljatelj (pošiljatelj robe) je stranka definirana u ugovoru o prijevozu kao stranka koja šalje pošiljku (robu) za isporuku kopnom, morem ili zrakom.",
+                        group: "Stranke i kontakti",
+                        criticalFields: [
+                            { id: "eFTI49", name: "ID", definition: "Identifikacijski broj pošiljatelja." },
+                            { id: "eFTI51", name: "Naziv", definition: "Naziv pošiljatelja." }
+                        ],
+                        advancedFields: [
+                            { id: "eFTI52", name: "Potpuni broj telefona", definition: "Potpuni broj telefona za kontakt pošiljatelja." },
+                            { id: "eFTI53", name: "Adresa e-pošte", definition: "Adresa e-pošte za kontakt pošiljatelja." },
+                            { id: "eFTI54", name: "Poštanski broj", definition: "Poštanski broj adrese pošiljatelja." },
+                            { id: "eFTI55", name: "Poštanski pretinac", definition: "Identifikator poštanskog pretinca ili druge poštanske lokacije dodijeljene osobi ili organizaciji gdje se poštanske stavke mogu čuvati za ovog pošiljatelja." },
+                            { id: "eFTI56", name: "Naziv ulice", definition: "Naziv ulice adrese pošiljatelja." },
+                            { id: "eFTI57", name: "Naziv grada", definition: "Naziv grada, mjesta ili sela za adresu pošiljatelja." },
+                            { id: "eFTI58", name: "Kod države", definition: "Kod države adrese pošiljatelja." },
+                            { id: "eFTI59", name: "Naziv podjele države", definition: "Naziv podjele države adrese pošiljatelja." },
+                            { id: "eFTI60", name: "Broj zgrade", definition: "Broj zgrade za adresu pošiljatelja." },
+                            { id: "eFTI62", name: "Kućni broj", definition: "Kućni broj ulice ili mjesta za adresu pošiljatelja." }
+                        ],
+                        auditFields: [
+                            { id: "eFTI50", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "lokacije",
+                name: "Lokacije",
+                cards: [
+                    {
+                        id: "asbie1048",
+                        name: "Lokacija prihvaćanja prijevoznika",
+                        definition: "Lokacija gdje će ova pošiljka biti ili je prihvaćena od strane prijevoznika.",
+                        group: "Lokacije",
+                        criticalFields: [
+                            { id: "eFTI136", name: "ID", definition: "Identifikator lokacije prihvaćanja prijevoznika, kao što je UN/LOCODE." },
+                            { id: "eFTI138", name: "Naziv", definition: "Naziv lokacije prihvaćanja prijevoznika." }
+                        ],
+                        advancedFields: [
+                            { id: "eFTI137", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." },
+                            { id: "eFTI139", name: "Geografska širina", definition: "Geografska širina lokacije prihvaćanja prijevoznika." },
+                            { id: "eFTI140", name: "Geografska dužina", definition: "Geografska dužina lokacije prihvaćanja prijevoznika." },
+                            { id: "eFTI141", name: "Poštanski broj", definition: "Poštanski broj adrese lokacije prihvaćanja prijevoznika." },
+                            { id: "eFTI144", name: "Naziv ulice", definition: "Naziv ulice adrese lokacije prihvaćanja prijevoznika." },
+                            { id: "eFTI145", name: "Naziv grada", definition: "Naziv grada, mjesta ili sela adrese lokacije prihvaćanja prijevoznika." },
+                            { id: "eFTI146", name: "Kod države", definition: "Kod države adrese lokacije prihvaćanja prijevoznika." },
+                            { id: "eFTI147", name: "Naziv podjele države", definition: "Naziv podjele države adrese lokacije prihvaćanja prijevoznika." },
+                            { id: "eFTI148", name: "Broj zgrade", definition: "Broj zgrade adrese lokacije prihvaćanja prijevoznika." },
+                            { id: "eFTI151", name: "Kućni broj", definition: "Kućni broj ulice ili mjesta adrese lokacije prihvaćanja prijevoznika." }
+                        ],
+                        auditFields: [
+                            { id: "eFTI137", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." }
+                        ]
+                    },
+                    {
+                        id: "asbie1051",
+                        name: "Lokacija primitka primatelja",
+                        definition: "Lokacija na kojoj će ova pošiljka biti ili je primljena od strane primatelja.",
+                        group: "Lokacije",
+                        criticalFields: [
+                            { id: "eFTI152", name: "ID", definition: "Identifikator lokacije primitka primatelja, kao što je UN/LOCODE." },
+                            { id: "eFTI154", name: "Naziv", definition: "Naziv lokacije primitka primatelja." }
+                        ],
+                        advancedFields: [
+                            { id: "eFTI155", name: "Geografska širina", definition: "Geografska širina lokacije primitka primatelja." },
+                            { id: "eFTI156", name: "Geografska dužina", definition: "Geografska dužina lokacije primitka primatelja." },
+                            { id: "eFTI157", name: "Poštanski broj", definition: "Poštanski broj adrese za lokaciju primitka primatelja." },
+                            { id: "eFTI160", name: "Naziv ulice", definition: "Naziv ulice adrese lokacije primitka primatelja." },
+                            { id: "eFTI161", name: "Naziv grada", definition: "Naziv grada, mjesta ili sela adrese lokacije primitka primatelja." },
+                            { id: "eFTI162", name: "Kod države", definition: "Kod države adrese lokacije primitka primatelja." },
+                            { id: "eFTI163", name: "Naziv podjele države", definition: "Naziv podjele države adrese lokacije primitka primatelja." },
+                            { id: "eFTI164", name: "Broj zgrade", definition: "Broj zgrade adrese lokacije primitka primatelja." },
+                            { id: "eFTI167", name: "Kućni broj", definition: "Kućni broj ulice ili mjesta adrese lokacije primitka primatelja." }
+                        ],
+                        auditFields: [
+                            { id: "eFTI153", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "transport-i-dokumenti",
+                name: "Transport i dokumenti",
+                cards: [
+                    {
+                        id: "asbie1086",
+                        name: "Korištena transportna oprema",
+                        definition: "Transportna oprema korištena za prijevoz ove pošiljke.",
+                        group: "Transport i dokumenti",
+                        criticalFields: [
+                            { id: "eFTI374", name: "ID", definition: "Identifikator transportne opreme korištene za prijevoz ove pošiljke." }
+                        ],
+                        advancedFields: [
+                            { id: "eFTI375", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." },
+                            { id: "eFTI378", name: "Kod kategorije", definition: "Kod koji specificira kategoriju korištene transportne opreme, kao što je kontejner ili prikolica." },
+                            { id: "eFTI385", name: "ID pozicije skladištenja", definition: "Identifikator pozicije skladištenja za korištenu transportnu opremu." },
+                            { id: "eFTI448", name: "ID", definition: "Identifikator prevezene transportne opreme." },
+                            { id: "eFTI449", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." },
+                            { id: "eFTI450", name: "Kod kategorije", definition: "Kod koji specificira kategoriju prevezene transportne opreme." },
+                            { id: "eFTI998", name: "ID pozicije skladištenja", definition: "Identifikator pozicije skladištenja za ovaj komad prevezene logističke transportne opreme." }
+                        ],
+                        auditFields: [
+                            { id: "eFTI578", name: "Kod države registracije", definition: "Kod za državu registracije korištene transportne opreme." }
+                        ]
+                    },
+                    {
+                        id: "asbie1098",
+                        name: "Glavni prijevozni pokret",
+                        definition: "Glavni prijevoz je primarni (glavni) dio prijevoza korišten za prijevoz pošiljke robe s jednog mjesta na drugo.",
+                        group: "Transport i dokumenti",
+                        criticalFields: [
+                            { id: "eFTI581", name: "Kod načina prijevoza", definition: "Kod koji specificira način prijevoza, kao što je zračni, pomorski, željeznički, cestovni ili unutarnji vodeni put, za glavni dio prijevoza pokreta pošiljke robe." },
+                            { id: "eFTI587", name: "ID", definition: "Identifikator lokacije događaja utovara za glavni dio prijevoznog pokreta, kao što je UN/LOCODE." },
+                            { id: "eFTI600", name: "ID", definition: "Identifikator lokacije događaja istovara za ovaj glavni dio prijevoznog pokreta, kao što je UN/LOCODE." },
+                            { id: "eFTI618", name: "ID", definition: "Identifikator sredstva prijevoza korištenog u glavnom dijelu prijevoza pošiljke robe s jednog mjesta na drugo." }
+                        ],
+                        advancedFields: [
+                            { id: "eFTI1022", name: "Redni broj", definition: "Redni broj koji razlikuje ovaj glavni prijevozni pokret od drugih u lancu prijevoznih pokreta." },
+                            { id: "eFTI588", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." },
+                            { id: "eFTI589", name: "Naziv", definition: "Naziv lokacije događaja utovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI592", name: "Naziv", definition: "Naziv stranke koja potvrđuje koja je odgovorna za potvrdu događaja utovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI601", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." },
+                            { id: "eFTI602", name: "Naziv", definition: "Naziv lokacije događaja istovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI605", name: "Naziv", definition: "Naziv stranke koja potvrđuje koja je odgovorna za potvrdu događaja istovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI619", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." }
+                        ],
+                        auditFields: [
+                            { id: "eFTI590", name: "ID", definition: "Identifikacijski broj stranke koja potvrđuje koja je odgovorna za potvrdu detalja događaja utovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI591", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." },
+                            { id: "eFTI593", name: "Kod uloge", definition: "Kod koji specificira ulogu stranke koja potvrđuje odgovorne za potvrdu događaja utovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI594", name: "Kod izjave", definition: "Kod koji specificira izjavu autentifikacije od strane stranke koja potvrđuje odgovorne za potvrdu događaja utovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI603", name: "ID", definition: "Identifikacijski broj stranke koja potvrđuje koja je odgovorna za potvrdu događaja istovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI604", name: "Kod agencije sheme identifikacije", definition: "Kod agencije koja održava shemu identifikacije." },
+                            { id: "eFTI606", name: "Kod uloge", definition: "Kod koji specificira ulogu stranke koja potvrđuje odgovorne za potvrdu događaja istovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI608", name: "Kod izjave", definition: "Kod koji specificira izjavu autentifikacije dokumenta od strane stranke koja potvrđuje odgovorne za potvrdu događaja istovara za glavni dio prijevoznog pokreta." },
+                            { id: "eFTI620", name: "Kod države registracije", definition: "Kod države registracije sredstva prijevoza korištenog u glavnom dijelu prijevoza pošiljke robe s jednog mjesta na drugo." }
+                        ]
+                    },
+                    {
+                        id: "asbie1055",
+                        name: "Transportni dokument",
+                        definition: "Transportni dokument koji dokazuje ugovor o prijevozu za pošiljku koja se prevozi, kao što je zračna otpremnica za zračni teret, željeznički ili cestovni otpremni list ili teretnica za pomorski ili unutarnji vodeni prijevoz.",
+                        group: "Transport i dokumenti",
+                        criticalFields: [
+                            { id: "eFTI168", name: "URI", definition: "Uniform Resource Identifier (URI) transportnog dokumenta." },
+                            { id: "eFTI169", name: "Tip", definition: "Kod koji specificira tip transportnog dokumenta." }
+                        ],
+                        advancedFields: [],
+                        auditFields: [
+                            { id: "eFTI169", name: "Tip", definition: "Kod koji specificira tip transportnog dokumenta." }
+                        ]
+                    },
+                    {
+                        id: "asbie1125",
+                        name: "Identifikacija prirode tereta",
+                        definition: "Detalji tereta za pošiljku koji su dovoljni za identifikaciju njegove prirode za carinske, statističke ili transportne svrhe.",
+                        group: "Transport i dokumenti",
+                        criticalFields: [
+                            { id: "eFTI698", name: "Kod prirode robe", definition: "Kod koji specificira prirodu tereta pošiljke." },
+                            { id: "eFTI699", name: "Opis robe", definition: "Opis prirode tereta pošiljke." }
+                        ],
+                        advancedFields: [
+                            { id: "eFTI700", name: "Kod operativne kategorije", definition: "Kod kategorije, kao što je opasan ili štetan, koji specificira operativnu prirodu tereta pošiljke." },
+                            { id: "eFTI701", name: "Kod statističke klasifikacije", definition: "Kod klasifikacije koji specificira prirodu tereta pošiljke za statističke svrhe." }
+                        ],
+                        auditFields: [
+                            { id: "eFTI702", name: "Kod agencije popisa kodova", definition: "Kod agencije koja održava jedan ili više popisa kodova." }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // State management
+        let expandedAdvanced = new Set();
+        let expandedAudit = new Set();
+        let activeCardId = null;
+
+        // Render sidebar
+        function renderSidebar() {
+            const sidebarContent = document.getElementById('sidebar-content');
+            sidebarContent.innerHTML = '';
+            
+            hr01Data.forEach(group => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'group-section';
+                
+                const groupItem = document.createElement('div');
+                groupItem.className = 'group-item group-header';
+                groupItem.textContent = group.name;
+                groupItem.addEventListener('click', () => scrollToGroup(group.id));
+                
+                groupDiv.appendChild(groupItem);
+                sidebarContent.appendChild(groupDiv);
+            });
+        }
+
+        // Render cards
+        function renderCards() {
+            const cardsContainer = document.getElementById('cards-container');
+            cardsContainer.innerHTML = '';
+            
+            hr01Data.forEach(group => {
+                group.cards.forEach(card => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card';
+                    cardDiv.id = `card-${card.id}`;
+                    
+                    // Card header
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'card-header';
+                    cardHeader.innerHTML = `
+                        <div>
+                            <h2>${card.name}</h2>
+                            <p>${card.definition}</p>
+                        </div>
+                    `;
+                    cardDiv.appendChild(cardHeader);
+                    
+                    // Card body
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+                    
+                    // Critical fields
+                    if (card.criticalFields.length > 0) {
+                        const criticalSection = document.createElement('div');
+                        criticalSection.className = 'fields-section';
+                        criticalSection.innerHTML = `
+                            <div class="fields">
+                                ${card.criticalFields.map(field => `
+                                    <div class="field">
+                                        <div class="field-name">${field.name}</div>
+                                        <div class="field-id">${field.id}</div>
+                                        <div class="field-desc">${field.definition}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                        cardBody.appendChild(criticalSection);
+                    }
+                    
+                    // Advanced fields
+                    const advancedSection = document.createElement('div');
+                    advancedSection.className = 'expandable-section';
+                    const advancedButton = document.createElement('button');
+                    advancedButton.className = `expand-button advanced-button ${expandedAdvanced.has(card.id) ? 'expanded' : ''} ${card.advancedFields.length === 0 ? 'disabled' : ''}`;
+                    advancedButton.innerHTML = `
+                        <span>
+                            <span style="margin-right: 8px;">${expandedAdvanced.has(card.id) ? '▼' : '▶'}</span>
+                            ${translations.buttons['napredni-podaci']} (${card.advancedFields.length})
+                        </span>
+                    `;
+                    advancedButton.addEventListener('click', () => toggleAdvanced(card.id));
+                    advancedSection.appendChild(advancedButton);
+                    
+                    const advancedContent = document.createElement('div');
+                    advancedContent.className = `expanded-content ${expandedAdvanced.has(card.id) ? 'show' : ''}`;
+                    advancedContent.innerHTML = `
+                        <div class="fields">
+                            ${card.advancedFields.map(field => `
+                                <div class="field">
+                                    <div class="field-name">${field.name}</div>
+                                    <div class="field-id">${field.id}</div>
+                                    <div class="field-desc">${field.definition}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    advancedSection.appendChild(advancedContent);
+                    cardBody.appendChild(advancedSection);
+                    
+                    // Audit fields
+                    const auditSection = document.createElement('div');
+                    auditSection.className = 'expandable-section';
+                    const auditButton = document.createElement('button');
+                    auditButton.className = `expand-button audit-button ${expandedAudit.has(card.id) ? 'expanded' : ''} ${card.auditFields.length === 0 ? 'disabled' : ''}`;
+                    auditButton.innerHTML = `
+                        <span>
+                            <span style="margin-right: 8px;">${expandedAudit.has(card.id) ? '▼' : '▶'}</span>
+                            ${translations.buttons['audit-podaci']} (${card.auditFields.length})
+                        </span>
+                    `;
+                    auditButton.addEventListener('click', () => toggleAudit(card.id));
+                    auditSection.appendChild(auditButton);
+                    
+                    const auditContent = document.createElement('div');
+                    auditContent.className = `expanded-content ${expandedAudit.has(card.id) ? 'show' : ''}`;
+                    auditContent.innerHTML = `
+                        <div class="fields">
+                            ${card.auditFields.map(field => `
+                                <div class="field">
+                                    <div class="field-name">${field.name}</div>
+                                    <div class="field-id">${field.id}</div>
+                                    <div class="field-desc">${field.definition}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    auditSection.appendChild(auditContent);
+                    cardBody.appendChild(auditSection);
+                    
+                    cardDiv.appendChild(cardBody);
+                    cardsContainer.appendChild(cardDiv);
+                });
+            });
+        }
+
+        // Toggle functions
+        function toggleAdvanced(cardId) {
+            if (expandedAdvanced.has(cardId)) {
+                expandedAdvanced.delete(cardId);
+            } else {
+                expandedAdvanced.add(cardId);
+            }
+            renderCards();
+        }
+
+        function toggleAudit(cardId) {
+            if (expandedAudit.has(cardId)) {
+                expandedAudit.delete(cardId);
+            } else {
+                expandedAudit.add(cardId);
+            }
+            renderCards();
+        }
+
+        // Scroll functions
+        function scrollToGroup(groupId) {
+            const group = hr01Data.find(g => g.id === groupId);
+            if (group && group.cards.length > 0) {
+                setTimeout(() => {
+                    scrollToCard(group.cards[0].id);
+                }, 100);
+            }
+        }
+
+        function scrollToCard(cardId) {
+            activeCardId = cardId;
+            const element = document.getElementById(`card-${cardId}`);
+            if (element) {
+                const offset = 120;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Update active state in sidebar
+                updateSidebarActiveState();
+            }
+        }
+
+        function updateSidebarActiveState() {
+            const groupItems = document.querySelectorAll('.group-item');
+            groupItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (activeCardId) {
+                const activeGroup = hr01Data.find(g => g.cards.some(c => c.id === activeCardId));
+                if (activeGroup) {
+                    const groupItem = Array.from(groupItems).find(item => 
+                        item.textContent === activeGroup.name
+                    );
+                    if (groupItem) {
+                        groupItem.classList.add('active');
+                    }
+                }
+            }
+        }
+
+        // Sample eCMR data (can be replaced with actual data)
+        const sampleECMRData = {
+            ecmrId: 'eCMR-2024-001234',
+            issueDate: '2024-01-15',
+            issueLocation: 'Zagreb, Hrvatska',
+            carrierAcceptanceDateTime: '2024-01-15 10:30:00',
+            consignor: { name: 'ABC Transport d.o.o.' },
+            consignee: { name: 'XYZ Logistics Ltd.' },
+            carrier: { name: 'Global Freight Services' },
+            vehicleNumber: 'ZG-1234-AB',
+            totalGrossWeight: '12500',
+            totalGrossWeightUnit: 'kg'
+        };
+
+        // Render header info
+        function renderHeaderInfo() {
+            const basicInfoGrid = document.getElementById('basic-info-grid');
+            const data = sampleECMRData;
+            
+            basicInfoGrid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">eCMR identifikator</div>
+                    <div class="info-value">${data.ecmrId || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Datum izdavanja</div>
+                    <div class="info-value">${data.issueDate || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mjesto izdavanja</div>
+                    <div class="info-value">${data.issueLocation || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Datum prihvaćanja</div>
+                    <div class="info-value">${data.carrierAcceptanceDateTime || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Pošiljatelj</div>
+                    <div class="info-value">${data.consignor?.name || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Primatelj</div>
+                    <div class="info-value">${data.consignee?.name || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Prijevoznik</div>
+                    <div class="info-value">${data.carrier?.name || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Broj vozila</div>
+                    <div class="info-value">${data.vehicleNumber || '—'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Ukupna masa</div>
+                    <div class="info-value">${data.totalGrossWeight ? data.totalGrossWeight + (data.totalGrossWeightUnit ? ' ' + data.totalGrossWeightUnit : '') : '—'}</div>
+                </div>
+            `;
+        }
+
+        // Initialize
+        function init() {
+            renderHeaderInfo();
+            renderSidebar();
+            renderCards();
+            
+            // Update sidebar active state on scroll
+            window.addEventListener('scroll', () => {
+                const cards = document.querySelectorAll('.card');
+                let currentCard = null;
+                
+                cards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    if (rect.top <= 150 && rect.bottom >= 150) {
+                        currentCard = card.id.replace('card-', '');
+                    }
+                });
+                
+                if (currentCard && currentCard !== activeCardId) {
+                    activeCardId = currentCard;
+                    updateSidebarActiveState();
+                }
+            });
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
+

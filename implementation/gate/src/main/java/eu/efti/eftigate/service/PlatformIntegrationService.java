@@ -7,6 +7,7 @@ import eu.efti.eftigate.config.GateProperties;
 import eu.efti.eftigate.dto.RabbitRequestDto;
 import eu.efti.eftigate.service.request.NotesRequestService;
 import eu.efti.eftigate.service.request.UilRequestService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class PlatformIntegrationService {
     private final List<GateProperties.PlatformProperties> platformsProperties;
@@ -61,13 +63,18 @@ public class PlatformIntegrationService {
         var platformId = control.getPlatformId();
         var platformInfo = getPlatformInfo(platformId);
         if (platformInfo.isEmpty()) {
+            log.error("Platform '{}' does not exist in configuration. Available platforms: {}", 
+                    platformId, platformsProperties.stream().map(GateProperties.PlatformProperties::platformId).toList());
             throw new IllegalArgumentException("platform " + platformId + " does not exist");
         } else {
             final RequestTypeEnum requestTypeEnum = control.getRequestType();
             if (platformInfo.get().useRestApi()) {
+                log.info("Using REST API for platform '{}' with URL: {}", platformId, platformInfo.get().restApiBaseUrl());
                 var client = platformRestService.getClient(platformInfo.get().restApiBaseUrl());
                 try {
-                    if (RequestTypeEnum.LOCAL_UIL_SEARCH.equals(requestTypeEnum)) {
+                    if (RequestTypeEnum.LOCAL_UIL_SEARCH.equals(requestTypeEnum) || RequestTypeEnum.EXTERNAL_ASK_UIL_SEARCH.equals(requestTypeEnum)) {
+                        log.info("Calling REST API for {}: datasetId={}, subsetIds={}", requestTypeEnum, 
+                                control.getDatasetId(), control.getSubsetIds());
                         uilRequestService.manageRestRequestInProgress(control.getRequestId());
                         var res = client.callGetConsignmentSubsets(control.getDatasetId(), Set.copyOf(control.getSubsetIds()));
                         uilRequestService.manageRestResponseReceived(control.getRequestId(), res);
@@ -79,6 +86,7 @@ public class PlatformIntegrationService {
                         throw new TechnicalException("unexpected request type: " + requestTypeEnum);
                     }
                 } catch (PlatformIntegrationServiceException e) {
+                    log.error("Error calling REST API for platform '{}': {}", platformId, e.getMessage(), e);
                     throw new RuntimeException(e);
                 }
             } else {

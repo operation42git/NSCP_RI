@@ -39,8 +39,9 @@ paths:
         content:
           application/xml:
             schema:
-              type: object
-              description: consignment element of type SupplyChainConsignment as defined by schema consignment-identifiers.xsd
+              type: string
+              format: xml
+              description: consignment element of type SupplyChainConsignment as defined by schema consignment-identifiers.xsd (raw XML string)
       responses:
         "200":
           description: Add or update consignment identifiers

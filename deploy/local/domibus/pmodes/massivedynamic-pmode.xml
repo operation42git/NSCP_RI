@@ -27,10 +27,12 @@
       <party name="syldavia"
              endpoint="http://efti.gate.syldavia.eu:81/domibus/services/msh?domain=syldavia">
         <identifier partyId="syldavia" partyIdType="partyTypeUrn"/>
+        <identifier partyId="slovenia" partyIdType="partyTypeUrn"/>
       </party>
       <party name="massivedynamic"
              endpoint="http://efti.platform.massivedynamic.com:81/domibus/services/msh?domain=massivedynamic">
         <identifier partyId="massivedynamic" partyIdType="partyTypeUrn"/>
+        <identifier partyId="slovenia eFTI platform" partyIdType="partyTypeUrn"/>
       </party>
     </parties>
     <meps>

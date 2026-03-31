@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<consignment xmlns="http://efti.eu/v1/consignment/common"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://efti.eu/v1/consignment/common ../consignment-common.xsd">
+    
+    <!-- ECMR Identifikator: HR-ECMR-2026-000123 -->
+    <associatedDocument>
+        <id schemeAgencyId="HR-REG">HR-ECMR-2026-000123</id>
+        <formattedIssueDateTime formatId="203">202601110915+0100</formattedIssueDateTime>
+        <issueLocation>
+            <name>Zagreb</name>
+            <postalAddress>
+                <cityName>Zagreb</cityName>
+                <countryCode>HR</countryCode>
+                <postcode>10000</postcode>
+            </postalAddress>
+        </issueLocation>
+        <typeCode>CMR</typeCode>
+    </associatedDocument>
+    
+    <!-- Priloženi dokumenti -->
+    <associatedDocument>
+        <id schemeAgencyId="INVOICE">INV-2026-00456</id>
+        <typeCode>INVOICE</typeCode>
+    </associatedDocument>
+    <associatedDocument>
+        <id schemeAgencyId="PACKING_LIST">PL-2026-00198</id>
+        <typeCode>PACKING_LIST</typeCode>
+    </associatedDocument>
+    
+    <!-- Pošiljatelj (Consignor) -->
+    <consignor>
+        <name>Adria Food d.o.o.</name>
+        <postalAddress>
+            <streetName>Radnička cesta</streetName>
+            <buildingNumber>80</buildingNumber>
+            <cityName>Zagreb</cityName>
+            <postcode>10000</postcode>
+            <countryCode>HR</countryCode>
+        </postalAddress>
+        <taxRegistration>
+            <id schemeAgencyId="HR-OIB">12345678901</id>
+        </taxRegistration>
+        <specifiedContactPerson>
+            <givenName>Ivan</givenName>
+            <familyName>Horvat</familyName>
+        </specifiedContactPerson>
+    </consignor>
+    
+    <!-- Primatelj (Consignee) -->
+    <consignee>
+        <name>Dalmacija Retail d.o.o.</name>
+        <postalAddress>
+            <streetName>Vukovarska</streetName>
+            <buildingNumber>220</buildingNumber>
+            <cityName>Split</cityName>
+            <postcode>21000</postcode>
+            <countryCode>HR</countryCode>
+        </postalAddress>
+        <taxRegistration>
+            <id schemeAgencyId="HR-OIB">98765432109</id>
+        </taxRegistration>
+        <specifiedContactPerson>
+            <givenName>Ana</givenName>
+            <familyName>Marić</familyName>
+        </specifiedContactPerson>
+    </consignee>
+    
+    <!-- Mjesto isporuke (Delivery Location) -->
+    <consigneeReceiptLocation>
+        <name>Skladište "DR-SPL-01"</name>
+        <postalAddress>
+            <streetName>Vukovarska</streetName>
+            <buildingNumber>220</buildingNumber>
+            <cityName>Split</cityName>
+            <postcode>21000</postcode>
+            <countryCode>HR</countryCode>
+        </postalAddress>
+    </consigneeReceiptLocation>
+    
+    <!-- Prijevoznik (Carrier) -->
+    <carrier>
+        <name>TransLogistika d.o.o.</name>
+        <postalAddress>
+            <streetName>Slavonska avenija</streetName>
+            <buildingNumber>52</buildingNumber>
+            <cityName>Zagreb</cityName>
+            <postcode>10000</postcode>
+            <countryCode>HR</countryCode>
+        </postalAddress>
+        <taxRegistration>
+            <id schemeAgencyId="HR-OIB">11223344556</id>
+        </taxRegistration>
+        <specifiedContactPerson>
+            <givenName>Marko</givenName>
+            <familyName>Kovač</familyName>
+        </specifiedContactPerson>
+    </carrier>
+    
+    <!-- Mjesto i datum preuzimanja (Pickup Location and Date) -->
+    <carrierAcceptanceLocation>
+        <name>Zagreb, Radnička cesta 80</name>
+        <postalAddress>
+            <streetName>Radnička cesta</streetName>
+            <buildingNumber>80</buildingNumber>
+            <cityName>Zagreb</cityName>
+            <postcode>10000</postcode>
+            <countryCode>HR</countryCode>
+        </postalAddress>
+    </carrierAcceptanceLocation>
+    <carrierAcceptanceDateTime formatId="203">202601111000+0100</carrierAcceptanceDateTime>
+    
+    <!-- Rezervacije prijevoznika -->
+    <carrierProvidedInformationText>Bez rezervi. Ambalaža neoštećena.</carrierProvidedInformationText>
+    
+    <!-- Upute pošiljatelja -->
+    <consignorProvidedInformationText>Isporuka radnim danom 08:00–16:00, najava 1h prije dolaska.</consignorProvidedInformationText>
+    
+    <!-- Pouzeće -->
+    <cODAmount currencyId="EUR">0.00</cODAmount>
+    
+    <!-- Upute za plaćanje vozarine -->
+    <applicableServiceCharge>
+        <paymentArrangementCode>PREPAID</paymentArrangementCode>
+        <payingPartyRoleCode>SENDER</payingPartyRoleCode>
+        <appliedAmount currencyId="EUR">620.00</appliedAmount>
+        <calculationBasisCode>KILOMETER</calculationBasisCode>
+    </applicableServiceCharge>
+    
+    <!-- Posebni sporazumi: Temperaturni režim -->
+    <consignorProvidedInformationText>Temperaturni režim: 5–25 °C (bez hlađenja)</consignorProvidedInformationText>
+    
+    <!-- Roba (Goods) -->
+    <includedConsignmentItem>
+        <sequenceNumber>1</sequenceNumber>
+        <grossWeightMeasure unitCode="KGM">6500.00</grossWeightMeasure>
+        <grossVolumeMeasure unitCode="MTQ">24.00</grossVolumeMeasure>
+        <consignmentItemQuantity>10</consignmentItemQuantity>
+        <natureIdentificationTransportCargo>
+            <identification>Pakirani prehrambeni proizvodi (neopasno)</identification>
+        </natureIdentificationTransportCargo>
+        <statisticalClassificationCode>21069098</statisticalClassificationCode>
+        <transportLogisticsPackage>
+            <itemQuantity>10</itemQuantity>
+            <physicalLogisticsShippingMarks>
+                <marking>AF-PLT-2026-01</marking>
+            </physicalLogisticsShippingMarks>
+            <packagingTypeCode>EUR</packagingTypeCode>
+            <packagingDescriptionText>10 paleta (EUR)</packagingDescriptionText>
+        </transportLogisticsPackage>
+    </includedConsignmentItem>
+    
+    <!-- Vozilo i prikolica (Transport Means and Equipment) -->
+    <mainCarriageTransportMovement>
+        <modeCode>3</modeCode>
+        <dangerousGoodsIndicator>false</dangerousGoodsIndicator>
+        <usedTransportMeans>
+            <id>HR ZG-1234-AB</id>
+            <registrationCountry>
+                <code>HR</code>
+            </registrationCountry>
+        </usedTransportMeans>
+    </mainCarriageTransportMovement>
+    
+    <usedTransportEquipment>
+        <id>HR ZG-5678-CD</id>
+        <registrationCountry>
+            <code>HR</code>
+        </registrationCountry>
+        <categoryCode>AE</categoryCode>
+        <sequenceNumber>1</sequenceNumber>
+        <equipmentDescriptionText>Schmitz S.KO</equipmentDescriptionText>
+    </usedTransportEquipment>
+    
+    <!-- Model vozila -->
+    <mainCarriageTransportMovement>
+        <usedTransportMeans>
+            <equipmentDescriptionText>MAN TGX 18.440</equipmentDescriptionText>
+        </usedTransportMeans>
+    </mainCarriageTransportMovement>
+    
+    <!-- Tarifa -->
+    <applicableServiceCharge>
+        <calculationBasisCode>KILOMETER</calculationBasisCode>
+        <appliedAmount currencyId="EUR">620.00</appliedAmount>
+    </applicableServiceCharge>
+    
+    <!-- Datum i mjesto izdavanja -->
+    <associatedDocument>
+        <formattedIssueDateTime formatId="203">202601110915+0100</formattedIssueDateTime>
+        <issueLocation>
+            <name>Zagreb</name>
+            <postalAddress>
+                <cityName>Zagreb</cityName>
+                <countryCode>HR</countryCode>
+            </postalAddress>
+        </issueLocation>
+    </associatedDocument>
+    
+    <!-- Potpisi (Signatures) - represented as parties -->
+    <associatedParty>
+        <name>Adria Food d.o.o. (Ivan Horvat)</name>
+        <roleCode>SIGNATORY</roleCode>
+        <specifiedContactPerson>
+            <givenName>Ivan</givenName>
+            <familyName>Horvat</familyName>
+        </specifiedContactPerson>
+    </associatedParty>
+    
+    <associatedParty>
+        <name>TransLogistika d.o.o. (Marko Kovač)</name>
+        <roleCode>SIGNATORY</roleCode>
+        <specifiedContactPerson>
+            <givenName>Marko</givenName>
+            <familyName>Kovač</familyName>
+        </specifiedContactPerson>
+    </associatedParty>
+    
+    <associatedParty>
+        <name>Dalmacija Retail d.o.o. (Ana Marić)</name>
+        <roleCode>RECEIPT_SIGNATORY</roleCode>
+        <specifiedContactPerson>
+            <givenName>Ana</givenName>
+            <familyName>Marić</familyName>
+        </specifiedContactPerson>
+    </associatedParty>
+    
+</consignment>
+
+
+
+

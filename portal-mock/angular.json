@@ -54,6 +54,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "standalone": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environment/environment.ts",
+                  "with": "src/environment/environment.standalone.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -66,11 +77,16 @@
             },
             "development": {
               "buildTarget": "portal:build:development"
+            },
+            "standalone": {
+              "buildTarget": "portal:build:standalone"
             }
           },
           "defaultConfiguration": "development",
           "options": {
-            "disableHostCheck": true
+            "disableHostCheck": true,
+            "port": 4200,
+            "host": "0.0.0.0"
           }
         },
         "extract-i18n": {

@@ -32,6 +32,14 @@ gate:
     username: borduria_service_account
     password: Azerty59*1234567
   platforms:
-    - platformId: "acme"
+    - platformId: "croatia eFTI platform"
       useRestApi: true
       restApiBaseUrl: "http://localhost:8070/api/gate-api"
+  # Remote gates that can be accessed via direct REST API (bypassing Domibus)
+  remoteGates:
+    - gateId: "syldavia"
+      useRestApi: true
+      restApiBaseUrl: "http://efti.gate.syldavia.eu:8080"
+      # Optional basic auth credentials:
+      # username: "api_user"
+      # password: "api_password"

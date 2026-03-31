@@ -1,48 +1,34 @@
 import {Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router, RouterOutlet} from "@angular/router";
-import {DatePipe, NgIf, NgFor} from "@angular/common";
+import {DatePipe, NgIf, NgFor, NgClass} from "@angular/common";
 import { TranslateModule } from "@ngx-translate/core";
 import { BootstrapIconsModule } from "ng-bootstrap-icons";
 import { IconsModule } from "../../icons/icons.module";
-import { ArrayUtils } from "../../core/utils/array-utils";
 import { Identifiers } from "../../core/models/identifiers.model";
 import { LocalStorageService } from "../../core/services/local-storage.service";
-import {NgbAccordionModule, NgbCollapse} from "@ng-bootstrap/ng-bootstrap";
-import {transportMode} from "../../core/models/transport-mode.model";
 
 @Component({
   selector: 'app-identifiers-display',
   standalone: true,
   templateUrl: './identifiers-display.component.html',
   imports: [
-    RouterOutlet, NgFor, NgIf, TranslateModule, BootstrapIconsModule, IconsModule,
-    NgbAccordionModule, DatePipe, NgbCollapse
+    RouterOutlet, NgFor, NgIf, NgClass, TranslateModule, BootstrapIconsModule, IconsModule,
+    DatePipe
   ],
   styleUrl: './identifiers-display.component.css'
 })
 export class IdentifiersDisplayComponent implements OnInit {
 
   identifiers!: Identifiers;
-  currentSort!: string;
 
   constructor(private route: ActivatedRoute, private localStorageService: LocalStorageService,
               private router: Router) {
   }
 
   ngOnInit() {
-    this.route.params.subscribe( params => {
-      this.identifiers = this.localStorageService.getIdentifiers(params['id'])
+    this.route.params.subscribe(params => {
+      this.identifiers = this.localStorageService.getIdentifiers(params['id']);
     });
-  }
-
-  sort(property: string) {
-    this.currentSort = this.currentSort === property ? '-' + property : property;
-    this.identifiers.usedTransportEquipment = this.identifiers.usedTransportEquipment.sort(ArrayUtils.dynamicSort(this.currentSort));
-  }
-
-  sortCarriage(property: string) {
-    this.currentSort = this.currentSort === property ? '-' + property : property;
-    this.identifiers.mainCarriageTransportMovement = this.identifiers.mainCarriageTransportMovement.sort(ArrayUtils.dynamicSort(this.currentSort));
   }
 
   goToUil() {
@@ -51,19 +37,62 @@ export class IdentifiersDisplayComponent implements OnInit {
     );
   }
 
-  showCarried(i : number) {
-    let elems = document.querySelectorAll("#carried-" + i);
-    let index = 0, length = elems.length;
-    for ( ; index < length; index++) {
-      if(elems[index].classList.contains("hidden")) {
-        elems[index].classList.remove('hidden')
-      } else {
-        elems[index].classList.add('hidden')
-      }
-    }
+  getTransportModeName(modeCode: number): string {
+    const modeNames: { [key: number]: string } = {
+      1: 'Waterway',
+      2: 'Railway',
+      3: 'Road',
+      4: 'Air'
+    };
+    return modeNames[modeCode] || `Mode ${modeCode}`;
   }
 
-  getTransportModeFromCode(index: any): string {
-    return transportMode[index];
+  getDangerousGoodsIndicator(): string {
+    if (this.identifiers.mainCarriageTransportMovement && this.identifiers.mainCarriageTransportMovement.length > 0) {
+      const ind = String(this.identifiers.mainCarriageTransportMovement[0].dangerousGoodsIndicator);
+      if (ind === 'true') return 'YES';
+      if (ind === 'false') return 'NO';
+    }
+    return 'N/A';
+  }
+
+  getDangerousGoodsClass(indicator: string | boolean): string {
+    const ind = String(indicator);
+    if (ind === 'true') return 'yes';
+    if (ind === 'false') return 'no';
+    return 'na';
+  }
+
+  getDangerousGoodsLabel(indicator: string | boolean): string {
+    const ind = String(indicator);
+    if (ind === 'true') return 'ADR';
+    if (ind === 'false') return 'No';
+    return 'N/A';
+  }
+
+  getMainTransportMode(): number | null {
+    if (this.identifiers.mainCarriageTransportMovement && this.identifiers.mainCarriageTransportMovement.length > 0) {
+      return this.identifiers.mainCarriageTransportMovement[0].modeCode;
+    }
+    return null;
+  }
+
+  getMainTransportCountry(): string | null {
+    if (this.identifiers.mainCarriageTransportMovement && this.identifiers.mainCarriageTransportMovement.length > 0) {
+      return this.identifiers.mainCarriageTransportMovement[0].registrationCountryCode;
+    }
+    return null;
+  }
+
+  getUsedEquipmentCount(): number {
+    return this.identifiers.usedTransportEquipment?.length || 0;
+  }
+
+  getCarriedEquipmentCount(): number {
+    let count = 0;
+    this.identifiers.usedTransportEquipment?.forEach(equipment => {
+      count += equipment.carriedTransportEquipment?.length || 0;
+    });
+    return count;
   }
 }

@@ -1,0 +1,963 @@
+<div class="ecmr-container" *ngIf="!loading">
+  <!-- Error message -->
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <h4>Error loading eCMR data</h4>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- POC Display -->
+  <app-poc-display 
+    *ngIf="version === 'poc' && ecmrData && !error"
+    [ecmrData]="ecmrData"
+    [xmlContent]="xmlContent"
+    [onSwitchToPilot]="switchToPilot.bind(this)">
+  </app-poc-display>
+
+  <!-- Show message if no data and no error -->
+  <div *ngIf="!ecmrData && !error && !loading" class="alert alert-info" role="alert">
+    <h4>No data available</h4>
+    <p>Please navigate from a result list to view eCMR data.</p>
+  </div>
+
+  <!-- eCMR Display - Pilot Version -->
+  <div *ngIf="version === 'pilot' && ecmrData && !error" class="ecmr-wrapper">
+    <!-- Header Card -->
+    <div class="card header-card">
+      <div class="card-header-content">
+        <div class="title-section">
+          <h1>eCMR tovarni list</h1>
+          <p class="subtitle">Međunarodni cestovni prijevoz robe (CMR) — elektronički prikaz</p>
+        </div>
+        <div class="meta-section">
+          <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+            <span class="badge">eCMR</span>
+            <span class="badge" style="background: rgba(255, 255, 255, 0.3);">Pilot</span>
+            <button class="btn btn-sm btn-link" (click)="switchToPOC()" style="color: white; padding: 4px 8px; text-decoration: none;">
+              Pregled POC
+            </button>
+          </div>
+          <div class="meta-info">
+            <div class="meta-item">
+              <span class="meta-label">eCMR identifikator:</span>
+              <span class="meta-value">{{ ecmrData.ecmrId || '—' }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Datum izdavanja:</span>
+              <span class="meta-value">{{ ecmrData.issueDate || '—' }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Mjesto izdavanja:</span>
+              <span class="meta-value">{{ ecmrData.issueLocation || '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Basic Information Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Osnovni podaci</h2>
+        <span class="field-range">Polja 1–5, 16–18</span>
+      </div>
+      <div class="card-body">
+        <div class="fields-grid">
+          <!-- Field 1: Consignor -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Pošiljatelj</span>
+              <span class="field-number">1</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.consignor">
+              {{ formatParty(ecmrData.consignor) || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 2: Consignee -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Primatelj</span>
+              <span class="field-number">2</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.consignee">
+              {{ formatParty(ecmrData.consignee) || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 16: Carrier -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Prijevoznik</span>
+              <span class="field-number">16</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.carrier">
+              {{ formatParty(ecmrData.carrier) || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 3: Delivery Address -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Adresa isporuke</span>
+              <span class="field-number">3</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.deliveryAddress">
+              {{ formatLocation(ecmrData.deliveryAddress) || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 17: Following Carrier -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Sljedeći prijevoznik</span>
+              <span class="field-number">17</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.followingCarrier">
+              {{ formatParty(ecmrData.followingCarrier) || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 4: Place/Date Taking Over -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Mjesto i datum preuzimanja robe</span>
+              <span class="field-number">4</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.carrierAcceptanceDateTime && !ecmrData.carrierAcceptanceLocation">
+              <ng-container *ngIf="ecmrData.carrierAcceptanceDateTime || ecmrData.carrierAcceptanceLocation">
+                <ng-container *ngIf="ecmrData.carrierAcceptanceDateTime">{{ ecmrData.carrierAcceptanceDateTime }}</ng-container>
+                <ng-container *ngIf="ecmrData.carrierAcceptanceDateTime && ecmrData.carrierAcceptanceLocation"><br></ng-container>
+                <ng-container *ngIf="ecmrData.carrierAcceptanceLocation">{{ formatLocation(ecmrData.carrierAcceptanceLocation) }}</ng-container>
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.carrierAcceptanceDateTime && !ecmrData.carrierAcceptanceLocation">—</ng-container>
+            </div>
+          </div>
+
+          <!-- Field 18: Carrier Reservations -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Rezerve i napomene prijevoznika</span>
+              <span class="field-number">18</span>
+            </div>
+            <div class="field-value empty">—</div>
+          </div>
+
+          <!-- Field 5: Annexed Documents -->
+          <div class="field-group full-width">
+            <div class="field-label">
+              <span>Priloženi dokumenti</span>
+              <span class="field-number">5</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.annexedDocuments || ecmrData.annexedDocuments.length === 0">
+              <ng-container *ngIf="ecmrData.annexedDocuments && ecmrData.annexedDocuments.length > 0">
+                <div *ngFor="let doc of ecmrData.annexedDocuments" class="document-item">{{ doc }}</div>
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.annexedDocuments || ecmrData.annexedDocuments.length === 0">—</ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goods Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Roba</h2>
+        <span class="field-range">Polja 6–12</span>
+      </div>
+      <div class="card-body">
+        <div class="table-wrapper">
+          <table class="goods-table">
+            <thead>
+              <tr>
+                <th>6. Oznake i brojevi</th>
+                <th>7. Broj paketa</th>
+                <th>8. Opis pakiranja</th>
+                <th>9. Priroda robe / Naziv</th>
+                <th>10. Stat. broj</th>
+                <th>11. Bruto masa (kg)</th>
+                <th>12. Volumen (m³)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of ecmrData.consignmentItems">
+                <td>{{ item.marksAndNumbers || '—' }}</td>
+                <td>{{ item.numberOfPackages || '—' }}</td>
+                <td>{{ item.packingDescription || '—' }}</td>
+                <td>{{ item.natureOfGoods || '—' }}</td>
+                <td>{{ item.statisticNumber || '—' }}</td>
+                <td>
+                  <ng-container *ngIf="item.grossWeight">
+                    {{ item.grossWeight }}<ng-container *ngIf="item.grossWeightUnit"> {{ item.grossWeightUnit }}</ng-container>
+                  </ng-container>
+                  <ng-container *ngIf="!item.grossWeight">—</ng-container>
+                </td>
+                <td>
+                  <ng-container *ngIf="item.volume">
+                    {{ item.volume }}<ng-container *ngIf="item.volumeUnit"> {{ item.volumeUnit }}</ng-container>
+                  </ng-container>
+                  <ng-container *ngIf="!item.volume">—</ng-container>
+                </td>
+              </tr>
+              <tr *ngIf="ecmrData.consignmentItems.length === 0">
+                <td colspan="7" class="empty-message">Nema stavki</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="goods-summary">
+          <div class="summary-item">
+            <span class="summary-label">Ukupno stavki:</span>
+            <span class="summary-value">{{ ecmrData.consignmentItems.length }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Ukupno bruto:</span>
+            <span class="summary-value">
+              <ng-container *ngIf="ecmrData.totalGrossWeight">
+                {{ ecmrData.totalGrossWeight }}<ng-container *ngIf="ecmrData.totalGrossWeightUnit"> {{ ecmrData.totalGrossWeightUnit }}</ng-container>
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.totalGrossWeight">—</ng-container>
+            </span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Ukupno volumen:</span>
+            <span class="summary-value">
+              <ng-container *ngIf="ecmrData.totalVolume">
+                {{ ecmrData.totalVolume }}<ng-container *ngIf="ecmrData.totalVolumeUnit"> {{ ecmrData.totalVolumeUnit }}</ng-container>
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.totalVolume">—</ng-container>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions & Payment Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Upute i plaćanje</h2>
+        <span class="field-range">Polja 13–21</span>
+      </div>
+      <div class="card-body">
+        <div class="fields-grid">
+          <!-- Field 13: Special Instructions -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Upute pošiljatelja (carina i formalnosti)</span>
+              <span class="field-number">13</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.specialInstructions">
+              {{ ecmrData.specialInstructions || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 19: Paying Party -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Plaća</span>
+              <span class="field-number">19</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.payingParty || ecmrData.payingParty.length === 0">
+              <ng-container *ngIf="ecmrData.payingParty && ecmrData.payingParty.length > 0">
+                {{ ecmrData.payingParty.join(', ') }}
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.payingParty || ecmrData.payingParty.length === 0">—</ng-container>
+            </div>
+          </div>
+
+          <!-- Field 14: COD Amount -->
+          <div class="field-group full-width">
+            <div class="field-label">
+              <span>Pouzeće</span>
+              <span class="field-number">14</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.codAmount">
+              <ng-container *ngIf="ecmrData.codAmount">
+                {{ formatCurrency(ecmrData.codAmount, ecmrData.codCurrency) }}
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.codAmount">—</ng-container>
+            </div>
+          </div>
+
+          <!-- Field 15: Payment Instructions -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Upute za plaćanje vozarine</span>
+              <span class="field-number">15</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.paymentInstructions || ecmrData.paymentInstructions.length === 0">
+              <ng-container *ngIf="ecmrData.paymentInstructions && ecmrData.paymentInstructions.length > 0">
+                {{ ecmrData.paymentInstructions.join(', ') }}
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.paymentInstructions || ecmrData.paymentInstructions.length === 0">—</ng-container>
+            </div>
+          </div>
+
+          <!-- Field 20: Special Agreements -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Posebni sporazumi</span>
+              <span class="field-number">20</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.specialAgreements">
+              {{ ecmrData.specialAgreements || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 21: Date and Place of Issue -->
+          <div class="field-group full-width">
+            <div class="field-label">
+              <span>Datum i mjesto izdavanja</span>
+              <span class="field-number">21</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.issueDateAndPlace">
+              {{ ecmrData.issueDateAndPlace || '—' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signatures Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Potpisi</h2>
+        <span class="field-range">Polja 22–24</span>
+      </div>
+      <div class="card-body">
+        <div class="signatures-grid">
+          <!-- Field 22: Sender Signature -->
+          <div class="signature-box">
+            <div class="field-label">
+              <span>Potpis i pečat pošiljatelja</span>
+              <span class="field-number">22</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.senderSignature">
+              {{ ecmrData.senderSignature || '—' }}
+            </div>
+            <div class="signature-line">Potpis / dokaz e-identifikacije</div>
+          </div>
+
+          <!-- Field 23: Carrier Signature -->
+          <div class="signature-box">
+            <div class="field-label">
+              <span>Potpis i pečat prijevoznika</span>
+              <span class="field-number">23</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.carrierSignature">
+              {{ ecmrData.carrierSignature || '—' }}
+            </div>
+            <div class="signature-line">Potpis / dokaz e-identifikacije</div>
+          </div>
+
+          <!-- Field 24: Consignee Signature -->
+          <div class="signature-box">
+            <div class="field-label">
+              <span>Roba zaprimljena</span>
+              <span class="field-number">24</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.consigneeSignature">
+              {{ ecmrData.consigneeSignature || '—' }}
+            </div>
+            <div class="signature-line">Potpis / dokaz e-identifikacije</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehicle & Tariff Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Vozilo i tarifa</h2>
+        <span class="field-range">Polja 25–28</span>
+      </div>
+      <div class="card-body">
+        <div class="fields-grid">
+          <!-- Field 25: Vehicle and Trailer Numbers -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Broj vozila i prikolice</span>
+              <span class="field-number">25</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.vehicleNumber && !ecmrData.trailerNumber">
+              <ng-container *ngIf="ecmrData.vehicleNumber || ecmrData.trailerNumber">
+                <ng-container *ngIf="ecmrData.vehicleNumber">Vozilo: {{ ecmrData.vehicleNumber }}</ng-container>
+                <ng-container *ngIf="ecmrData.vehicleNumber && ecmrData.trailerNumber"> / </ng-container>
+                <ng-container *ngIf="ecmrData.trailerNumber">Prikolica: {{ ecmrData.trailerNumber }}</ng-container>
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.vehicleNumber && !ecmrData.trailerNumber">—</ng-container>
+            </div>
+          </div>
+
+          <!-- Field 26: Vehicle Model -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Model vozila i prikolice</span>
+              <span class="field-number">26</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.vehicleModel">
+              {{ ecmrData.vehicleModel || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 27: Tariff -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Tarifa</span>
+              <span class="field-number">27</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.tariff27">
+              {{ ecmrData.tariff27 || '—' }}
+            </div>
+          </div>
+
+          <!-- Field 28: Tariffs -->
+          <div class="field-group full-width">
+            <div class="field-label">
+              <span>Tarife</span>
+              <span class="field-number">28</span>
+            </div>
+            <div class="field-value" [class.empty]="!ecmrData.tariffs || ecmrData.tariffs.length === 0">
+              <ng-container *ngIf="ecmrData.tariffs && ecmrData.tariffs.length > 0">
+                <div *ngFor="let tariff of ecmrData.tariffs" class="tariff-item">
+                  {{ formatTariff(tariff) }}
+                </div>
+              </ng-container>
+              <ng-container *ngIf="!ecmrData.tariffs || ecmrData.tariffs.length === 0">—</ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADR / Dangerous Goods Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>ADR / Opasna roba</h2>
+        <span class="field-range">Dangerous Goods Note</span>
+      </div>
+      <div class="card-body">
+        <!-- ADR Fields -->
+        <div class="fields-grid" style="margin-top: 24px;">
+          <ng-container *ngFor="let item of ecmrData.adrData?.adrItems">
+            <!-- Shipping Marks -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.shipping-marks' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.shippingMarks">
+                {{ item.shippingMarks || '—' }}
+              </div>
+            </div>
+
+            <!-- Proper Shipping Name -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.proper-shipping-name' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.properShippingName">
+                {{ item.properShippingName || '—' }}
+              </div>
+            </div>
+
+            <!-- UN Number -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.un-no' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.unNumber">
+                {{ item.unNumber || '—' }}
+              </div>
+            </div>
+
+            <!-- Hazard Classification ID -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.hazard-classification-id' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.hazardClass">
+                {{ item.hazardClass || '—' }}
+              </div>
+            </div>
+
+            <!-- Hazard Category Code -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.hazard-category-code' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.hazardCategoryCode">
+                {{ item.hazardCategoryCode || '—' }}
+              </div>
+            </div>
+
+            <!-- Hazard Type Code -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.hazard-type-code' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.hazardTypeCode">
+                {{ item.hazardTypeCode || '—' }}
+              </div>
+            </div>
+
+            <!-- Packaging Danger Level Code -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.packaging-danger-level-code' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.packagingDangerLevelCode">
+                {{ item.packagingDangerLevelCode || '—' }}
+              </div>
+            </div>
+
+            <!-- Tunnel Restriction Code -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.tunnel-restriction-code' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.tunnelRestrictionCode">
+                {{ item.tunnelRestrictionCode || '—' }}
+              </div>
+            </div>
+
+            <!-- Limited Quantity Code -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.limited-quantity-code' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.limitedQuantityCode">
+                {{ item.limitedQuantityCode || '—' }}
+              </div>
+            </div>
+
+            <!-- Special Provision ID -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.special-provision-id' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.specialProvisionID">
+                {{ item.specialProvisionID || '—' }}
+              </div>
+            </div>
+
+            <!-- Reportable Quantity -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.reportable-quantity' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.reportableQuantity">
+                {{ item.reportableQuantity || '—' }}
+              </div>
+            </div>
+
+            <!-- Technical Name -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.technical-name' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.technicalName">
+                {{ item.technicalName || '—' }}
+              </div>
+            </div>
+
+            <!-- Regulatory Authority -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.regulatory-authority' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.regulatoryAuthorityName">
+                {{ item.regulatoryAuthorityName || '—' }}
+              </div>
+            </div>
+
+            <!-- Number of Packages -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.number-of-packages' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.numberOfPackages">
+                {{ item.numberOfPackages || '—' }}
+              </div>
+            </div>
+
+            <!-- Packing Description -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.packing-description' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.packingDescription">
+                {{ item.packingDescription || '—' }}
+              </div>
+            </div>
+
+            <!-- Net Weight -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.net-wt-kg' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.netWeight">
+                <ng-container *ngIf="item.netWeight">
+                  {{ item.netWeight }}<ng-container *ngIf="item.netWeightUnit"> {{ item.netWeightUnit }}</ng-container>
+                </ng-container>
+                <ng-container *ngIf="!item.netWeight">—</ng-container>
+              </div>
+            </div>
+
+            <!-- Gross Weight -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.gross-weight-kg' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.grossWeight">
+                <ng-container *ngIf="item.grossWeight">
+                  {{ item.grossWeight }}<ng-container *ngIf="item.grossWeightUnit"> {{ item.grossWeightUnit }}</ng-container>
+                </ng-container>
+                <ng-container *ngIf="!item.grossWeight">—</ng-container>
+              </div>
+            </div>
+
+            <!-- Cube (Volume) -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.cube-m3' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.volume">
+                <ng-container *ngIf="item.volume">
+                  {{ item.volume }}<ng-container *ngIf="item.volumeUnit"> {{ item.volumeUnit }}</ng-container>
+                </ng-container>
+                <ng-container *ngIf="!item.volume">—</ng-container>
+              </div>
+            </div>
+
+            <!-- Density -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.density' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.densityMeasure">
+                <ng-container *ngIf="item.densityMeasure">
+                  {{ item.densityMeasure }}<ng-container *ngIf="item.densityMeasureUnit"> {{ item.densityMeasureUnit }}</ng-container>
+                </ng-container>
+                <ng-container *ngIf="!item.densityMeasure">—</ng-container>
+              </div>
+            </div>
+
+            <!-- Melting Point -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.melting-point' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.meltingPointTemperatureMeasure">
+                <ng-container *ngIf="item.meltingPointTemperatureMeasure">
+                  {{ item.meltingPointTemperatureMeasure }}<ng-container *ngIf="item.meltingPointTemperatureUnit"> {{ item.meltingPointTemperatureUnit }}</ng-container>
+                </ng-container>
+                <ng-container *ngIf="!item.meltingPointTemperatureMeasure">—</ng-container>
+              </div>
+            </div>
+
+            <!-- Explosive Cargo Net Weight -->
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.explosive-cargo-net-weight' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.explosiveCargoNetWeight">
+                <ng-container *ngIf="item.explosiveCargoNetWeight">
+                  {{ item.explosiveCargoNetWeight }}<ng-container *ngIf="item.explosiveCargoNetWeightUnit"> {{ item.explosiveCargoNetWeightUnit }}</ng-container>
+                </ng-container>
+                <ng-container *ngIf="!item.explosiveCargoNetWeight">—</ng-container>
+              </div>
+            </div>
+
+            <!-- Radioactive Material Section -->
+            <div class="field-group full-width" style="padding: 12px; background: #fff3cd; border-left: 3px solid #ffc107;">
+              <div class="field-label">
+                <span>{{ 'adr.radioactive-material' | translate }}</span>
+              </div>
+              <div class="fields-grid" style="margin-top: 8px;">
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.isotope' | translate }}</span>
+                  </div>
+                  <div class="field-value" [class.empty]="!item.radioactiveMaterial?.isotopeName">
+                    {{ item.radioactiveMaterial?.isotopeName || '—' }}
+                  </div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.activity-level' | translate }}</span>
+                  </div>
+                  <div class="field-value" [class.empty]="!item.radioactiveMaterial?.activityLevelMeasure">
+                    <ng-container *ngIf="item.radioactiveMaterial?.activityLevelMeasure">
+                      {{ item.radioactiveMaterial?.activityLevelMeasure }}<ng-container *ngIf="item.radioactiveMaterial?.activityLevelUnit"> {{ item.radioactiveMaterial?.activityLevelUnit }}</ng-container>
+                    </ng-container>
+                    <ng-container *ngIf="!item.radioactiveMaterial?.activityLevelMeasure">—</ng-container>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.fissile-criticality-safety-index' | translate }}</span>
+                  </div>
+                  <div class="field-value" [class.empty]="!item.radioactiveMaterial?.fissileCriticalitySafetyIndexNumber">
+                    {{ item.radioactiveMaterial?.fissileCriticalitySafetyIndexNumber || '—' }}
+                  </div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.transport-index-code' | translate }}</span>
+                  </div>
+                  <div class="field-value" [class.empty]="!item.radioactiveMaterial?.radioactivePackageTransportIndexCode">
+                    {{ item.radioactiveMaterial?.radioactivePackageTransportIndexCode || '—' }}
+                  </div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.special-form' | translate }}</span>
+                  </div>
+                  <div class="field-value" [class.empty]="!item.radioactiveMaterial?.specialFormInformation">
+                    {{ item.radioactiveMaterial?.specialFormInformation || '—' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Supplementary Information -->
+            <div class="field-group full-width">
+              <div class="field-label">
+                <span>{{ 'adr.supplementary-info' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.supplementaryInformation">
+                {{ item.supplementaryInformation || '—' }}
+              </div>
+            </div>
+
+            <!-- Information -->
+            <div class="field-group full-width">
+              <div class="field-label">
+                <span>{{ 'adr.information' | translate }}</span>
+              </div>
+              <div class="field-value" [class.empty]="!item.information">
+                {{ item.information || '—' }}
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Empty state - show all fields with dashes -->
+          <ng-container *ngIf="!ecmrData.adrData || !ecmrData.adrData.adrItems || (ecmrData.adrData?.adrItems?.length ?? 0) === 0">
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.shipping-marks' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.proper-shipping-name' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.un-no' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.hazard-classification-id' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.hazard-category-code' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.hazard-type-code' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.packaging-danger-level-code' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.tunnel-restriction-code' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.limited-quantity-code' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.special-provision-id' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.reportable-quantity' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.technical-name' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.regulatory-authority' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.number-of-packages' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.packing-description' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.net-wt-kg' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.gross-weight-kg' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.cube-m3' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.density' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.melting-point' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>{{ 'adr.explosive-cargo-net-weight' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group full-width" style="padding: 12px; background: #fff3cd; border-left: 3px solid #ffc107;">
+              <div class="field-label">
+                <span>{{ 'adr.radioactive-material' | translate }}</span>
+              </div>
+              <div class="fields-grid" style="margin-top: 8px;">
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.isotope' | translate }}</span>
+                  </div>
+                  <div class="field-value empty">—</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.activity-level' | translate }}</span>
+                  </div>
+                  <div class="field-value empty">—</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.fissile-criticality-safety-index' | translate }}</span>
+                  </div>
+                  <div class="field-value empty">—</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.transport-index-code' | translate }}</span>
+                  </div>
+                  <div class="field-value empty">—</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">
+                    <span>{{ 'adr.special-form' | translate }}</span>
+                  </div>
+                  <div class="field-value empty">—</div>
+                </div>
+              </div>
+            </div>
+            <div class="field-group full-width">
+              <div class="field-label">
+                <span>{{ 'adr.supplementary-info' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+            <div class="field-group full-width">
+              <div class="field-label">
+                <span>{{ 'adr.information' | translate }}</span>
+              </div>
+              <div class="field-value empty">—</div>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Temperature Requirements -->
+        <div class="fields-grid" style="margin-top: 24px;">
+          <div class="field-group">
+            <div class="field-label">
+              <span>{{ 'adr.control-temperature' | translate }}</span>
+            </div>
+            <div class="field-value" [class.empty]="!getFirstControlTemperature(ecmrData.adrData)">
+              {{ getFirstControlTemperature(ecmrData.adrData) || '—' }}
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">
+              <span>{{ 'adr.emergency-temperature' | translate }}</span>
+            </div>
+            <div class="field-value" [class.empty]="!getFirstEmergencyTemperature(ecmrData.adrData)">
+              {{ getFirstEmergencyTemperature(ecmrData.adrData) || '—' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="goods-summary" style="margin-top: 24px;">
+          <div class="summary-item">
+            <span class="summary-label">Ukupno ADR stavki:</span>
+            <span class="summary-value">{{ ecmrData.adrData?.adrItems?.length || 0 }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading state -->
+<div class="ecmr-container" *ngIf="loading">
+  <div class="card">
+    <div class="card-body" style="text-align: center; padding: 40px;">
+      <p>Loading eCMR data...</p>
+    </div>
+  </div>
+</div>

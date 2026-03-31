@@ -19,7 +19,7 @@ services:
       - '3306:3306'
     volumes:
       - ./mariadb/sybo/initdb.d:/docker-entrypoint-initdb.d/
-      - ./mariadb/sybo/data:/var/lib/mysql:Z
+      - mariadb-sybo-data:/var/lib/mysql
     networks:
       efti:
 
@@ -43,7 +43,7 @@ services:
       - '3307:3306'
     volumes:
       - ./mariadb/li/initdb.d:/docker-entrypoint-initdb.d/
-      - ./mariadb/li/data:/var/lib/mysql:Z
+      - mariadb-li-data:/var/lib/mysql
     networks:
       efti:
 
@@ -67,7 +67,7 @@ services:
       - '3308:3306'
     volumes:
       - ./mariadb/platform/initdb.d:/docker-entrypoint-initdb.d/
-      - ./mariadb/platform/data:/var/lib/mysql:Z
+      - mariadb-platform-data:/var/lib/mysql
     networks:
       efti:
 
@@ -191,3 +191,8 @@ networks:
   efti:
     name: efti-network
     external: true
+
+volumes:
+  mariadb-sybo-data:
+  mariadb-li-data:
+  mariadb-platform-data:

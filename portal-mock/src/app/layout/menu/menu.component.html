@@ -1,35 +1,73 @@
-<div class="container d-flex justify-content-between px-5">
-  <div>
-    <a href="#"><img src="/assets/logo.jpg" height="90" alt="logo"/></a>
-    <a href="#"><img src="/assets/logo_in.svg" height="90" class="px-5" alt="logo-in" /></a>
-  </div>
-  <div class="mt-4 header-title">
-    eFTI Demo Portal
-  </div>
-  <div class="mt-4 mx-5">
-    <button class="login-btn" *ngIf="!isAuthenticated()" (click)="login()"> {{'menu.login' | translate }} </button>
-    <button class="login-btn" *ngIf="isAuthenticated()" (click)="logout()"> {{'menu.logout' | translate }} </button>
-  </div>
-</div>
-<nav class="navbar navbar-expand-sm navbar-light" id="neubar">
-  <div class="container">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<header class="nscp-header">
+  <div class="container header-content">
+    <a routerLink="/" class="nscp-logo">
+      <img src="/assets/images/logo-nscp.png" alt="NSCP" class="logo-img" />
+    </a>
 
-    <div class=" collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav">
-        <li class="nav-item" *ngIf="isLogged()">
-          <a class="nav-link ms-5" routerLink="uil">{{'menu.search-by-uil' | translate }}</a>
-        </li>
-        <li class="nav-item" *ngIf="isLogged()">
-          <a class="nav-link ms-5" routerLink="identifiers">{{'menu.search-by-identifiers' | translate }}</a>
-        </li>
-      </ul>
+    <div class="header-right">
+      <!-- Standalone mode: user selector -->
+      <div class="user-section" *ngIf="isStandalone">
+        <div class="dropdown">
+          <button class="user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-user"></i>
+            {{ selectedMockUser.label }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li *ngFor="let user of mockUsers">
+              <a class="dropdown-item" href="javascript:void(0)" (click)="switchMockUser(user)"
+                 [class.active]="user === selectedMockUser">
+                <span class="country-badge">{{ user.country }}</span>
+                {{ user.label }}
+              </a>
+            </li>
+          </ul>
+        </div>
+        <span class="header-sep"></span>
+        <a href="javascript:void(0)" class="logout-link">{{'menu.logout' | translate }}</a>
+      </div>
 
-      <div class="form-check form-switch collapse navbar-collapse justify-content-end navend-button">
-        <label class="form-check-label nav-link me-5" for="switch">Auto Polling</label>
-        <input class="form-check-input" type="checkbox" id="switch" [(ngModel)]="autoPolling" (change)="updatePollingValue($event)">
+      <!-- Backend mode: login/logout -->
+      <div class="user-section" *ngIf="!isStandalone">
+        <button class="user-btn" *ngIf="!isAuthenticated()" (click)="login()">
+          <i class="fa-solid fa-right-to-bracket me-1"></i>
+          {{'menu.login' | translate }}
+        </button>
+        <ng-container *ngIf="isAuthenticated()">
+          <div class="dropdown">
+            <button class="user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-user"></i>
+              Inspector1
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="javascript:void(0)" (click)="logout()">{{'menu.logout' | translate }}</a></li>
+            </ul>
+          </div>
+          <span class="header-sep"></span>
+          <a href="javascript:void(0)" class="logout-link" (click)="logout()">{{'menu.logout' | translate }}</a>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="nscp-nav" *ngIf="isLogged()">
+  <div class="container nav-content">
+    <div class="nav-links">
+      <a class="nscp-nav-link" routerLink="identifiers" routerLinkActive="active">
+        <i class="fa-solid fa-search me-1"></i>
+        {{'menu.search-by-identifiers' | translate }}
+      </a>
+      <a class="nscp-nav-link" routerLink="uil" routerLinkActive="active">
+        <i class="fa-solid fa-file-lines me-1"></i>
+        {{'menu.search-by-uil' | translate }}
+      </a>
+    </div>
+
+    <div class="polling-toggle">
+      <label class="polling-label" for="autoPollingSwitch">Auto Polling</label>
+      <div class="form-check form-switch mb-0">
+        <input class="form-check-input" type="checkbox" id="autoPollingSwitch"
+               [(ngModel)]="autoPolling" (change)="updatePollingValue($event)">
       </div>
     </div>
   </div>

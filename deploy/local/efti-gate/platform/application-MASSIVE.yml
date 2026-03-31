@@ -3,7 +3,19 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://auth.gate.syldavia.eu:8080/realms/eFTI_SY
+          issuer-uri: http://auth.gate.slovenia.eu:8080/realms/eFTI_SLO
+  datasource:
+    url: jdbc:postgresql://reference-gate-shared-db:5432/efti
+    username: efti
+    password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
           
 server:
   port: 8071
@@ -11,11 +23,12 @@ server:
 gate:
   minSleep: 1000
   maxSleep: 2000
-  owner: massivedynamic
+  owner: slovenia eFTI platform
   cda_path: file:cda/
-  gate: syldavia
+  gate: slovenia
+  restApiBaseUrl: http://host.docker.internal:83/api/platform
   ap:
-    url: http://efti.platform.massivedynamic.com:81/domibus/services/wsplugin
-    username: massivedynamic_service_account
+    url: http://efti.platform.slovenia-efti-platform.com:81/domibus/services/wsplugin
+    username: slovenia_efti_platform_service_account
     password: Azerty59*1234567
 

@@ -6,6 +6,7 @@ import eu.efti.identifiersregistry.entity.Consignment;
 import eu.efti.identifiersregistry.entity.MainCarriageTransportMovement;
 import eu.efti.identifiersregistry.entity.UsedTransportEquipment;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -43,23 +44,43 @@ public interface IdentifiersRepository extends JpaRepository<Consignment, Long>,
     Optional<Consignment> findByUil(final String gate, final String uuid, final String platform);
 
     default List<Consignment> searchByCriteria(final SearchWithIdentifiersRequestDto request) {
+        System.out.println("=== SEARCH BY CRITERIA START ===");
+        System.out.println("Identifier: '" + request.getIdentifier() + "'");
+        System.out.println("Identifier Types: " + request.getIdentifierType());
+        
         final Set<Consignment> results = new HashSet<>();
         List<String> identifierTypes = request.getIdentifierType();
         if (CollectionUtils.isNotEmpty(identifierTypes)) {
             identifierTypes.forEach(identifierType -> {
+                System.out.println("Searching for type: " + identifierType);
                 if (MEANS.equalsIgnoreCase(identifierType)) {
-                    results.addAll(findAllForMeans(request));
+                    List<Consignment> meansResults = findAllForMeans(request);
+                    System.out.println("MEANS results: " + meansResults.size());
+                    results.addAll(meansResults);
                 } else if (EQUIPMENT.equalsIgnoreCase(identifierType)) {
-                    results.addAll(findAllForEquipment(request));
+                    List<Consignment> equipmentResults = findAllForEquipment(request);
+                    System.out.println("EQUIPMENT results: " + equipmentResults.size());
+                    results.addAll(equipmentResults);
                 } else if (CARRIED.equalsIgnoreCase(identifierType)) {
-                    results.addAll(findAllForCarried(request));
+                    List<Consignment> carriedResults = findAllForCarried(request);
+                    System.out.println("CARRIED results: " + carriedResults.size());
+                    results.addAll(carriedResults);
                 }
             });
         } else {
-            results.addAll(Stream.of(findAllForMeans(request), findAllForEquipment(request), findAllForCarried(request))
+            System.out.println("No identifier types specified, searching all types");
+            List<Consignment> meansResults = findAllForMeans(request);
+            List<Consignment> equipmentResults = findAllForEquipment(request);
+            List<Consignment> carriedResults = findAllForCarried(request);
+            System.out.println("MEANS results: " + meansResults.size());
+            System.out.println("EQUIPMENT results: " + equipmentResults.size());
+            System.out.println("CARRIED results: " + carriedResults.size());
+            results.addAll(Stream.of(meansResults, equipmentResults, carriedResults)
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet()));
         }
+        System.out.println("Total unique results: " + results.size());
+        System.out.println("=== SEARCH BY CRITERIA END ===");
         return new ArrayList<>(results);
     }
 
@@ -68,7 +89,15 @@ public interface IdentifiersRepository extends JpaRepository<Consignment, Long>,
             final List<Predicate> predicates = new ArrayList<>();
             Join<Consignment, MainCarriageTransportMovement> mainCarriageTransportMovementJoin = root.join(MOVEMENTS, JoinType.LEFT);
 
-            predicates.add(cb.equal(cb.upper(mainCarriageTransportMovementJoin.get(USED_TRANSPORT_MEANS_ID)), request.getIdentifier().toUpperCase()));
+            // Normalize identifier by removing dashes and non-alphanumeric characters for comparison
+            String normalizedSearchId = request.getIdentifier().replaceAll("[^A-Za-z0-9]", "").toUpperCase();
+            Expression<String> normalizedDbId = cb.function("REPLACE", String.class,
+                    cb.upper(mainCarriageTransportMovementJoin.get(USED_TRANSPORT_MEANS_ID)),
+                    cb.literal("-"),
+                    cb.literal(""));
+            // Remove any remaining non-alphanumeric characters
+            normalizedDbId = cb.function("REPLACE", String.class, normalizedDbId, cb.literal(" "), cb.literal(""));
+            predicates.add(cb.equal(normalizedDbId, normalizedSearchId));
 
             buildCommonAttributesRequest(request, cb, predicates, mainCarriageTransportMovementJoin);
 
@@ -85,14 +114,36 @@ public interface IdentifiersRepository extends JpaRepository<Consignment, Long>,
             final List<Predicate> predicates = new ArrayList<>();
             Join<Consignment, MainCarriageTransportMovement> mainCarriageTransportMovementJoin = root.join(MOVEMENTS, JoinType.LEFT);
             Join<Consignment, UsedTransportEquipment> equipmentJoin = root.join(TRANSPORT_VEHICLES, JoinType.LEFT);
-            predicates.add(cb.equal(cb.upper(equipmentJoin.get(VEHICLE_ID)), request.getIdentifier().toUpperCase()));
+            
+            // Log the search identifier
+            String originalIdentifier = request.getIdentifier();
+            String normalizedSearchId = originalIdentifier.replaceAll("[^A-Za-z0-9]", "").toUpperCase();
+            System.out.println("=== EQUIPMENT SEARCH DEBUG ===");
+            System.out.println("Original Identifier: '" + originalIdentifier + "'");
+            System.out.println("Normalized Search ID: '" + normalizedSearchId + "'");
+            System.out.println("ModeCode filter: " + request.getModeCode());
+            System.out.println("RegistrationCountryCode filter: " + request.getRegistrationCountryCode());
+            System.out.println("DangerousGoodsIndicator filter: " + request.getDangerousGoodsIndicator());
+            
+            // Normalize identifier by removing dashes and non-alphanumeric characters for comparison
+            Expression<String> normalizedDbId = cb.function("REPLACE", String.class,
+                    cb.upper(equipmentJoin.get(VEHICLE_ID)),
+                    cb.literal("-"),
+                    cb.literal(""));
+            // Remove any remaining non-alphanumeric characters (spaces, etc.)
+            normalizedDbId = cb.function("REPLACE", String.class, normalizedDbId, cb.literal(" "), cb.literal(""));
+            predicates.add(cb.equal(normalizedDbId, normalizedSearchId));
 
             buildCommonAttributesRequest(request, cb, predicates, mainCarriageTransportMovementJoin);
 
             if (StringUtils.isNotBlank(request.getRegistrationCountryCode())) {
                 predicates.add(cb.equal(equipmentJoin.get(VEHICLE_COUNTRY), request.getRegistrationCountryCode()));
             }
-            return cb.and(predicates.toArray(new Predicate[]{}));
+            
+            Predicate finalPredicate = cb.and(predicates.toArray(new Predicate[]{}));
+            System.out.println("Total predicates: " + predicates.size());
+            System.out.println("=== END EQUIPMENT SEARCH DEBUG ===");
+            return finalPredicate;
         });
     }
 
@@ -103,7 +154,15 @@ public interface IdentifiersRepository extends JpaRepository<Consignment, Long>,
             Join<Consignment, UsedTransportEquipment> equipmentJoin = root.join(TRANSPORT_VEHICLES, JoinType.LEFT);
             Join<UsedTransportEquipment, CarriedTransportEquipment> carriedJoin = equipmentJoin.join(CARRIED_TRANSPORT_EQUIPMENTS, JoinType.LEFT);
 
-            predicates.add(cb.equal(cb.upper(carriedJoin.get(VEHICLE_ID)), request.getIdentifier().toUpperCase()));
+            // Normalize identifier by removing dashes and non-alphanumeric characters for comparison
+            String normalizedSearchId = request.getIdentifier().replaceAll("[^A-Za-z0-9]", "").toUpperCase();
+            Expression<String> normalizedDbId = cb.function("REPLACE", String.class,
+                    cb.upper(carriedJoin.get(VEHICLE_ID)),
+                    cb.literal("-"),
+                    cb.literal(""));
+            // Remove any remaining non-alphanumeric characters (spaces, etc.)
+            normalizedDbId = cb.function("REPLACE", String.class, normalizedDbId, cb.literal(" "), cb.literal(""));
+            predicates.add(cb.equal(normalizedDbId, normalizedSearchId));
 
             buildCommonAttributesRequest(request, cb, predicates, mainCarriageTransportMovementJoin);
 

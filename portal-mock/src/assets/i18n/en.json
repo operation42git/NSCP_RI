@@ -49,7 +49,26 @@
     "request-saved": "Request saved",
     "note-saved": "Request saved",
     "request-updated": "Request updated",
-    "gate-indicator": "Gate Indicators"
+    "gate-indicator": "Gate Indicators",
+    "dangerous-goods": "Dangerous Goods",
+    "transport-movement": "Main Transport Movement",
+    "used-transport-equipment": "Used Transport Equipment",
+    "carried-equipment": "Carried Equipment",
+    "equipment-id": "Equipment ID",
+    "sequence-number": "Sequence Number",
+    "category-code": "Category Code",
+    "scheme-agency-id": "Scheme Agency ID",
+    "registration-country": "Registration Country",
+    "mode-code": "Mode Code",
+    "dangerous-goods-indicator": "Dangerous Goods Indicator",
+    "used": "Used",
+    "carried": "Carried",
+    "items": "items",
+    "no-carried-equipment": "No carried equipment",
+    "equipment": "Equipment",
+    "id": "ID",
+    "seq": "Seq",
+    "scheme": "Scheme"
   },
   "uil-search": {
     "title": "UIL Request",
@@ -70,7 +89,8 @@
   "form": {
     "error": {
       "required": "this field is required",
-      "pattern": "this field doesnt match required format"
+      "pattern": "this field doesnt match required format",
+      "fix-errors": "Please fix the form errors before submitting"
     }
   },
   "loader": {

@@ -32,7 +32,7 @@ gate:
     username: syldavia_service_account
     password: Azerty59*1234567
   platforms:
-    - platformId: "massivedynamic"
+    - platformId: "slovenia eFTI platform"
       useRestApi: false
 
 efti:

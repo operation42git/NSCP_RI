@@ -1,5 +1,5 @@
 import {Component, inject, OnInit, TemplateRef} from '@angular/core';
-import {ActivatedRoute, RouterOutlet} from "@angular/router";
+import {ActivatedRoute, Router, RouterOutlet} from "@angular/router";
 import {DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
@@ -34,12 +34,12 @@ export class UilSearchComponent implements OnInit {
   private modalService = inject(NgbModal);
   note: string = '';
 
-  gates: Array<string> = ["france", "borduria", "syldavia"];
+  gates: Array<string> = ["borduria", "syldavia", "listenbourg"];
 
   platforms: Array<PlatformModel> = [
     { "id": "ttf", "label": "ttf - FR"},
-    { "id": "acme", "label": "acme - BO"},
-    { "id": "massivedynamic", "label": "massivedynamic - SY"}];
+    { "id": "croatia eFTI platform", "label": "croatia eFTI platform"},
+    { "id": "slovenia eFTI platform", "label": "slovenia eFTI platform"}];
 
   searchForm!: FormGroup;
   public formSubmitted = false;
@@ -50,7 +50,7 @@ export class UilSearchComponent implements OnInit {
 
   constructor(private formBuilder: FormBuilder, public translate: TranslateService, private service: UilService, private toastr: ToastrService,
               private sanitizer: DomSanitizer, private route: ActivatedRoute, private noteService: NoteService,
-              private localStorageService: LocalStorageService) {
+              private localStorageService: LocalStorageService, private router: Router) {
     const id: string = this.route.snapshot.queryParamMap.get('id')!;
     const gate: string = this.route.snapshot.queryParamMap.get('gate')!;
     const platform: string = this.route.snapshot.queryParamMap.get('platform')!;
@@ -157,7 +157,19 @@ export class UilSearchComponent implements OnInit {
     this.result[indexToUpdate].errorDescription = response.errorDescription;
   }
 
-  async open(requestId: string) {
+  open(requestId: string) {
+    let index = this.result.findIndex(entry => entry.requestId === requestId);
+    if (index === -1) return;
+    
+    // Navigate to eCMR display component with base64 encoded XML data
+    const xmlData = this.result[index].data;
+    this.router.navigate(['/ecmr-display'], {
+      queryParams: { data: xmlData }
+    });
+  }
+
+  // Legacy method - kept for reference but not used
+  async openLegacy(requestId: string) {
     let index = this.result.findIndex(entry => entry.requestId === requestId);
     let content = atob(this.result[index].data);
     const style = await this.getAsset('/assets/xslt/eCMR.xslt');
@@ -169,9 +181,38 @@ export class UilSearchComponent implements OnInit {
     xsltProcessor.importStylesheet(styleEl);
     const resultDocument = xsltProcessor.transformToDocument(contentEl);
 
-    if(resultDocument.firstElementChild != null) {
-      let winUrl = URL.createObjectURL(new Blob([resultDocument.firstElementChild.innerHTML], {type: 'text/html'}));
-      window.open(winUrl);
+    if(resultDocument.documentElement != null) {
+      // Serialize the entire HTML document properly with UTF-8 encoding
+      const serializer = new XMLSerializer();
+      // Serialize the complete document including DOCTYPE
+      const htmlString = '<!DOCTYPE html>\n' + serializer.serializeToString(resultDocument.documentElement);
+      
+      // Debug: log the length to check if complete document is serialized
+      console.log('HTML string length:', htmlString.length);
+      console.log('HTML ends with:', htmlString.slice(-200));
+      
+      // Check if document contains multiple table rows
+      const tbodyCount = (htmlString.match(/<tbody>/g) || []).length;
+      const trCount = (htmlString.match(/<tr>/g) || []).length;
+      console.log('Table bodies found:', tbodyCount);
+      console.log('Table rows found:', trCount);
+      
+      // Use data URL with base64 encoding to ensure complete document transfer
+      // This bypasses potential issues with document.write() truncation
+      const base64Html = btoa(unescape(encodeURIComponent(htmlString)));
+      const dataUrl = 'data:text/html;charset=utf-8;base64,' + base64Html;
+      
+      // Open a new window with the data URL
+      const newWindow = window.open(dataUrl, '_blank');
+      if (!newWindow) {
+        // Fallback: if popup blocked, try direct write
+        const fallbackWindow = window.open('', '_blank');
+        if (fallbackWindow) {
+          fallbackWindow.document.open('text/html; charset=utf-8', 'replace');
+          fallbackWindow.document.write(htmlString);
+          fallbackWindow.document.close();
+        }
+      }
     }
   }
 
@@ -185,7 +226,8 @@ export class UilSearchComponent implements OnInit {
 
   parse(data: string): HTMLElement {
     const parser = new DOMParser();
-    const xmlNode = parser.parseFromString(data, 'application/xml');
+    // Parse XML with UTF-8 encoding
+    const xmlNode = parser.parseFromString(data, 'text/xml');
     return xmlNode.documentElement;
   }
 

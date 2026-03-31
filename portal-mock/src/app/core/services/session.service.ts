@@ -39,6 +39,6 @@ export class SessionService {
   }
 
   logout(): void {
-    window.open('/redirect_uri?logout=', '_self');
+    window.location.href = '/redirect_uri?logout=';
   }
 }

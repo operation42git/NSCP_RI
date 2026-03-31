@@ -1,46 +1,74 @@
 @import 'ngx-toastr/toastr';
 
+:root {
+  --nscp-dark: #1a2640;
+  --nscp-primary: #1a3a6e;
+  --nscp-accent: #3a7bd5;
+  --nscp-light-bg: #eaeff6;
+  --nscp-card-border: #d0d8e4;
+  --nscp-text: #2c3e50;
+  --nscp-text-muted: #5a6a7a;
+  --nscp-success: #28a745;
+  --nscp-danger: #dc3545;
+  --nscp-warning: #ff9900;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--nscp-text);
+  background-color: var(--nscp-light-bg);
+  margin: 0;
+}
+
 .btn-primary-in {
-  background-color: #C6AA76;
+  background-color: var(--nscp-primary);
   color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
 .btn-primary-in:active, .btn-primary-in:hover {
-  background-color: #ad9972;
+  background-color: var(--nscp-dark);
   color: white;
 }
 
 .data-area {
-  border-radius: 0 0 10px 10px;
-  border: 1px solid #c6aa76;
+  border-radius: 8px;
+  border: 1px solid var(--nscp-card-border);
   border-left: 0;
   background-color: white;
-  box-shadow: rgba(50, 50, 93, 0.25) 0 2px 5px -1px, rgba(0, 0, 0, 0.3) 0 1px 3px -1px;
-  font-family: Helvetica, serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .title-area {
-  background-color: #C6AA76;
+  background-color: var(--nscp-primary);
   color: white;
-  font-size: 1rem;
-  font-weight: normal;
-  font-family: Helvetica, serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 10px 16px;
+  border-radius: 8px 8px 0 0;
 }
 
 .subtitle-area {
-  background-color: #C6AA76;
+  background-color: var(--nscp-accent);
   color: white;
-  font-size: 1rem;
-  font-weight: normal;
-  font-family: Helvetica, serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .key {
-  color: #c6aa76 !important;
+  color: var(--nscp-text-muted) !important;
+  font-weight: 500;
 }
 
 .value {
-  color:#003088 !important;
+  color: var(--nscp-dark) !important;
+  font-weight: 600;
 }
 
 bi {
@@ -60,25 +88,25 @@ bi.arrow {
 }
 
 .complete {
-  color: green !important;
+  color: var(--nscp-success) !important;
   font-weight: bolder;
 }
 
 .error {
-  color: red !important;
+  color: var(--nscp-danger) !important;
   font-weight: bolder;
 }
 
 .pending {
-  color: #003088 !important;
+  color: var(--nscp-accent) !important;
   font-weight: bolder;
 }
 
 .timeout {
-  color: #ff9900 !important;
+  color: var(--nscp-warning) !important;
   font-weight: bolder;
 }
 
 .grey {
-  background-color: #efefef !important;
+  background-color: #f5f7fa !important;
 }

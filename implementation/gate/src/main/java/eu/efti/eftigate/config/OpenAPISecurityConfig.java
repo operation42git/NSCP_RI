@@ -21,9 +21,18 @@ public class OpenAPISecurityConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI().components(new Components()
-                        .addSecuritySchemes(OAUTH_SCHEME_NAME, createOAuthScheme()))
+        Components components = new Components()
+                .addSecuritySchemes(OAUTH_SCHEME_NAME, createOAuthScheme())
+                .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("Enter your JWT token from Keycloak"));
+        
+        return new OpenAPI()
+                .components(components)
                 .addSecurityItem(new SecurityRequirement().addList(OAUTH_SCHEME_NAME))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .info(new Info().title("Efti Gate")
                         .description("Efti gate")
                         .version("1.0"));

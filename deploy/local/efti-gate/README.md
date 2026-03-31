@@ -25,12 +25,17 @@ The project includes all the required components to properly run the gates and t
 To run the project, use the deploy script to build and deploy all services:
 
 ```shell
-# Build with tests
-./deploy.sh
+# Build with tests (gates only)
+./deploy-with-maven.sh
 
-# ...or build without tests
-./deploy.sh skip-tests
+# Build without tests (gates only)
+./deploy-with-maven.sh skip-tests
+
+# Build with Domibus for gate-to-gate eDelivery communication
+./deploy-with-maven.sh skip-tests with-domibus
 ```
+
+### Basic Deployment (Gates Only)
 
 This will launch 12 containers:
 * rabbitmq
@@ -49,12 +54,70 @@ To display logs of a container
 docker logs <container name>
 ```
 
+### With Domibus (for Gate-to-Gate Communication)
+
+When using the `with-domibus` option, additional containers are started for eDelivery AS4 messaging:
+
+| Component | Port | Purpose |
+|-----------|------|---------|
+| Domibus Sybo | 8081 | Handles Syldavia & Borduria gates |
+| Domibus Li | 8090 | Handles Listenbourg gate |
+| Domibus Platform | 8100 | Handles all platforms |
+| MariaDB (x3) | 3306-3308 | Domibus databases |
+| ActiveMQ (x3) | 8161-8163 | Message queues |
+| Nginx | 81-82 | Proxy for Domibus endpoints |
+
+**First-time Domibus setup:**
+1. Get the super user password from logs: `docker logs domibus-domibus-sybo-1 2>&1 | grep 'Default password'`
+2. Login at http://localhost:8081/domibus/ with user `super`
+3. Upload PMode files from `deploy/local/domibus/pmodes/`
+4. Create plugin users (see `deploy/local/domibus/README.md`)
+
+For troubleshooting, see `deploy/local/domibus/TROUBLESHOOTING.md`.
+
 Finally, open your host file (for windows C:\Windows\System32\drivers\etc\hosts) and add the following:
 ```
-127.0.0.1 auth.gate.borduria.eu
-127.0.0.1 auth.gate.syldavia.eu
-127.0.0.1 auth.gate.listenbourg.eu
+127.0.0.1 auth.gate.croatia.eu
+127.0.0.1 auth.gate.slovenia.eu
+127.0.0.1 auth.gate.austria.eu
+127.0.0.1 portal.efti.fr
 ```
+
+If using Domibus, also add:
+```
+127.0.0.1 efti.gate.syldavia.eu
+127.0.0.1 efti.gate.borduria.eu
+127.0.0.1 efti.gate.listenbourg.eu
+127.0.0.1 efti.platform.massivedynamic.com
+127.0.0.1 efti.platform.acme.com
+127.0.0.1 efti.platform.umbrellainc.com
+```
+
+## Start the Portal Web Application
+
+The portal web application (Angular) needs to be started separately from the Docker services:
+
+1. Navigate to the portal directory:
+   ```shell
+   cd ../../../portal-mock
+   ```
+
+2. Install dependencies (first time only):
+   ```shell
+   npm ci
+   ```
+
+3. Start the portal:
+   ```shell
+   npm start
+   ```
+
+The portal will start on port 4200, and you can access it through the Apache proxy at:
+- **URL**: http://portal.efti.fr:83
+
+For login credentials, see [Portal Startup Guide](../../../PORTAL_STARTUP_GUIDE.md).
+
+**Note**: The portal must be running for the web interface to work. The deploy script only starts the backend services (gates, platforms, databases, etc.).
 
 ### Send a message
 

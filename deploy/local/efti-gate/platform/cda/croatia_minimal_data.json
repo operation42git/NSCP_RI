@@ -1,0 +1,115 @@
+{
+  "ecmr_identifier": "HR-ECMR-260111-01",
+  "issue_date": "2026-01-11T06:45:00+01:00",
+  "issue_location": {
+    "city": "Zagreb",
+    "country": "HR"
+  },
+  "consignor": {
+    "name": "Croatia Distribution d.o.o.",
+    "address": {
+      "street": "Ilica",
+      "building_number": "100",
+      "postcode": "10000",
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "tax_id": "HR12345678"
+  },
+  "consignee": {
+    "name": "Croatia Food d.o.o.",
+    "address": {
+      "street": "Savska cesta",
+      "building_number": "50",
+      "postcode": "10000",
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "tax_id": "HR87654321"
+  },
+  "delivery_location": {
+    "name": "",
+    "address": {
+      "city": "Zagreb",
+      "country": "HR"
+    }
+  },
+  "pickup": {
+    "location": {
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "datetime": "2026-01-11T07:15:00+01:00"
+  },
+  "attached_documents": [
+    {
+      "id": "INV-2601-0456",
+      "type": "Invoice"
+    }
+  ],
+  "carrier": {
+    "name": "Croatia Logistics d.o.o.",
+    "address": {
+      "street": "Vukovarska",
+      "building_number": "200",
+      "postcode": "10000",
+      "city": "Zagreb",
+      "country": "HR"
+    },
+    "tax_id": "HR11223344"
+  },
+  "carrier_reservations": "",
+  "goods": {
+    "marks": "CF-PLT-2026-01",
+    "package_count": 10,
+    "packaging_description": "10 paleta (EUR)",
+    "nature": "Pakirani prehrambeni proizvodi (neopasno)",
+    "hs_code": "21069098",
+    "gross_weight": {
+      "value": 6500.00,
+      "unit": "KGM"
+    },
+    "volume": {
+      "value": 24.00,
+      "unit": "MTQ"
+    }
+  },
+  "sender_instructions": "",
+  "cod_amount": {
+    "value": 0.00,
+    "currency": "EUR"
+  },
+  "freight_payment": "PREPAID",
+  "payment_party": "CONSIGNOR",
+  "special_agreements": "",
+  "signatures": {
+    "consignor": {
+      "company": "Croatia Distribution d.o.o.",
+      "person": ""
+    },
+    "carrier": {
+      "company": "Croatia Logistics d.o.o.",
+      "person": ""
+    },
+    "consignee": {
+      "company": "Croatia Food d.o.o.",
+      "person": ""
+    }
+  },
+  "vehicle": {
+    "id": "HR-ZG-1234AB",
+    "trailer_id": "HR-ZG-5678CD",
+    "model": ""
+  },
+  "tariff": {
+    "basis": "per_km",
+    "amount": {
+      "value": 175.00,
+      "currency": "EUR"
+    }
+  }
+}
+
+
+
+

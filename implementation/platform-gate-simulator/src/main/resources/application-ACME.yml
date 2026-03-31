@@ -11,12 +11,12 @@ server:
 gate:
   minSleep: 1000
   maxSleep: 2000
-  owner: acme
+  owner: croatia eFTI platform
   cda_path: classpath:cda/
   gate: borduria
   ap:
-    url: http://efti.platform.acme.com:81/domibus/services/wsplugin
-    username: acme_service_account
+    url: http://efti.platform.croatia-efti-platform.com:81/domibus/services/wsplugin
+    username: croatia_efti_platform_service_account
     password: Azerty59*1234567
 
 mock:

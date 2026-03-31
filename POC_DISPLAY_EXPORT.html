@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pregled podataka o pošiljci - POC</title>
+  <style>
+    /* CSS Variables */
+    :root {
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --paper: #ffffff;
+      --bg: #f9fafb;
+      --accent: #2563eb;
+      --accent-light: rgba(37, 99, 235, 0.1);
+      --border-radius: 12px;
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* POC Display Styles */
+    .poc-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    /* Header */
+    .poc-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 16px;
+      box-shadow: var(--shadow-lg);
+      flex-shrink: 0;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .header-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      color: white;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .basic-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      backdrop-filter: blur(10px);
+    }
+
+    .info-label {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .info-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+    }
+
+    /* Main Layout */
+    .main-layout {
+      display: flex;
+      flex: 1;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    /* Sidebar - Fixed */
+    .sidebar {
+      width: 240px;
+      background: var(--paper);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .sidebar-title {
+      padding: 12px 16px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 2px solid var(--line);
+      flex-shrink: 0;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    .group-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      color: var(--ink);
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .group-item:hover {
+      background: var(--bg);
+      color: var(--accent);
+    }
+
+    .group-item.active {
+      background: var(--accent-light);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      background: var(--bg);
+    }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--paper);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(to bottom, #fafbfc, #ffffff);
+    }
+
+    .card-header h2 {
+      margin: 0 0 1px 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .card-header p {
+      margin: 0;
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .card-body {
+      padding: 10px 12px;
+    }
+
+    .fields-section {
+      margin-bottom: 8px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 6px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .field-name {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+
+    .field-value {
+      font-size: 11px;
+      color: var(--ink);
+      line-height: 1.3;
+      padding: 5px 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      min-height: 28px;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .field-value.empty {
+      color: var(--muted);
+      font-style: italic;
+      opacity: 0.6;
+    }
+
+    /* Expandable Sections */
+    .expandable-section {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+    }
+
+    .expand-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink);
+      width: 100%;
+      text-align: left;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .expand-button:hover {
+      background: var(--bg);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-1px);
+    }
+
+    .expand-button.expanded {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .expand-button.advanced-button {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .expand-button.advanced-button:hover {
+      background: var(--accent-light);
+    }
+
+    .expand-button.advanced-button.expanded {
+      background: var(--accent-light);
+    }
+
+    .expand-button.audit-button {
+      border-color: #f59e0b;
+      color: #d97706;
+      background: #fef3c7;
+    }
+
+    .expand-button.audit-button:hover {
+      background: #fde68a;
+      border-color: #d97706;
+      color: #92400e;
+    }
+
+    .expand-button.audit-button.expanded {
+      background: #fde68a;
+      border-color: #d97706;
+      color: #92400e;
+    }
+
+    .button-icon {
+      font-size: 10px;
+      transition: transform 0.2s;
+      width: 14px;
+      display: inline-block;
+    }
+
+    .button-text {
+      flex: 1;
+    }
+
+    .expanded-content {
+      margin-top: 6px;
+      animation: slideDown 0.3s ease;
+    }
+
+    /* Subsection Styles */
+    .subsection {
+      margin-bottom: 8px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .subsection-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: var(--bg);
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .subsection-header:hover {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .subsection-header.expanded {
+      background: var(--accent-light);
+      color: var(--accent);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .subsection-icon {
+      font-size: 9px;
+      width: 12px;
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    .subsection-title {
+      flex: 1;
+    }
+
+    .subsection-content {
+      padding: 8px;
+      background: var(--paper);
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-height: 200px;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+      }
+
+      .fields {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="poc-container">
+    <!-- Header -->
+    <header class="poc-header">
+      <div class="header-content">
+        <div class="header-title">
+          <h1>Pregled podataka o pošiljci</h1>
+          <div class="header-badges">
+            <span class="badge">POC</span>
+          </div>
+        </div>
+        <div class="basic-info-grid">
+          <div class="info-item">
+            <div class="info-label">eCMR identifikator</div>
+            <div class="info-value">HR-ECMR-260111-02</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Datum izdavanja</div>
+            <div class="info-value">202601111100+0100</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Mjesto izdavanja</div>
+            <div class="info-value">Skladište Zagreb</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Datum prihvaćanja</div>
+            <div class="info-value">202601111120+0100</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Pošiljatelj</div>
+            <div class="info-value">Adria Food d.o.o.</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Primatelj</div>
+            <div class="info-value">Kvarner Wholesale d.o.o.</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Prijevoznik</div>
+            <div class="info-value">TransLogistika d.o.o.</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Broj vozila</div>
+            <div class="info-value">SI-LJ-1234AB</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Ukupna masa</div>
+            <div class="info-value">6500.0 KGM</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+      <!-- Sidebar - Fixed -->
+      <aside class="sidebar">
+        <div class="sidebar-title">Kartice</div>
+        <div class="sidebar-content">
+          <div class="group-item" onclick="scrollToCard('pregled-posiljke')">Pregled pošiljke</div>
+          <div class="group-item" onclick="scrollToCard('roba-i-teret')">Roba i teret</div>
+          <div class="group-item" onclick="scrollToCard('ruta-i-dogadaji')">Ruta i događaji</div>
+          <div class="group-item" onclick="scrollToCard('stranke-i-kontakti')">Stranke i kontakti</div>
+          <div class="group-item" onclick="scrollToCard('vozilo-i-oprema')">Vozilo i oprema</div>
+          <div class="group-item" onclick="scrollToCard('dokumenti-i-reference')">Dokumenti i reference</div>
+          <div class="group-item" onclick="scrollToCard('potvrde-i-autentifikacija')">Potvrde i autentifikacija</div>
+          <div class="group-item" onclick="scrollToCard('audit-i-tehnicka-meta')">Audit i tehnička meta</div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="content">
+        <div class="cards-container">
+          <!-- Card 1: Pregled pošiljke -->
+          <div class="card" id="card-pregled-posiljke">
+            <div class="card-header">
+              <div>
+                <h2>Pregled pošiljke</h2>
+                <p>Osnovni pregled podataka o pošiljci</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="fields-section">
+                <div class="fields">
+                  <div class="field">
+                    <div class="field-name">Opis robe</div>
+                    <div class="field-value">Pakirani prehrambeni proizvodi (neopasno)</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Datum i vrijeme prihvaćanja</div>
+                    <div class="field-value">202601111120+0100</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Bruto masa</div>
+                    <div class="field-value">6500.0 KGM</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Bruto volumen</div>
+                    <div class="field-value">24.0 MTQ</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Način prijevoza</div>
+                    <div class="field-value">Cestovni</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button advanced-button" onclick="toggleAdvanced('pregled-posiljke')">
+                  <span class="button-icon" id="icon-pregled-posiljke-advanced">▶</span>
+                  <span class="button-text">Napredni podaci</span>
+                </button>
+                <div class="fields expanded-content" id="advanced-pregled-posiljke" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Dodatni datumi i vremenski zapisi</div>
+                    <div class="field-value">Datum izdavanja: 202601111100+0100</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Pomoćni identifikatori pošiljke</div>
+                    <div class="field-value">HR-ECMR-260111-02</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Dodatne mjere</div>
+                    <div class="field-value">Ukupno paketa: 10, 303</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button audit-button" onclick="toggleAudit('pregled-posiljke')">
+                  <span class="button-icon" id="icon-pregled-posiljke-audit">▶</span>
+                  <span class="button-text">Audit podaci</span>
+                </button>
+                <div class="fields expanded-content" id="audit-pregled-posiljke" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Vrijeme kreiranja skupa podataka</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Vrijeme zadnje izmjene skupa podataka</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Izvor podataka</div>
+                    <div class="field-value">EO / Platforma</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Status validacije</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Roba i teret -->
+          <div class="card" id="card-roba-i-teret">
+            <div class="card-header">
+              <div>
+                <h2>Roba i teret</h2>
+                <p>Detaljni podaci o robi i teretu</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="fields-section">
+                <div class="fields">
+                  <div class="field">
+                    <div class="field-name">Opis robe</div>
+                    <div class="field-value">Pakirani prehrambeni proizvodi (neopasno)</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Kod vrste robe</div>
+                    <div class="field-value">Pakirani prehrambeni proizvodi</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Indikator opasne robe</div>
+                    <div class="field-value">Neopasno</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button advanced-button" onclick="toggleAdvanced('roba-i-teret')">
+                  <span class="button-icon" id="icon-roba-i-teret-advanced">▶</span>
+                  <span class="button-text">Napredni podaci</span>
+                </button>
+                <div class="fields expanded-content" id="advanced-roba-i-teret" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Statistička klasifikacija robe</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Vrsta pakiranja</div>
+                    <div class="field-value">10 paleta (EUR)</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Broj paketa</div>
+                    <div class="field-value">10, 303</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Oznake i brojevi</div>
+                    <div class="field-value">AF-PLT-2026-01</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Posebni uvjeti prijevoza</div>
+                    <div class="field-value">Potrebna pažljiva rukovanje, Fragilno, Ne okretati, Zaštita od vlage</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button audit-button" onclick="toggleAudit('roba-i-teret')">
+                  <span class="button-icon" id="icon-roba-i-teret-audit">▶</span>
+                  <span class="button-text">Audit podaci</span>
+                </button>
+                <div class="fields expanded-content" id="audit-roba-i-teret" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Vrijeme zadnje izmjene opisa robe</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Izvor izmjene</div>
+                    <div class="field-value">EO / Sustav</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Ruta i događaji -->
+          <div class="card" id="card-ruta-i-dogadaji">
+            <div class="card-header">
+              <div>
+                <h2>Ruta i događaji</h2>
+                <p>Lokacije i događaji na ruti prijevoza</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="subsection">
+                <button class="subsection-header expanded" onclick="toggleSubsection('pickup')">
+                  <span class="subsection-icon" id="icon-pickup">▼</span>
+                  <span class="subsection-title">Preuzimanje</span>
+                </button>
+                <div class="subsection-content" id="content-pickup">
+                  <div class="fields-section">
+                    <div class="fields">
+                      <div class="field">
+                        <div class="field-name">Identifikator lokacije</div>
+                        <div class="field-value">HR-534903</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Naziv lokacije</div>
+                        <div class="field-value">Luka Split, Ericsson Nikola Tesla d.d.</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Grad</div>
+                        <div class="field-value">Zagreb</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Kod države</div>
+                        <div class="field-value">HR</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="expandable-section">
+                    <button class="expand-button advanced-button" onclick="toggleAdvanced('pickup-advanced')">
+                      <span class="button-icon" id="icon-pickup-advanced">▶</span>
+                      <span class="button-text">Napredni podaci</span>
+                    </button>
+                    <div class="fields expanded-content" id="advanced-pickup-advanced" style="display: none;">
+                      <div class="field">
+                        <div class="field-name">Naziv ulice</div>
+                        <div class="field-value">Trg bana Jelačića</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Kućni broj</div>
+                        <div class="field-value">77</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Poštanski broj</div>
+                        <div class="field-value">52100</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Regija</div>
+                        <div class="field-value empty">—</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Geografska širina</div>
+                        <div class="field-value">10.00 DD</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Geografska dužina</div>
+                        <div class="field-value">3.68 DD</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="subsection">
+                <button class="subsection-header expanded" onclick="toggleSubsection('loading')">
+                  <span class="subsection-icon" id="icon-loading">▼</span>
+                  <span class="subsection-title">Utovar</span>
+                </button>
+                <div class="subsection-content" id="content-loading">
+                  <div class="fields-section">
+                    <div class="fields">
+                      <div class="field">
+                        <div class="field-name">Identifikator lokacije</div>
+                        <div class="field-value">HR-534903</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Naziv lokacije</div>
+                        <div class="field-value">Luka Split, Ericsson Nikola Tesla d.d.</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Grad</div>
+                        <div class="field-value">Zagreb</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Kod države</div>
+                        <div class="field-value">HR</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="subsection">
+                <button class="subsection-header expanded" onclick="toggleSubsection('delivery')">
+                  <span class="subsection-icon" id="icon-delivery">▼</span>
+                  <span class="subsection-title">Isporuka</span>
+                </button>
+                <div class="subsection-content" id="content-delivery">
+                  <div class="fields-section">
+                    <div class="fields">
+                      <div class="field">
+                        <div class="field-name">Identifikator lokacije</div>
+                        <div class="field-value">HR-114953</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Naziv lokacije</div>
+                        <div class="field-value">Rijeka</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Grad</div>
+                        <div class="field-value">Rijeka</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Kod države</div>
+                        <div class="field-value">HR</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="expandable-section">
+                    <button class="expand-button advanced-button" onclick="toggleAdvanced('delivery-advanced')">
+                      <span class="button-icon" id="icon-delivery-advanced">▶</span>
+                      <span class="button-text">Napredni podaci</span>
+                    </button>
+                    <div class="fields expanded-content" id="advanced-delivery-advanced" style="display: none;">
+                      <div class="field">
+                        <div class="field-name">Naziv ulice</div>
+                        <div class="field-value">Dubrovačka</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Kućni broj</div>
+                        <div class="field-value">30</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Poštanski broj</div>
+                        <div class="field-value">42000</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Regija</div>
+                        <div class="field-value empty">—</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Geografska širina</div>
+                        <div class="field-value">3.43 DCM</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Geografska dužina</div>
+                        <div class="field-value">7.90 DEG</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Stranke i kontakti -->
+          <div class="card" id="card-stranke-i-kontakti">
+            <div class="card-header">
+              <div>
+                <h2>Stranke i kontakti</h2>
+                <p>Podaci o svim strankama uključenim u prijevoz</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="subsection">
+                <button class="subsection-header expanded" onclick="toggleSubsection('consignor')">
+                  <span class="subsection-icon" id="icon-consignor">▼</span>
+                  <span class="subsection-title">Pošiljatelj</span>
+                </button>
+                <div class="subsection-content" id="content-consignor">
+                  <div class="fields-section">
+                    <div class="fields">
+                      <div class="field">
+                        <div class="field-name">Naziv stranke</div>
+                        <div class="field-value">Adria Food d.o.o.</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Identifikator stranke</div>
+                        <div class="field-value">HR-169411</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Ime kontakta</div>
+                        <div class="field-value">Petar Babić</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Broj telefona kontakta</div>
+                        <div class="field-value">+385 21 803 210</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Email adresa kontakta</div>
+                        <div class="field-value">+385 20 276 146</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="expandable-section">
+                    <button class="expand-button advanced-button" onclick="toggleAdvanced('consignor-advanced')">
+                      <span class="button-icon" id="icon-consignor-advanced">▶</span>
+                      <span class="button-text">Napredni podaci</span>
+                    </button>
+                    <div class="fields expanded-content" id="advanced-consignor-advanced" style="display: none;">
+                      <div class="field">
+                        <div class="field-name">Adresa</div>
+                        <div class="field-value">Radnička cesta 42, 10000 Zagreb, HR</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="subsection">
+                <button class="subsection-header expanded" onclick="toggleSubsection('consignee')">
+                  <span class="subsection-icon" id="icon-consignee">▼</span>
+                  <span class="subsection-title">Primatelj</span>
+                </button>
+                <div class="subsection-content" id="content-consignee">
+                  <div class="fields-section">
+                    <div class="fields">
+                      <div class="field">
+                        <div class="field-name">Naziv stranke</div>
+                        <div class="field-value">Kvarner Wholesale d.o.o.</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Identifikator stranke</div>
+                        <div class="field-value">HR-211674</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Ime kontakta</div>
+                        <div class="field-value">Josip Marić, Josip Novak, Petar Horvat</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Broj telefona kontakta</div>
+                        <div class="field-value">+385 42 423 146, +385 20 719 267</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Email adresa kontakta</div>
+                        <div class="field-value">+385 21 183 762</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="subsection">
+                <button class="subsection-header expanded" onclick="toggleSubsection('carrier')">
+                  <span class="subsection-icon" id="icon-carrier">▼</span>
+                  <span class="subsection-title">Prijevoznik</span>
+                </button>
+                <div class="subsection-content" id="content-carrier">
+                  <div class="fields-section">
+                    <div class="fields">
+                      <div class="field">
+                        <div class="field-name">Naziv stranke</div>
+                        <div class="field-value">TransLogistika d.o.o.</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Identifikator stranke</div>
+                        <div class="field-value">SI12345678, HR-704215</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Ime kontakta</div>
+                        <div class="field-value">Petar Novak, Ante Jurić</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Broj telefona kontakta</div>
+                        <div class="field-value empty">—</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-name">Email adresa kontakta</div>
+                        <div class="field-value empty">—</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="expandable-section">
+                    <button class="expand-button advanced-button" onclick="toggleAdvanced('carrier-advanced')">
+                      <span class="button-icon" id="icon-carrier-advanced">▶</span>
+                      <span class="button-text">Napredni podaci</span>
+                    </button>
+                    <div class="fields expanded-content" id="advanced-carrier-advanced" style="display: none;">
+                      <div class="field">
+                        <div class="field-name">Adresa</div>
+                        <div class="field-value">Zagrebačka 150, 1000 Ljubljana / 23000 Zadar, SI</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5: Vozilo i oprema -->
+          <div class="card" id="card-vozilo-i-oprema">
+            <div class="card-header">
+              <div>
+                <h2>Vozilo i oprema</h2>
+                <p>Podaci o vozilu i transportnoj opremi</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="fields-section">
+                <div class="fields">
+                  <div class="field">
+                    <div class="field-name">Identifikator transportnog sredstva</div>
+                    <div class="field-value">SI-LJ-1234AB</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Država registracije</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Identifikator transportne opreme</div>
+                    <div class="field-value">HR-118713, HR-529499, HR-396213</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button advanced-button" onclick="toggleAdvanced('vozilo-i-oprema')">
+                  <span class="button-icon" id="icon-vozilo-i-oprema-advanced">▶</span>
+                  <span class="button-text">Napredni podaci</span>
+                </button>
+                <div class="fields expanded-content" id="advanced-vozilo-i-oprema" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Vrsta transportne opreme</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Tehničke oznake / dodatni opisi</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 6: Dokumenti i reference -->
+          <div class="card" id="card-dokumenti-i-reference">
+            <div class="card-header">
+              <div>
+                <h2>Dokumenti i reference</h2>
+                <p>Transportni dokumenti i reference</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="fields-section">
+                <div class="fields">
+                  <div class="field">
+                    <div class="field-name">Vrsta transportnog dokumenta</div>
+                    <div class="field-value">LICENSE</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Identifikator transportnog dokumenta</div>
+                    <div class="field-value">HR-ECMR-260111-02</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">URI transportnog dokumenta</div>
+                    <div class="field-value">https://ex.hr/hr-tax/645349</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button advanced-button" onclick="toggleAdvanced('dokumenti-i-reference')">
+                  <span class="button-icon" id="icon-dokumenti-i-reference-advanced">▶</span>
+                  <span class="button-text">Napredni podaci</span>
+                </button>
+                <div class="fields expanded-content" id="advanced-dokumenti-i-reference" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Identifikacijska shema</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Izdavajuća agencija</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Dodatne reference</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 7: Potvrde i autentifikacija -->
+          <div class="card" id="card-potvrde-i-autentifikacija">
+            <div class="card-header">
+              <div>
+                <h2>Potvrde i autentifikacija</h2>
+                <p>Potvrde i autentifikacija dokumenta</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="fields-section">
+                <div class="fields">
+                  <div class="field">
+                    <div class="field-name">Identifikator potvrđujuće stranke</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Naziv potvrđujuće stranke</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Kod izjave</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button advanced-button" onclick="toggleAdvanced('potvrde-i-autentifikacija')">
+                  <span class="button-icon" id="icon-potvrde-i-autentifikacija-advanced">▶</span>
+                  <span class="button-text">Napredni podaci</span>
+                </button>
+                <div class="fields expanded-content" id="advanced-potvrde-i-autentifikacija" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Metoda autentifikacije</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Identifikacijska shema</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Izdavajuća agencija</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 8: Audit i tehnička meta -->
+          <div class="card" id="card-audit-i-tehnicka-meta">
+            <div class="card-header">
+              <div>
+                <h2>Audit i tehnička meta</h2>
+                <p>Audit podaci i tehnička metapodaci</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="fields-section">
+                <div class="fields">
+                  <div class="field">
+                    <div class="field-name">Verzija skupa podataka</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Vrijeme kreiranja skupa podataka</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Vrijeme zadnje izmjene skupa podataka</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Izvor podataka</div>
+                    <div class="field-value">EO / Platforma</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Status validacije</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button advanced-button" onclick="toggleAdvanced('audit-i-tehnicka-meta')">
+                  <span class="button-icon" id="icon-audit-i-tehnicka-meta-advanced">▶</span>
+                  <span class="button-text">Napredni podaci</span>
+                </button>
+                <div class="fields expanded-content" id="advanced-audit-i-tehnicka-meta" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Korelacijski / Zahtjev ID</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Tehnički statusi razmjene</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="expandable-section">
+                <button class="expand-button audit-button" onclick="toggleAudit('audit-i-tehnicka-meta')">
+                  <span class="button-icon" id="icon-audit-i-tehnicka-meta-audit">▶</span>
+                  <span class="button-text">Audit podaci</span>
+                </button>
+                <div class="fields expanded-content" id="audit-audit-i-tehnicka-meta" style="display: none;">
+                  <div class="field">
+                    <div class="field-name">Evidencija pristupa</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Evidencija izvoza / preuzimanja</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-name">Hash / dokaz neizmjenjivosti</div>
+                    <div class="field-value empty">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // State management
+    const expandedAdvanced = new Set();
+    const expandedAudit = new Set();
+    const expandedSubsection = new Set(['pickup', 'loading', 'delivery', 'consignor', 'consignee', 'carrier']);
+
+    // Initialize - expand all subsections by default
+    document.addEventListener('DOMContentLoaded', function() {
+      expandedSubsection.forEach(id => {
+        const content = document.getElementById('content-' + id);
+        const icon = document.getElementById('icon-' + id);
+        if (content) {
+          content.style.display = 'block';
+        }
+        if (icon) {
+          icon.textContent = '▼';
+        }
+      });
+    });
+
+    function toggleAdvanced(cardId) {
+      const content = document.getElementById('advanced-' + cardId);
+      const icon = document.getElementById('icon-' + cardId + '-advanced');
+      const button = event.target.closest('.expand-button');
+      
+      if (expandedAdvanced.has(cardId)) {
+        expandedAdvanced.delete(cardId);
+        if (content) content.style.display = 'none';
+        if (icon) icon.textContent = '▶';
+        if (button) button.classList.remove('expanded');
+      } else {
+        expandedAdvanced.add(cardId);
+        if (content) content.style.display = 'block';
+        if (icon) icon.textContent = '▼';
+        if (button) button.classList.add('expanded');
+      }
+    }
+
+    function toggleAudit(cardId) {
+      const content = document.getElementById('audit-' + cardId);
+      const icon = document.getElementById('icon-' + cardId + '-audit');
+      const button = event.target.closest('.expand-button');
+      
+      if (expandedAudit.has(cardId)) {
+        expandedAudit.delete(cardId);
+        if (content) content.style.display = 'none';
+        if (icon) icon.textContent = '▶';
+        if (button) button.classList.remove('expanded');
+      } else {
+        expandedAudit.add(cardId);
+        if (content) content.style.display = 'block';
+        if (icon) icon.textContent = '▼';
+        if (button) button.classList.add('expanded');
+      }
+    }
+
+    function toggleSubsection(subsectionId) {
+      const content = document.getElementById('content-' + subsectionId);
+      const icon = document.getElementById('icon-' + subsectionId);
+      const header = event.target.closest('.subsection-header');
+      
+      if (expandedSubsection.has(subsectionId)) {
+        expandedSubsection.delete(subsectionId);
+        if (content) content.style.display = 'none';
+        if (icon) icon.textContent = '▶';
+        if (header) header.classList.remove('expanded');
+      } else {
+        expandedSubsection.add(subsectionId);
+        if (content) content.style.display = 'block';
+        if (icon) icon.textContent = '▼';
+        if (header) header.classList.add('expanded');
+      }
+    }
+
+    function scrollToCard(cardId) {
+      const element = document.getElementById('card-' + cardId);
+      if (element) {
+        // Update active state
+        document.querySelectorAll('.group-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Scroll to element
+        const offset = 100;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }
+  </script>
+</body>
+</html>
+

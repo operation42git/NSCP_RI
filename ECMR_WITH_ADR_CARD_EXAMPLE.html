@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eCMR Display with ADR Card - Example</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --paper: #ffffff;
+            --bg: #f9fafb;
+            --accent: #2563eb;
+            --accent-light: rgba(37, 99, 235, 0.1);
+            --border-radius: 12px;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --danger-bg: #fee2e2;
+            --danger-text: #991b1b;
+            --danger-border: #fecaca;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Container */
+        .ecmr-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            background: var(--bg);
+            min-height: 100vh;
+        }
+
+        .ecmr-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Card Component */
+        .card {
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(to bottom, #fafbfc, #ffffff);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.01em;
+        }
+
+        .field-range {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Header Card */
+        .header-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-card .card-header-content {
+            padding: 32px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 32px;
+        }
+
+        .title-section h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .title-section .subtitle {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .meta-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 16px;
+            min-width: 300px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: right;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Fields Grid */
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .field-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+
+        .field-number {
+            font-size: 11px;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .field-value {
+            font-size: 14px;
+            color: var(--ink);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            min-height: 44px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .field-value.empty {
+            color: var(--muted);
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        /* Goods Table */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: -24px;
+            padding: 24px;
+        }
+
+        .goods-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: var(--paper);
+        }
+
+        .goods-table thead {
+            background: var(--bg);
+        }
+
+        .goods-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--line);
+            white-space: nowrap;
+        }
+
+        .goods-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        .goods-table tbody tr:hover {
+            background: var(--bg);
+        }
+
+        .goods-summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid var(--line);
+            flex-wrap: wrap;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        /* ADR Card Specific Styles */
+        .adr-card {
+            border-left: 4px solid var(--danger-text);
+        }
+
+        .danger-badge {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            border: 1px solid var(--danger-border);
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .dangerous-goods-item {
+            padding: 20px 0;
+            border-bottom: 2px solid var(--line);
+        }
+
+        .dangerous-goods-item:last-child {
+            border-bottom: none;
+        }
+
+        .dangerous-goods-header {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .dangerous-goods-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .info-section {
+            margin-bottom: 24px;
+        }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            margin: 0 0 16px 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .package-item {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .package-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .mark-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 2px 4px 2px 0;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .document-item,
+        .tariff-item {
+            padding: 4px 0;
+        }
+
+        .document-item:not(:last-child),
+        .tariff-item:not(:last-child) {
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .ecmr-container {
+                padding: 16px 12px;
+            }
+
+            .ecmr-wrapper {
+                gap: 16px;
+            }
+
+            .header-card .card-header-content {
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .meta-section {
+                align-items: flex-start;
+                min-width: 100%;
+            }
+
+            .meta-info {
+                text-align: left;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .fields-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .goods-summary {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .table-wrapper {
+                margin: -16px;
+                padding: 16px;
+            }
+
+            .goods-table {
+                font-size: 12px;
+            }
+
+            .goods-table th,
+            .goods-table td {
+                padding: 8px 12px;
+            }
+        }
+
+        /* Visual separator for new section */
+        .section-divider {
+            margin: 32px 0 16px 0;
+            padding: 16px;
+            background: linear-gradient(to right, var(--accent-light), transparent);
+            border-left: 4px solid var(--accent);
+            border-radius: 4px;
+        }
+
+        .section-divider-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="ecmr-container">
+        <div class="ecmr-wrapper">
+            <!-- Header Card -->
+            <div class="card header-card">
+                <div class="card-header-content">
+                    <div class="title-section">
+                        <h1>eCMR tovarni list</h1>
+                        <p class="subtitle">Međunarodni cestovni prijevoz robe (CMR) — elektronički prikaz</p>
+                    </div>
+                    <div class="meta-section">
+                        <span class="badge">eCMR</span>
+                        <div class="meta-info">
+                            <div class="meta-item">
+                                <span class="meta-label">eCMR identifikator:</span>
+                                <span class="meta-value">HR-ECMR-2026-000123</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Datum izdavanja:</span>
+                                <span class="meta-value">2024-01-15</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Mjesto izdavanja:</span>
+                                <span class="meta-value">Zagreb</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Basic Information Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Osnovni podaci</h2>
+                    <span class="field-range">Polja 1–5, 16–18</span>
+                </div>
+                <div class="card-body">
+                    <div class="fields-grid">
+                        <!-- Field 1: Consignor -->
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Pošiljatelj</span>
+                                <span class="field-number">1</span>
+                            </div>
+                            <div class="field-value">
+                                Ulica Vatroslava Jagića 1<br>
+                                10000 Zagreb<br>
+                                ABC Transport d.o.o.
+                            </div>
+                        </div>
+
+                        <!-- Field 2: Consignee -->
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Primatelj</span>
+                                <span class="field-number">2</span>
+                            </div>
+                            <div class="field-value">
+                                Industrijska cesta 15<br>
+                                20000 Pula<br>
+                                XYZ Logistics d.o.o.
+                            </div>
+                        </div>
+
+                        <!-- Field 16: Carrier -->
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Prijevoznik</span>
+                                <span class="field-number">16</span>
+                            </div>
+                            <div class="field-value">
+                                Transportna ulica 5<br>
+                                31000 Osijek<br>
+                                Fast Freight d.o.o.
+                            </div>
+                        </div>
+
+                        <!-- Field 3: Delivery Address -->
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Adresa isporuke</span>
+                                <span class="field-number">3</span>
+                            </div>
+                            <div class="field-value">
+                                Industrijska cesta 15<br>
+                                20000 Pula
+                            </div>
+                        </div>
+
+                        <!-- Field 4: Place/Date Taking Over -->
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Mjesto i datum preuzimanja robe</span>
+                                <span class="field-number">4</span>
+                            </div>
+                            <div class="field-value">
+                                2024-01-15 08:00<br>
+                                Zagreb, Skladište A
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goods Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Roba</h2>
+                    <span class="field-range">Polja 6–12</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="goods-table">
+                            <thead>
+                                <tr>
+                                    <th>6. Oznake i brojevi</th>
+                                    <th>7. Broj paketa</th>
+                                    <th>8. Opis pakiranja</th>
+                                    <th>9. Priroda robe / Naziv</th>
+                                    <th>10. Stat. broj</th>
+                                    <th>11. Bruto masa (kg)</th>
+                                    <th>12. Volumen (m³)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PKG-001</td>
+                                    <td>10</td>
+                                    <td>Drums</td>
+                                    <td>Benzin</td>
+                                    <td>2710</td>
+                                    <td>500</td>
+                                    <td>0.2</td>
+                                </tr>
+                                <tr>
+                                    <td>PKG-002</td>
+                                    <td>5</td>
+                                    <td>Boxes</td>
+                                    <td>Elektronički dijelovi</td>
+                                    <td>8541</td>
+                                    <td>150</td>
+                                    <td>0.5</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="goods-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Ukupno stavki:</span>
+                            <span class="summary-value">2</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Ukupno bruto:</span>
+                            <span class="summary-value">650 kg</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Ukupno volumen:</span>
+                            <span class="summary-value">0.7 m³</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions & Payment Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Upute i plaćanje</h2>
+                    <span class="field-range">Polja 13–21</span>
+                </div>
+                <div class="card-body">
+                    <div class="fields-grid">
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Upute pošiljatelja</span>
+                                <span class="field-number">13</span>
+                            </div>
+                            <div class="field-value">
+                                Rukovati s oprezom. Držati podalje od vatre.
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Plaća</span>
+                                <span class="field-number">19</span>
+                            </div>
+                            <div class="field-value">Pošiljatelj</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle & Tariff Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Vozilo i tarifa</h2>
+                    <span class="field-range">Polja 25–28</span>
+                </div>
+                <div class="card-body">
+                    <div class="fields-grid">
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Broj vozila i prikolice</span>
+                                <span class="field-number">25</span>
+                            </div>
+                            <div class="field-value">
+                                Vozilo: ZG-1234-AB<br>
+                                Prikolica: ZG-5678-CD
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <div class="field-label">
+                                <span>Model vozila</span>
+                                <span class="field-number">26</span>
+                            </div>
+                            <div class="field-value">Mercedes Actros</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Separator for New Section -->
+            <div class="section-divider">
+                <div class="section-divider-text">Dodatni podaci iz consignment-common.xml</div>
+            </div>
+
+            <!-- 🆕 ADR / Dangerous Goods Card -->
+            <div class="card adr-card">
+                <div class="card-header">
+                    <h2>ADR / Opasna roba</h2>
+                    <span class="danger-badge">⚠️ ADR</span>
+                </div>
+                <div class="card-body">
+                    <div class="dangerous-goods-item">
+                        <!-- Basic Information Section -->
+                        <div class="info-section">
+                            <h4 class="section-title">Osnovni podaci</h4>
+                            <div class="fields-grid">
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>UN Broj</span>
+                                    </div>
+                                    <div class="field-value">UN1202</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Naziv za prijevoz</span>
+                                    </div>
+                                    <div class="field-value">Benzin</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Tehnički naziv</span>
+                                    </div>
+                                    <div class="field-value">Gasoline</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Klasifikacija opasnosti</span>
+                                    </div>
+                                    <div class="field-value">3</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Kategorija opasnosti</span>
+                                    </div>
+                                    <div class="field-value">Flammable Liquid</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Tip opasnosti</span>
+                                    </div>
+                                    <div class="field-value">FL</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Grupa pakiranja</span>
+                                    </div>
+                                    <div class="field-value">II</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Ograničena količina</span>
+                                    </div>
+                                    <div class="field-value">LQ</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Tunel ograničenje</span>
+                                    </div>
+                                    <div class="field-value">E</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Temperature Requirements Section -->
+                        <div class="info-section">
+                            <h4 class="section-title">Temperaturne specifikacije</h4>
+                            <div class="fields-grid">
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Kontrolna temperatura</span>
+                                    </div>
+                                    <div class="field-value">-10°C (MIN)</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Hitna temperatura</span>
+                                    </div>
+                                    <div class="field-value">-20°C (EMERG)</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Talište</span>
+                                    </div>
+                                    <div class="field-value">50°C</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Weights and Volumes Section -->
+                        <div class="info-section">
+                            <h4 class="section-title">Mase i volumen</h4>
+                            <div class="fields-grid">
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Bruto masa</span>
+                                    </div>
+                                    <div class="field-value">500 kg</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Neto masa</span>
+                                    </div>
+                                    <div class="field-value">450 kg</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Volumen</span>
+                                    </div>
+                                    <div class="field-value">200 L</div>
+                                </div>
+
+                                <div class="field-group">
+                                    <div class="field-label">
+                                        <span>Gustoća</span>
+                                    </div>
+                                    <div class="field-value">0.75 kg/L</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Package Information Section -->
+                        <div class="info-section">
+                            <h4 class="section-title">Pakiranje</h4>
+                            <div class="package-item">
+                                <div class="fields-grid">
+                                    <div class="field-group">
+                                        <div class="field-label">
+                                            <span>Tip pakiranja</span>
+                                        </div>
+                                        <div class="field-value">Drums</div>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <div class="field-label">
+                                            <span>Količina</span>
+                                        </div>
+                                        <div class="field-value">10 kom</div>
+                                    </div>
+
+                                    <div class="field-group full-width">
+                                        <div class="field-label">
+                                            <span>Informacije</span>
+                                        </div>
+                                        <div class="field-value">
+                                            Standard metal drums, UN certified
+                                        </div>
+                                    </div>
+
+                                    <div class="field-group full-width">
+                                        <div class="field-label">
+                                            <span>Oznake</span>
+                                        </div>
+                                        <div class="field-value">
+                                            <span class="mark-badge">FLAMMABLE</span>
+                                            <span class="mark-badge">UN1202</span>
+                                            <span class="mark-badge">CLASS 3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="info-section">
+                            <h4 class="section-title">Dodatne informacije</h4>
+                            <div class="fields-grid">
+                                <div class="field-group full-width">
+                                    <div class="field-label">
+                                        <span>Informacije</span>
+                                    </div>
+                                    <div class="field-value">
+                                        Handle with care. Keep away from heat and open flames. Store in well-ventilated area.
+                                    </div>
+                                </div>
+
+                                <div class="field-group full-width">
+                                    <div class="field-label">
+                                        <span>Dopunske informacije</span>
+                                    </div>
+                                    <div class="field-value">
+                                        Driver must have ADR certificate. Vehicle must be equipped with fire extinguisher.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Note about additional cards -->
+            <div class="card" style="background: var(--bg); border: 2px dashed var(--line);">
+                <div class="card-body" style="text-align: center; color: var(--muted);">
+                    <p style="margin: 0; font-size: 13px;">
+                        <strong>Napomena:</strong> Ovo je primjer kako bi ADR kartica komplementirala postojeće eCMR polja.<br>
+                        Dodatne kartice (Delivery Events, Transport Movement, Risk Analysis, itd.) mogu se dodati na isti način.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

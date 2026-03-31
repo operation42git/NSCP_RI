@@ -1,0 +1,54 @@
+spring:
+  rabbitmq:
+    password: slo
+    username: slo
+    virtual-host: slo
+  datasource:
+    control:
+      liquibase:
+        default-schema: eftislo
+    identifiers:
+      liquibase:
+        default-schema: eftislo
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://auth.gate.slovenia.eu:8080/realms/eFTI_SLO
+  jpa:
+    properties:
+      hibernate:
+        control_schema: "eftislo"
+        identifiers_schema: "eftislo"
+
+gate:
+  owner: slovenia
+  country: SI
+  ap:
+    # Domibus is multi-domain: explicitly target the syldavia domain to ensure PartyId matching uses the correct PMode
+    url: http://efti.gate.syldavia.eu:81/domibus/services/wsPlugin?domain=syldavia
+    username: syldavia_service_account
+    password: Azerty59*1234567
+  platforms:
+    - platformId: "slovenia eFTI platform"
+      useRestApi: true
+      restApiBaseUrl: "http://platform-MASSIVE:8071/api/gate-api"  # Use MASSIVE platform simulator (Slovenia)
+  # Remote gates that can be accessed via direct REST API (bypassing Domibus)
+  remoteGates:
+    # Croatia gate (owner: "croatia", runs on efti-gate-HR:8880)
+    - gateId: "croatia"
+      useRestApi: true
+      restApiBaseUrl: "http://efti-gate-HR:8880"
+    # Austria/Listenbourg gate (owner: "listenbourg", runs on efti-gate-AT:8881)
+    - gateId: "listenbourg"
+      useRestApi: true
+      restApiBaseUrl: "http://efti-gate-AT:8881"
+
+efti:
+  control:
+    pending:
+      timeout: 120  # Increased timeout for Slovenia gate to allow for Domibus forwarding
+
+
+
+
